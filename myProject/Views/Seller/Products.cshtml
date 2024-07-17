@@ -343,26 +343,26 @@
             </div>
             <div class="modal-body">
                 <div class="container">
-                    <form method="post" action="@Url.Action("AddNewProduct", "Seller")" enctype="multipart/form-data">
+                    <form class="gap-1"  method="post" action="@Url.Action("AddNewProduct", "Seller")" enctype="multipart/form-data">
                         <div class="form-group">
-                            <label for="productName">Product Name:</label>
-                            <input type="text" class="form-control no-outline" id="productName" name="Name" required>
+                            <label for="productName" style="font-size:14px;">Product Name:</label>
+                            <input type="text" class="form-control no-outline" style="font-size:13px;" id="productName" name="Name" required>
                         </div>
                         <div class="form-group">
-                            <label for="productDescription">Product Description:</label>
-                            <textarea class="form-control no-outline" id="productDescription" name="Description" rows="3" required></textarea>
+                            <label for="productDescription" style="font-size:14px;">Product Description:</label>
+                            <textarea class="form-control no-outline" style="font-size:13px;" id="productDescription" name="Description" rows="3" required></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="productPrice">Price:</label>
-                            <input type="number" class="form-control no-outline" id="productPrice" name="Price" step="0.01" required>
+                            <label for="productPrice" style="font-size:14px;">Price:</label>
+                            <input type="number" class="form-control no-outline" style="font-size:13px;" id="productPrice" name="Price" step="0.01" required>
                         </div>
                         <div class="form-group">
-                            <label for="productStock">Stock Quantity:</label>
-                            <input type="number" class="form-control no-outline" id="productStock" name="Stock" required>
+                            <label for="productStock" style="font-size:14px;">Stock Quantity:</label>
+                            <input type="number" class="form-control no-outline" style="font-size:13px;" id="productStock" name="Stock" required>
                         </div>
                         <div class="form-group">
-                            <label for="productCategory">Category:</label>
-                            <select class="form-control no-outline" id="productCategory" name="Category" required>
+                            <label for="productCategory" style="font-size:14px;">Category:</label>
+                            <select class="form-control no-outline" style="font-size:13px;" id="productCategory" name="Category" required>
                                 <option value="">Select a category</option>
                                 <option value="table">Table</option>
                                 <option value="chair">Chair</option>
@@ -371,30 +371,34 @@
                                 <option value="wardrobe">Wardrobe</option>
                             </select>
                         </div>
-                        <div class="d-flex align-items-center">
-                            <label class="form-check-label" for="availabilityToggle">Show Product (Active):</label>
-                            <div class="form-check form-switch" style="margin-left:10px; margin-top:5px;">
-                                <input class="form-check-input" type="checkbox" id="availabilityToggle" name="Availability" value="available" checked>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <label class="form-check-label" style="font-size:14px;" for="availabilityToggle">Status (Active):</label>
+                                <div class="form-check form-switch" style="margin-left:10px; margin-top:5px;">
+                                    <input class="form-check-input" type="checkbox" id="availabilityToggle" name="isAvailable" value="available">
+                                </div>
+                            </div>
+
+                            <div class="form-group mt-3">
+                                <span style="margin-right:10px; font-size:14px;">Select Images:</span>
+                                <label for="productImages" class="btn btn-sm " style="border:1px solid black">
+                                    <i class="las la-file"></i>File
+                                    <input type="file" id="productImages" name="Images" multiple accept="image/*" style="display: none;">
+                                </label>
+                                <span id="file-selected-info"></span>
                             </div>
                         </div>
 
 
 
-                        <div class="form-group mt-3">
-                            <span style="margin-right:10px;">Select Images:</span>
-                            <label for="productImages" class="btn btn-sm btn-primary">
-                                <i class="las la-file"></i>File
-                                <input type="file" id="productImages" name="Images" multiple accept="image/*" style="display: none;">
-                            </label>
-                            <span id="file-selected-info"></span>
-                        </div>
+                        
                         <div class="image-preview mt-3 row gap-2">
                             <!-- Burada eklenen resimlerin listesi olacak -->
                             <div id="image-preview-container" class="d-flex flex-wrap">
                                 <!-- Eklenen resimler dinamik olarak burada listelenecek -->
                             </div>
                         </div>
-                        <div class="col-12 d-flex justify-content-end mt-3">
+                        <div class="col-12 d-flex justify-content-end">
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </form>
@@ -423,7 +427,7 @@
     }
 
     .form-group {
-        margin-bottom: 1rem;
+        margin-bottom: 10px;
     }
 
     .image-preview {
@@ -431,9 +435,9 @@
     }
 
     .image-preview img {
-        max-width: 100px; /* Önizleme resminin maksimum genişliği */
-        margin-right: 10px; /* Resimler arasındaki boşluk */
-        margin-bottom: 10px; /* Resimler ile alttaki form öğeleri arasındaki boşluk */
+        max-width: 100px;
+        margin-right: 10px;
+        margin-bottom: 10px; 
     }
 
     .dot {
@@ -445,20 +449,20 @@
     }
 
     .dot.dot-green {
-        background-color: #4CAF50; /* Yeşil */
+        background-color: #4CAF50; 
     }
 
     .dot.dot-red {
-        background-color: #F44336; /* Kırmızı */
+        background-color: #F44336; 
     }
 
     table th{
         font-size: 14px;
-        text-align: center; /* Metni ortala */
+        text-align: center;
     }
 
     table td{
-        text-align: center; /* Metni ortala */
+        text-align: center; 
         font-size: 13px;
     }
 
@@ -468,43 +472,48 @@
     }
 
     .full-star {
-        //color: #ffd700; /* Dolu yıldız rengi */
+        //color: #ffd700; 
     }
 
     .half-star {
-        color: #d3d3d3; /* Boş yıldız rengi */
+        color: #d3d3d3; 
         position: relative;
     }
 
     .half-star::before {
-        content: '\2605'; /* Dolu yıldız */
-        color: #000; /* Dolu yıldız rengi */
+        content: '\2605'; 
+        color: #000; 
         position: absolute;
         left: 0;
-        width: 55%; /* Yarım yıldız efekti */
+        width: 55%; 
         overflow: hidden;
     }
 
     .empty-star {
-        color: #d3d3d3; /* Boş yıldız rengi */
+        color: #d3d3d3;
     }
 
     .empty-star::before {
-        content: '\2605'; /* Dolu yıldız */
-        color: #000; /* Dolu yıldız rengi */
+        content: '\2605'; 
+        color: #000;
         position: absolute;
         overflow: hidden;
     }
 
     .favorite-heart {
-        color: #ff0000; /* Dolu kalp rengi */
+        color: #ff0000; 
     }
 
     .not-favorite-heart {
-        color: #d3d3d3; /* Boş kalp rengi */
+        color: #d3d3d3;
        
     }
 </style>
+
+
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
 
 
 <script>
@@ -530,9 +539,11 @@
                         // Render thumbnail
                         const imageSrc = e.target.result;
                         const imageElement = `
-                                <div class="image-item">
-                                    <img src="${imageSrc}" alt="Preview Image">
-                                    <button type="button" class="btn btn-sm btn-danger remove-image" style="display: block; margin-top: 5px;">Remove</button>
+                                <div class="image-item position-relative" style="display:inline-block;">
+                                        <img src="${imageSrc}" alt="Preview Image" style=" display: block; ">
+                                            <button type="button" class="btn btn-sm btn-danger remove-image position-absolute" style="border-radius: 100%;  bottom:0px; right:0px; border:none; cursor:pointer; width:30px; height:30px;">
+                                               <i class="las la-trash"></i>
+                                        </button>
                                 </div>
                             `;
                         $('#image-preview-container').append(imageElement);
@@ -616,5 +627,26 @@
         });
     });
 
+    /* ısAvailable check box için */
+    document.addEventListener('DOMContentLoaded', function () {
+        var checkbox = document.getElementById('availabilityToggle');
+        var isAvailableInput = document.querySelector('input[name="isAvailable"]');
+
+        // Checkbox durumu değiştiğinde dinamik olarak güncelle
+        checkbox.addEventListener('change', function () {
+            if (checkbox.checked) {
+                isAvailableInput.value = "available";
+            } else {
+                isAvailableInput.value = "unavailable";
+            }
+        });
+
+        // Sayfa yüklendiğinde checkbox durumunu kontrol et ve ilk değeri ayarla
+        if (checkbox.checked) {
+            isAvailableInput.value = "available";
+        } else {
+            isAvailableInput.value = "unavailable";
+        }
+    });
 </script>
 

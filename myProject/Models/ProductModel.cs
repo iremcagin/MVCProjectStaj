@@ -5,8 +5,8 @@ namespace myProject.Models
     public class ProductModel
     {
         public int ProductId { get; set; }
-        public int CompanyId { get; set; }  // foreign key
-        public List<string> Images { get; set; }
+        public int CompanyId { get; set; } = 0; // foreign key
+        public List<string> Images { get; set; } = new List<string>();
         public string Name { get; set; }
         public string Description { get; set; }
         
@@ -15,20 +15,14 @@ namespace myProject.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public String Category { get; set; }
 
-        public float Rating { get; set; }
+        public double Rating { get; set; } = 0;
         public int Favorite { get; set; } = 0;
-        public string isAvailable { get; set; } = "true";
-        public List<ProductReviewModel> Reviews { get; set; }  // reviewID
+        public string isAvailable { get; set; }
+        public List<ProductReviewModel> Reviews { get; set; } = new List<ProductReviewModel>();  // reviewID
 
 
 
-        public static void saveData(ProductModel newProduct)
-        {
-            Console.WriteLine("Images:");
-            foreach (var image in newProduct.Images)
-            {
-                Console.WriteLine($"- {image}");
-            }
-        }
+
+
     }
 }

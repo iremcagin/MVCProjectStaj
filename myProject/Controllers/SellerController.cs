@@ -12,159 +12,19 @@ namespace myProject.Controllers
 {
     public class SellerController : Microsoft.AspNetCore.Mvc.Controller
     {
-        private List<ProductModel> products = new List<ProductModel>
-    {
-        
-            new ProductModel
-            {
-                Name = "Product 1",
-                Description = "Description 1",
-                Price = 100.00m,
-                Stock = 10,
-                CreatedAt = DateTime.Now,
-                Category = "Category 1",
-                Rating = 4.5f,
-                Favorite = 1,
-                isAvailable = "false",
-                Images = new List<string> { "koltuk1.webp", "koltuk1_2.webp", "logo.png","user.jpg"},
-                Reviews = new List<ProductReviewModel> {
-                    new ProductReviewModel { ReviewId = 1, ProductId = 1, UserId = 1, Rating = 5, Review="çok güzel.", CreatedAt = DateTime.Now},
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="mükemmel." ,CreatedAt = DateTime.Now.AddDays(-1) },
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="bir beden büyük almanızı öneririm." ,CreatedAt = DateTime.Now.AddDays(-1) },
+        private readonly DatabaseControlModel databaseControlModel;
 
-                }
-            },
-             new ProductModel
-            {
-                Name = "Product 1",
-                Description = "Description 1",
-                Price = 100.00m,
-                Stock = 10,
-                CreatedAt = DateTime.Now,
-                Category = "Category 1",
-                Rating = 3f,
-                Favorite = 0,
-                Images = new List<string> { "koltuk1.webp", "koltuk1_2.webp", "logo.png","user.jpg"},
-                Reviews = new List<ProductReviewModel> {
-                    new ProductReviewModel { ReviewId = 1, ProductId = 1, UserId = 1, Rating = 5, Review="çok güzel.", CreatedAt = DateTime.Now },
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="mükemmel." ,CreatedAt = DateTime.Now.AddDays(-1) },
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="bir beden büyük almanızı öneririm." ,CreatedAt = DateTime.Now.AddDays(-1) },
 
-                }
-            },
-              new ProductModel
-            {
-                Name = "Product 1",
-                Description = "Description 1",
-                Price = 100.00m,
-                Stock = 10,
-                CreatedAt = DateTime.Now,
-                Category = "Category 1",
-                Rating = 3.5f,
-                Favorite = 0,
-                Images = new List<string> { "koltuk1.webp", "koltuk1_2.webp", "logo.png","user.jpg"},
-                Reviews = new List<ProductReviewModel> {
-                    new ProductReviewModel { ReviewId = 1, ProductId = 1, UserId = 1, Rating = 5, Review="çok güzel.", CreatedAt = DateTime.Now },
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="mükemmel." ,CreatedAt = DateTime.Now.AddDays(-1) },
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="bir beden büyük almanızı öneririm." ,CreatedAt = DateTime.Now.AddDays(-1) },
 
-                }
-            },
-               new ProductModel
-            {
-                Name = "Product 1",
-                Description = "Description 1",
-                Price = 100.00m,
-                Stock = 10,
-                CreatedAt = DateTime.Now,
-                Category = "Category 1",
-                Rating = 2f,
-                Favorite = 1,
-                Images = new List<string> { "koltuk1.webp", "koltuk1_2.webp", "logo.png","user.jpg"},
-                Reviews = new List<ProductReviewModel> {
-                    new ProductReviewModel { ReviewId = 1, ProductId = 1, UserId = 1, Rating = 5, Review="çok güzel.", CreatedAt = DateTime.Now },
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="mükemmel." ,CreatedAt = DateTime.Now.AddDays(-1) },
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="bir beden büyük almanızı öneririm." ,CreatedAt = DateTime.Now.AddDays(-1) },
+        /* --------------------------------------------------- Constructor --------------------------------------------------- */
+        public SellerController()
+        {
+            databaseControlModel = new DatabaseControlModel();
+        }
 
-                }
-            },
-                new ProductModel
-            {
-                Name = "Product 1",
-                Description = "Description 1",
-                Price = 100.00m,
-                Stock = 10,
-                CreatedAt = DateTime.Now,
-                Category = "Category 1",
-                Rating = 1.5f,
-                Favorite = 1,
-                Images = new List<string> { "koltuk1.webp", "koltuk1_2.webp", "logo.png","user.jpg"},
-                Reviews = new List<ProductReviewModel> {
-                    new ProductReviewModel { ReviewId = 1, ProductId = 1, UserId = 1, Rating = 5, Review="çok güzel.", CreatedAt = DateTime.Now },
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="mükemmel." ,CreatedAt = DateTime.Now.AddDays(-1) },
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="bir beden büyük almanızı öneririm." ,CreatedAt = DateTime.Now.AddDays(-1) },
 
-                }
-            },
-                 new ProductModel
-            {
-                Name = "Product 1",
-                Description = "Description 1",
-                Price = 100.00m,
-                Stock = 10,
-                CreatedAt = DateTime.Now,
-                Category = "Category 1",
-                Rating = 5,
-                Favorite = 1,
-                Images = new List<string> { "koltuk1.webp", "koltuk1_2.webp", "logo.png","user.jpg"},
-                Reviews = new List<ProductReviewModel> {
-                    new ProductReviewModel { ReviewId = 1, ProductId = 1, UserId = 1, Rating = 5, Review="çok güzel.", CreatedAt = DateTime.Now },
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="mükemmel." ,CreatedAt = DateTime.Now.AddDays(-1) },
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="bir beden büyük almanızı öneririm." ,CreatedAt = DateTime.Now.AddDays(-1) },
 
-                }
-            },
-                  new ProductModel
-            {
-                Name = "Product 1",
-                Description = "Description 1",
-                Price = 100.00m,
-                Stock = 10,
-                CreatedAt = DateTime.Now,
-                Category = "Category 1",
-                Rating = 5,
-                Favorite = 1,
-                Images = new List<string> { "koltuk1.webp", "koltuk1_2.webp", "logo.png","user.jpg"},
-                Reviews = new List<ProductReviewModel> {
-                    new ProductReviewModel { ReviewId = 1, ProductId = 1, UserId = 1, Rating = 5, Review="çok güzel.", CreatedAt = DateTime.Now },
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="mükemmel." ,CreatedAt = DateTime.Now.AddDays(-1) },
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="bir beden büyük almanızı öneririm." ,CreatedAt = DateTime.Now.AddDays(-1) },
-
-                },
-            },
-                         new ProductModel
-            {
-                Name = "test",
-                Description = "Black table for six people and can bigger",
-                Price = 100.00m,
-                Stock = 10,
-                CreatedAt = DateTime.Now,
-                Category = "Category 1",
-                Rating = 5,
-                Favorite = 1,
-                Images = new List<string> { "koltuk1.webp", "koltuk1_2.webp", "logo.png","user.jpg"},
-                Reviews = new List<ProductReviewModel> {
-                    new ProductReviewModel { ReviewId = 1, ProductId = 1, UserId = 1, Rating = 5, Review="çok güzel.", CreatedAt = DateTime.Now },
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="mükemmel." ,CreatedAt = DateTime.Now.AddDays(-1) },
-                    new ProductReviewModel { ReviewId = 2, ProductId = 1, UserId = 2, Rating = 4, Review="bir beden büyük almanızı öneririm." ,CreatedAt = DateTime.Now.AddDays(-1) },
-
-                }
-                         }
-
-        // Add more products as needed
-        };
-
-        /* Dashboard */
+        /* --------------------------------------------------- Dashboard Page --------------------------------------------------- */
         public IActionResult Index()
         {
             return View();
@@ -173,13 +33,13 @@ namespace myProject.Controllers
         /* --------------------------------------------------- Products Page --------------------------------------------------- */
         public IActionResult Products(List<ProductModel> products_ = null, int page = 1, int pageSize = 7)
         {
-            List<ProductModel> allProducts;
-
+            List<ProductModel> allProducts = new List<ProductModel>();
+            
             if (products_ == null)
             {
                 // Veri tabanından tüm ürünleri çek
-                //allProducts = _context.Products.ToList();
-                allProducts = products; // initial list 
+                allProducts = databaseControlModel.getAllProducts();
+               
             }
             else
             {
@@ -193,7 +53,7 @@ namespace myProject.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.AllProducts = allProducts;
 
-            return View(pagedProducts);
+            return View(pagedProducts); 
         }
 
 
@@ -201,31 +61,19 @@ namespace myProject.Controllers
         [HttpPost]
         public async Task<IActionResult> AddNewProduct(List<IFormFile> images, ProductModel model)
         {
+            try
             {
-                
-                var newProduct = new ProductModel
-                {
-                    Name = model.Name,
-                    Description = model.Description,
-                    Price = model.Price,
-                    Stock = model.Stock,
-                    CreatedAt = DateTime.Now,
-                    Category = model.Category,
-                    Rating = 0,
-                    Favorite = 0,
-                    isAvailable = model.isAvailable,
-                    Reviews = new List<ProductReviewModel>(),
-                    Images = new List<string>()
-                };
+                string availability = model.isAvailable;
+                if (availability == "available") model.isAvailable = "true";
+                else model.isAvailable = "false";   
 
 
-                
                 foreach (var image in images)
                 {
                     if (image != null && image.Length > 0)
                     {
                         // Kategoriye göre klasör oluşturma
-                        var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", newProduct.Category);
+                        var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", model.Category);
                         Directory.CreateDirectory(uploadPath);
 
                         // Dosya adını al
@@ -236,15 +84,16 @@ namespace myProject.Controllers
                         {
                             await image.CopyToAsync(fileStream);
                         }
-
-                        newProduct.Images.Add(fileName);
+                        model.Images.Add(fileName);
                     }
                 }
-                
-                ProductModel.saveData(newProduct);
+                databaseControlModel.saveProductToDatabase(model);
                 return RedirectToAction("Products");
-
-
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Failed to add product: " + ex.Message;
+                return RedirectToAction("Products");
             }
         }
 
