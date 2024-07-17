@@ -19,22 +19,104 @@
         box-shadow: none;
     }
 
+    #filterForm label{
+        font-size: 13px;
+        font-weight: 600;
+    }
+    #filterForm input,
+    #filterForm select {
+        font-size:13px;
+    }
 
+    #filterForm .form-control{
+        width:95px;
+    }
+
+    .filter-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+        display:flex;
+        justify-content:center;
+    }
+
+    .table-description:hover {
+        cursor: pointer;
+    }
 </style>
 
 
 <div class="container-fluid">
     <div class="row">
-        <div class="">
-            <form id="filterForm" class="d-flex">
-                <div class="form-group">
-                    <label for="searchInput" class="sr-only">Search</label>
-                    <input type="text" class="form-control form-control-sm no-outline" id="searchInput" placeholder="Search...">
-                </div>
-                <div class="form-check form-switch">
-                    <button type="button" id="applyFilter" class="btn btn-smaller btn-primary">Apply Filter</button>
-                </div>
-            </form>
+       
+        <div class="col-11" style="margin-top:-10px;">
+            
+            <div class="filter-card">
+
+                <form id="filterForm" class="d-flex flex-wrap align-items-start justify-content-center gap-2">
+                    <!-- Search Input -->
+                    <div class="form-group d-flex flex-column">
+                        <label for="searchInput" class="mr-2">Name</label>
+                        <input type="text" class="form-control form-control-sm no-outline me-2" id="searchInput" placeholder="Search...">
+                    </div>
+                    <!-- Price Filter -->
+                    <div class="form-group d-flex align-items-start flex-column">
+                        <label for="priceFilterMin" class="me-2">Price</label>
+                        <div class="d-flex flex-wrap">
+                            <input type="number" class="form-control form-control-sm no-outline mr-1" id="priceFilterMin" placeholder="Min Price">
+                            <input type="number" class="form-control form-control-sm no-outline" id="priceFilterMax" placeholder="Max Price">
+                        </div>
+                    </div>
+
+                    <!-- Stock Filter -->
+                    <div class="form-group d-flex align-items-start flex-column">
+                        <label for="stockFilterMin" class="mr-2">Stock</label>
+                        <div class="d-flex flex-wrap">
+                            <input type="number" class="form-control form-control-sm no-outline mr-1" id="stockFilterMin" placeholder="Min Stock">
+                            <input type="number" class="form-control form-control-sm no-outline" id="stockFilterMax" placeholder="Max Stock">
+                        </div>
+                    </div>
+
+                    <!-- Rating Filter -->
+                    <div class="form-group d-flex align-items-start flex-column">
+                        <label for="ratingFilterMin" class="mr-2">Rating</label>
+                        <div class="d-flex flex-wrap">
+                            <input type="number" class="form-control form-control-sm no-outline mr-1" id="ratingFilterMin" placeholder="Min Rating" step="0.1" min="0" max="5">
+                            <input type="number" class="form-control form-control-sm no-outline" id="ratingFilterMax" placeholder="Max Rating" step="0.1" min="0" max="5">
+                        </div>
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div class="form-group d-flex  flex-column">
+                        <label for="categoryFilter" class="mr-2">Category</label>
+                        <select class="form-control form-control-sm no-outline mr-2" id="categoryFilter">
+                            <option value="">Choose</option>
+                            <option value="Table">Table</option>
+                            <option value="Chair">Chair</option>
+                            <option value="Sofa">Sofa</option>
+                            <option value="Bed">Bed</option>
+                            <!-- Diğer kategoriler -->
+                        </select>
+
+                        
+                    </div>
+                    <div class="form-group d-flex  flex-column">
+                        <label for="statusFilter" class="mr-2">Status</label>
+                        <select class="form-control form-control-sm no-outline me-2" id="statusFilter">
+                            <option value="active" selected>Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-top:19px;">
+                        <!-- Apply Filter Button -->
+                        <button type="button" id="applyFilter" class="btn btn-smaller btn-primary">Apply Filter</button>
+                    </div>
+                </form>
+
+
+            </div>
         </div>
     </div>
 
@@ -42,7 +124,7 @@
 
 
     <!-- Tablo -->
-    <table class="table table-striped mt-2">
+    <table class="table table-striped mt-4">
         <thead>
             <tr>
                 <th>Images</th>
@@ -114,6 +196,8 @@
                         @product.Description
                         
                     </td>
+
+                    
 
                     <!-- Description Modal -->
                     <div class="modal fade " id="descriptionModal" tabindex="-1" role="dialog" aria-labelledby="descriptionModalLabel" aria-hidden="true">
@@ -241,7 +325,7 @@
         </nav>
 
         <!-- Ürün ekleme butonu -->
-        <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#addProductModal">
+        <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#addProductModal" style="margin-top:-20px;">
             Add Product
         </button>
     </div>
@@ -423,18 +507,6 @@
 </style>
 
 
-
-
-<!-- jQuery -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
-<!-- Popper.js (gerekiyorsa) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
-
-<!-- Bootstrap JS -->
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-
 <script>
 
 
@@ -491,36 +563,57 @@
         }
     }
 
-    /* Search için */
-    $(document).ready(function () {
+    /* Search ve filter için */
+    document.getElementById('applyFilter').addEventListener('click', function () {
+        const keyword = document.getElementById('searchInput').value.toLowerCase();
+        const maxPrice = document.getElementById('priceFilter').value;
+        const minStock = document.getElementById('stockFilter').value;
+        const category = document.getElementById('categoryFilter').value;
+        const minRating = document.getElementById('ratingFilter').value;
+        const favorite = document.getElementById('favoriteFilter').checked;
+        const status = document.getElementById('statusFilter').value;
 
-        var products = @Html.Raw(Json.Serialize(ViewBag.AllProducts));
-        console.log(products);
+        const rows = document.querySelectorAll('table tbody tr');
+        rows.forEach(row => {
+            const productName = row.querySelector('td:nth-child(1)').innerText.toLowerCase();
+            const productDescription = row.querySelector('td:nth-child(2)').innerText.toLowerCase();
+            const productPrice = parseFloat(row.querySelector('td:nth-child(4)').innerText);
+            const productStock = parseInt(row.querySelector('td:nth-child(5)').innerText);
+            const productCategory = row.querySelector('td:nth-child(6)').innerText;
+            const productRating = parseFloat(row.querySelector('td:nth-child(7)').innerText);
+            const productFavorite = row.querySelector('td:nth-child(8)').innerText === 'Yes';
+            const productStatus = row.querySelector('td:nth-child(9)').innerText;
 
-        // Arama kutusunda herhangi bir tuşa basıldığında
-        $('#searchInput').on('keyup', function () {
-            var keyword = $(this).val().toLowerCase();
-            filterProducts(keyword);
+            let isVisible = true;
+
+            if (keyword && !(productName.includes(keyword) || productDescription.includes(keyword))) {
+                isVisible = false;
+            }
+            if (maxPrice && productPrice > maxPrice) {
+                isVisible = false;
+            }
+            if (minStock && productStock < minStock) {
+                isVisible = false;
+            }
+            if (category && productCategory !== category) {
+                isVisible = false;
+            }
+            if (minRating && productRating < minRating) {
+                isVisible = false;
+            }
+            if (favorite && !productFavorite) {
+                isVisible = false;
+            }
+            if (status && productStatus !== status) {
+                isVisible = false;
+            }
+
+            if (isVisible) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
         });
-
-        // Ürünleri filtrelemek için fonksiyon
-        function filterProducts(keyword) {
-            // Her ürün satırını kontrol et
-            $('.product-row').each(function () {
-                var productName = $(this).find('td:nth-child(2)').text().toLowerCase();
-                var productDescription = $(this).find('td:nth-child(3)').text().toLowerCase();
-                var productCategory = $(this).find('td:nth-child(7)').text().toLowerCase();
-
-                // Arama terimini herhangi bir ürün özelliğinde içeriyorsa satırı göster, yoksa gizle
-                if (productName.includes(keyword) ||
-                    productDescription.includes(keyword) ||
-                    productCategory.includes(keyword)) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
-        }
     });
 
 </script>

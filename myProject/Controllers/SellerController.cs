@@ -171,12 +171,28 @@ namespace myProject.Controllers
         }
 
         /* --------------------------------------------------- Products Page --------------------------------------------------- */
-        public IActionResult Products(int page = 1, int pageSize = 7)
+        public IActionResult Products(List<ProductModel> products_ = null, int page = 1, int pageSize = 7)
         {
-            var pagedProducts = products.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-            ViewBag.TotalPages = (int)Math.Ceiling((double)products.Count / pageSize);
+            List<ProductModel> allProducts;
+
+            if (products_ == null)
+            {
+                // Veri tabanından tüm ürünleri çek
+                //allProducts = _context.Products.ToList();
+                allProducts = products; // initial list 
+            }
+            else
+            {
+                // Arama sonucu ile gelen ürünleri kullan
+                allProducts = products_;
+            }
+
+            // Sayfalama işlemleri
+            var pagedProducts = allProducts.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            ViewBag.TotalPages = (int)Math.Ceiling((double)allProducts.Count / pageSize);
             ViewBag.CurrentPage = page;
-            ViewBag.AllProducts = products;
+            ViewBag.AllProducts = allProducts;
+
             return View(pagedProducts);
         }
 
@@ -197,7 +213,7 @@ namespace myProject.Controllers
                     Category = model.Category,
                     Rating = 0,
                     Favorite = 0,
-                    isAvailable = "true",
+                    isAvailable = model.isAvailable,
                     Reviews = new List<ProductReviewModel>(),
                     Images = new List<string>()
                 };
