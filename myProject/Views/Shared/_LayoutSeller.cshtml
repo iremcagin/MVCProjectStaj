@@ -13,10 +13,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Playwrite+PE:wght@100..400&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playwrite+PE:wght@100..400&family=Poppins&display=swap" rel="stylesheet">
 </head>
-<body>
+<body style="overflow:hidden;">
    
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light box-shadow2 px-4 rounded">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light box-shadow2 px-3 rounded">
             <div class="container-fluid">
                 <a class="navbar-brand text-center" style="display:flex; align-items:center;" asp-area="" asp-controller="Seller" asp-action="Index">
                     <!--div class="poppins text-center" style="color:#fefefe; width:50px; height:50px;">
@@ -31,13 +31,14 @@
 
                 <!--h6 style=" font-family: "Poppins", sans-serif;">Seller Management System</!--h6-->
 
-                <div class="satici-info rounded" style="display:flex; align-items:center;">
+                <div class="satici-info" style="display:flex; align-items:center;">
+                    <div style="width:25px;"></div>
                     <!-- Sol tarafta resim --> 
                     <div class="poppins text-center" style="color:#fefefe; width:45px; height:45px;">
                         <img src="~/images/user.jpg" class="img-fluid rounded-circle" alt="image">
                     </div>
                     <!-- Sağ tarafta mağaza adı ve satıcı ismi -->
-                    <div class=" " style="margin-left:10px; margin-right:5px; justify-content:center;" >
+                    <div class=" " style="margin-left:10px; margin-right:5px; justify-content:center;">
                         <h6 class="poppins" style="color:#fefefe;  margin-top:3px; margin-bottom:-1px;">Mağaza Adı</h6>
                         <h6 class="poppins" style="color:#fefefe; font-size:13px;">Satıcı İsmi</h6>
                     </div>
@@ -65,10 +66,10 @@
     </header>
     
     
-    <div class="container-fluid">
+    <div class="container-fluid" >
         <div class="row px-2">
             <!-- Sidebar -->
-            <nav class="col-md-2 d-md-block sidebar" style="overflow-y:scroll; box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.2);">
+            <nav class="col-md-2 d-md-block sidebar" style="height:100vh; overflow-y:scroll; box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.2);">
                 <div class="sidebar-sticky" >
                     <ul class="nav flex-column">
                         <li class="nav-item rounded mt-3 @(ViewContext.RouteData.Values["Controller"].ToString() == "Seller" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
@@ -76,9 +77,9 @@
                                 <i class="las la-tachometer-alt"></i> Dashboard
                             </a>
                         </li>
-                        <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Seller" && ViewContext.RouteData.Values["Action"].ToString() == "Followers" ? "active" : "")">
-                            <a class="nav-link" asp-area="" asp-controller="Seller" asp-action="Followers">
-                                <i class="las la-users"></i> Followers
+                        <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Seller" && ViewContext.RouteData.Values["Action"].ToString() == "Customers" ? "active" : "")">
+                            <a class="nav-link" asp-area="" asp-controller="Seller" asp-action="Customers">
+                                <i class="las la-users"></i> Customers  <!-- beğeniler, takipçiler, ürün sepette olanlar, comments  -->
                             </a>
                         </li>
                         <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Seller" && ViewContext.RouteData.Values["Action"].ToString() == "Products" ? "active" : "")">
@@ -92,14 +93,14 @@
                             </a>
                         </li>
                        
-                        <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Seller" && ViewContext.RouteData.Values["Action"].ToString() == "Comments" ? "active" : "")">
+                        
+                       
+                        <!--li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Seller" && ViewContext.RouteData.Values["Action"].ToString() == "Comments" ? "active" : "")">
                             <a class="nav-link" asp-area="" asp-controller="Seller" asp-action="Comments">
                                 <i class="las la-comments"></i> Comments
                             </a>
-                        </li>
-                        <li>
-                            <a></a>
-                        </li>
+                        </!--li-->
+                        
                        
                        
                     </ul>
@@ -108,7 +109,7 @@
             </nav>
 
             <!-- Main content -->
-            <main role="main" class="col-md-10 ml-sm-auto col-lg-10 px-4 mt-4 ">
+            <main role="main" class="col-md-10 ml-sm-auto col-lg-10 px-4 mt-4">
                 @RenderBody()
             </main>
         </div>

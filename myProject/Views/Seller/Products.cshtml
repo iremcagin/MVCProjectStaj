@@ -1,0 +1,527 @@
+﻿@model List<myProject.Models.ProductModel>
+
+@{
+    ViewData["Title"] = "Products";
+    Layout = "~/Views/Shared/_LayoutSeller.cshtml";
+    int totalPages = ViewBag.TotalPages;
+    int currentPage = ViewBag.CurrentPage;
+
+}
+
+<style>
+    .btn-smaller {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .no-outline:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+
+</style>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="">
+            <form id="filterForm" class="d-flex">
+                <div class="form-group">
+                    <label for="searchInput" class="sr-only">Search</label>
+                    <input type="text" class="form-control form-control-sm no-outline" id="searchInput" placeholder="Search...">
+                </div>
+                <div class="form-check form-switch">
+                    <button type="button" id="applyFilter" class="btn btn-smaller btn-primary">Apply Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+
+    <!-- Tablo -->
+    <table class="table table-striped mt-2">
+        <thead>
+            <tr>
+                <th>Images</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Created At</th>
+                <th>Category</th>
+                <th>Rating</th>
+                <th>Favorite</th>
+                <th>Reviews</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="productTableBody">
+            <!-- Tablo içeriği burada dinamik olarak oluşturulacak -->
+            @foreach (var product in Model)
+            {
+                <tr class="product-row">
+                    <td>
+                        <!-- Sadece ilk resmi gösteren Carousel bileşeni -->
+                        <div id="carousel-@product.ProductId" class="carousel slide" data-ride="carousel">
+                            <div class="carousel-inner">
+                                <div class="carousel-item active">
+                                    <a href="#" data-toggle="modal" data-target="#imageModal">
+                                        <img src="@Url.Content("~/images/" + product.Images[0])" alt="@product.Name" class="d-block w-100 card-img " style="width: 90px; height: 45px;" />
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <!-- Modal penceresi -->
+                    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="imageModalLabel">@product.Name</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div id="carouselImages" class="carousel slide" data-ride="false">
+                                        <div class="carousel-inner">
+                                            @foreach (var image in product.Images)
+                                            {
+                                                <div class="carousel-item @(image == product.Images[0] ? "active" : "")">
+                                                    <img src="@Url.Content("~/images/" + image)" alt="@product.Name" class="d-block w-100 img-fluid img-thumbnail" style="object-fit: contain; max-height: 450px;" />
+                                                </div>
+                                            }
+                                        </div>
+                                        <a class="carousel-control-prev" href="#carouselImages" role="button" data-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="sr-only">Previous</span>
+                                        </a>
+                                        <a class="carousel-control-next" href="#carouselImages" role="button" data-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="sr-only">Next</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <td>@product.Name</td>
+                    <td class="table-description" onclick="showFullDescription('@product.Description')"  style=" white-space: nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 20px;">
+                        @product.Description
+                        
+                    </td>
+
+                    <!-- Description Modal -->
+                    <div class="modal fade " id="descriptionModal" tabindex="-1" role="dialog" aria-labelledby="descriptionModalLabel" aria-hidden="true">
+                        <div class="modal-dialog  modal-dialog-centered " role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h6 class="modal-title" id="descriptionModalLabel">Description</h6>
+                                </div>
+                                <div class="modal-body">
+                                    <p id="modalDescription"  style="font-size:15px;"></p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <td>$@product.Price</td>
+                    <td>@product.Stock</td>
+                    <td>@product.CreatedAt.ToShortDateString()</td>
+                    <td>@product.Category</td>
+                   <td>
+                        @if (@product.Rating >= 0 && @product.Rating <= 5)
+                        {
+                           
+                            var fullStars = (int)Math.Floor(@product.Rating);
+                            var halfStar = (@product.Rating - fullStars) >= 0.5;
+                            // Boş yıldızların sayısı
+                            var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+                            for (int i = 0; i < fullStars; i++)
+                            {
+                                <span class="star full-star">&#9733;</span>
+                            }
+
+                            if (halfStar)
+                            {
+                                <span class="star half-star">&#9733;</span>
+                            }
+
+                            for (int i = 0; i < emptyStars; i++)
+                            {
+                                <span class="star">&#9734;</span>
+                            }
+                        }
+
+                    </td>
+
+
+                    <td>
+                        <span class="favorite ">
+                            <span class="favorite-count">@product.Favorite</span>
+                            @if (@product.Favorite>0)
+                            {
+                                <span class="favorite-heart">&#9829;</span> 
+                            }
+                            else
+                            {
+                                <span class="not-favorite-heart">&#9825;</span> 
+                            }
+                            
+                        </span>
+                    </td>
+
+
+                    <td>
+                        @product.Reviews.Count
+                        <button type="button" class="btn btn-sm" style="font-size:15px; margin-top:-2px; margin-left:-7px;" data-toggle="modal" data-target="#reviewModal-@product.ProductId">
+                            <i class="las la-comment-dots"></i>
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="reviewModal-@product.ProductId" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h6 class="modal-title" id="reviewModalLabel">Reviews for @product.Name</h6>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        @foreach (var review in product.Reviews)
+                                        {
+                                            <div class="mb-2" style="border-bottom:1px solid black">
+                                                <span>@review.Review</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        @if (product.isAvailable == "true")
+                        {
+                            <span class="text-success align-items-center">
+                                <span class="dot dot-green mr-2"></span>
+                                <span>Active</span>
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-danger align-items-center">
+                                <span class="dot dot-red mr-2"></span>
+                                <span>Inactive</span>
+                            </span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between align-items-center">
+        <!-- Page Navigation -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm">
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Products", "Seller", new { page = i })">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+
+        <!-- Ürün ekleme butonu -->
+        <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#addProductModal">
+            Add Product
+        </button>
+    </div>
+</div>
+
+<!-- Modal for adding product -->
+<div class="modal fade" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="addProductModalLabel">Add New Product</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <form method="post" action="@Url.Action("AddNewProduct", "Seller")" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="productName">Product Name:</label>
+                            <input type="text" class="form-control no-outline" id="productName" name="Name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productDescription">Product Description:</label>
+                            <textarea class="form-control no-outline" id="productDescription" name="Description" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="productPrice">Price:</label>
+                            <input type="number" class="form-control no-outline" id="productPrice" name="Price" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productStock">Stock Quantity:</label>
+                            <input type="number" class="form-control no-outline" id="productStock" name="Stock" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productCategory">Category:</label>
+                            <select class="form-control no-outline" id="productCategory" name="Category" required>
+                                <option value="">Select a category</option>
+                                <option value="table">Table</option>
+                                <option value="chair">Chair</option>
+                                <option value="bed">Bed</option>
+                                <option value="sofa">Sofa</option>
+                                <option value="wardrobe">Wardrobe</option>
+                            </select>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <label class="form-check-label" for="availabilityToggle">Show Product (Active):</label>
+                            <div class="form-check form-switch" style="margin-left:10px; margin-top:5px;">
+                                <input class="form-check-input" type="checkbox" id="availabilityToggle" name="Availability" value="available" checked>
+                            </div>
+                        </div>
+
+
+
+                        <div class="form-group mt-3">
+                            <span style="margin-right:10px;">Select Images:</span>
+                            <label for="productImages" class="btn btn-sm btn-primary">
+                                <i class="las la-file"></i>File
+                                <input type="file" id="productImages" name="Images" multiple accept="image/*" style="display: none;">
+                            </label>
+                            <span id="file-selected-info"></span>
+                        </div>
+                        <div class="image-preview mt-3 row gap-2">
+                            <!-- Burada eklenen resimlerin listesi olacak -->
+                            <div id="image-preview-container" class="d-flex flex-wrap">
+                                <!-- Eklenen resimler dinamik olarak burada listelenecek -->
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex justify-content-end mt-3">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<style>
+    .btn:focus,
+    .btn:active {
+        box-shadow: none;
+        outline: none;
+    }
+
+    /* Reset default outline */
+    input:focus,
+    textarea:focus,
+    select:focus {
+        box-shadow: none;
+        outline: none;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .image-preview {
+        margin-top: 1rem;
+    }
+
+    .image-preview img {
+        max-width: 100px; /* Önizleme resminin maksimum genişliği */
+        margin-right: 10px; /* Resimler arasındaki boşluk */
+        margin-bottom: 10px; /* Resimler ile alttaki form öğeleri arasındaki boşluk */
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-left: 5px;
+    }
+
+    .dot.dot-green {
+        background-color: #4CAF50; /* Yeşil */
+    }
+
+    .dot.dot-red {
+        background-color: #F44336; /* Kırmızı */
+    }
+
+    table th{
+        font-size: 14px;
+        text-align: center; /* Metni ortala */
+    }
+
+    table td{
+        text-align: center; /* Metni ortala */
+        font-size: 13px;
+    }
+
+    .star {
+        font-size: 13px;
+        margin-right:-2px;
+    }
+
+    .full-star {
+        //color: #ffd700; /* Dolu yıldız rengi */
+    }
+
+    .half-star {
+        color: #d3d3d3; /* Boş yıldız rengi */
+        position: relative;
+    }
+
+    .half-star::before {
+        content: '\2605'; /* Dolu yıldız */
+        color: #000; /* Dolu yıldız rengi */
+        position: absolute;
+        left: 0;
+        width: 55%; /* Yarım yıldız efekti */
+        overflow: hidden;
+    }
+
+    .empty-star {
+        color: #d3d3d3; /* Boş yıldız rengi */
+    }
+
+    .empty-star::before {
+        content: '\2605'; /* Dolu yıldız */
+        color: #000; /* Dolu yıldız rengi */
+        position: absolute;
+        overflow: hidden;
+    }
+
+    .favorite-heart {
+        color: #ff0000; /* Dolu kalp rengi */
+    }
+
+    .not-favorite-heart {
+        color: #d3d3d3; /* Boş kalp rengi */
+       
+    }
+</style>
+
+
+
+
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<!-- Popper.js (gerekiyorsa) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+<script>
+
+
+    const maxImages = 4;
+
+    $(document).ready(function () {
+        // File input change event
+        $('#productImages').on('change', function () {
+            const files = $(this)[0].files;
+
+            // Iterate through selected files
+            for (let i = 0; i < files.length; i++) {
+                if (i >= maxImages) break; // Limit to maxImages
+
+                // Create FileReader instance for each file
+                const reader = new FileReader();
+
+                // Closure to capture the file information
+                reader.onload = (function (file) {
+                    return function (e) {
+                        // Render thumbnail
+                        const imageSrc = e.target.result;
+                        const imageElement = `
+                                <div class="image-item">
+                                    <img src="${imageSrc}" alt="Preview Image">
+                                    <button type="button" class="btn btn-sm btn-danger remove-image" style="display: block; margin-top: 5px;">Remove</button>
+                                </div>
+                            `;
+                        $('#image-preview-container').append(imageElement);
+
+                        // Remove image event
+                        $('.remove-image').on('click', function () {
+                            $(this).parent().remove();
+                        });
+                    };
+                })(files[i]);
+
+                // Read in the image file as a data URL
+                reader.readAsDataURL(files[i]);
+            }
+        });
+    });
+
+    /* Desciption modalı */
+    function showFullDescription(description) {
+        document.getElementById('modalDescription').innerText = description;
+        $('#descriptionModal').modal('show');
+    }
+
+    function limitImageSelection(input) {
+        if (input.files.length > 4) {
+            alert("You can only select up to 4 images.");
+            input.value = ''; // Clear the selected files
+        }
+    }
+
+    /* Search için */
+    $(document).ready(function () {
+
+        var products = @Html.Raw(Json.Serialize(ViewBag.AllProducts));
+        console.log(products);
+
+        // Arama kutusunda herhangi bir tuşa basıldığında
+        $('#searchInput').on('keyup', function () {
+            var keyword = $(this).val().toLowerCase();
+            filterProducts(keyword);
+        });
+
+        // Ürünleri filtrelemek için fonksiyon
+        function filterProducts(keyword) {
+            // Her ürün satırını kontrol et
+            $('.product-row').each(function () {
+                var productName = $(this).find('td:nth-child(2)').text().toLowerCase();
+                var productDescription = $(this).find('td:nth-child(3)').text().toLowerCase();
+                var productCategory = $(this).find('td:nth-child(7)').text().toLowerCase();
+
+                // Arama terimini herhangi bir ürün özelliğinde içeriyorsa satırı göster, yoksa gizle
+                if (productName.includes(keyword) ||
+                    productDescription.includes(keyword) ||
+                    productCategory.includes(keyword)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+    });
+
+</script>
+
