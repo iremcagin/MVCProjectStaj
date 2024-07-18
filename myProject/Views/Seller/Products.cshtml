@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Products";
     Layout = "~/Views/Shared/_LayoutSeller.cshtml";
+    var allProducts = ViewBag.AllProducts as List<ProductModel>;
     int totalPages = ViewBag.TotalPages;
     int currentPage = ViewBag.CurrentPage;
 
@@ -141,172 +142,184 @@
             </tr>
         </thead>
         <tbody id="productTableBody">
-            <!-- Tablo içeriği burada dinamik olarak oluşturulacak -->
-            @foreach (var product in Model)
+            @if (Model != null && Model.Any())
             {
-                <tr class="product-row">
-                    <td>
-                        <!-- Sadece ilk resmi gösteren Carousel bileşeni -->
-                        <div id="carousel-@product.ProductId" class="carousel slide" data-ride="carousel">
-                            <div class="carousel-inner">
-                                <div class="carousel-item active">
-                                    <a href="#" data-toggle="modal" data-target="#imageModal">
-                                        <img src="@Url.Content("~/images/" + product.Images[0])" alt="@product.Name" class="d-block w-100 card-img " style="width: 90px; height: 45px;" />
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <!-- Modal penceresi -->
-                    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="imageModalLabel">@product.Name</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <div id="carouselImages" class="carousel slide" data-ride="false">
-                                        <div class="carousel-inner">
-                                            @foreach (var image in product.Images)
-                                            {
-                                                <div class="carousel-item @(image == product.Images[0] ? "active" : "")">
-                                                    <img src="@Url.Content("~/images/" + image)" alt="@product.Name" class="d-block w-100 img-fluid img-thumbnail" style="object-fit: contain; max-height: 450px;" />
-                                                </div>
-                                            }
-                                        </div>
-                                        <a class="carousel-control-prev" href="#carouselImages" role="button" data-slide="prev">
-                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                            <span class="sr-only">Previous</span>
-                                        </a>
-                                        <a class="carousel-control-next" href="#carouselImages" role="button" data-slide="next">
-                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                            <span class="sr-only">Next</span>
-                                        </a>
+                <!-- Tablo içeriği burada dinamik olarak oluşturulacak -->
+                @foreach (var product in Model)
+                {
+                    <tr class="product-row">
+                        <td>
+                            <!-- Sadece ilk resmi gösteren Carousel bileşeni -->
+                            <div id="carousel-@product.ProductId" class="carousel slide" data-ride="carousel">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        @if (product.Images.Count > 0)
+                                        {
+                                            <a href="#" data-toggle="modal" data-target="#imageModal">
+                                                <img src="@Url.Content("~/images/" + product.Images[0])" alt="@product.Name" class="d-block w-100 card-img" style="width: 90px; height: 45px;" />
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <img src="~/images/placeholder-1.png"
+                                                 alt="@product.Name" class="d-block card-img" style="width: 70px; height: 45px; margin-left:45px;" />
+                                        }
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </td>
 
-                    <td>@product.Name</td>
-                    <td class="table-description" onclick="showFullDescription('@product.Description')"  style=" white-space: nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 20px;">
-                        @product.Description
-                        
-                    </td>
-
-                    
-
-                    <!-- Description Modal -->
-                    <div class="modal fade " id="descriptionModal" tabindex="-1" role="dialog" aria-labelledby="descriptionModalLabel" aria-hidden="true">
-                        <div class="modal-dialog  modal-dialog-centered " role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h6 class="modal-title" id="descriptionModalLabel">Description</h6>
-                                </div>
-                                <div class="modal-body">
-                                    <p id="modalDescription"  style="font-size:15px;"></p>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <td>$@product.Price</td>
-                    <td>@product.Stock</td>
-                    <td>@product.CreatedAt.ToShortDateString()</td>
-                    <td>@product.Category</td>
-                   <td>
-                        @if (@product.Rating >= 0 && @product.Rating <= 5)
-                        {
-                           
-                            var fullStars = (int)Math.Floor(@product.Rating);
-                            var halfStar = (@product.Rating - fullStars) >= 0.5;
-                            // Boş yıldızların sayısı
-                            var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-
-                            for (int i = 0; i < fullStars; i++)
-                            {
-                                <span class="star full-star">&#9733;</span>
-                            }
-
-                            if (halfStar)
-                            {
-                                <span class="star half-star">&#9733;</span>
-                            }
-
-                            for (int i = 0; i < emptyStars; i++)
-                            {
-                                <span class="star">&#9734;</span>
-                            }
-                        }
-
-                    </td>
-
-
-                    <td>
-                        <span class="favorite ">
-                            <span class="favorite-count">@product.Favorite</span>
-                            @if (@product.Favorite>0)
-                            {
-                                <span class="favorite-heart">&#9829;</span> 
-                            }
-                            else
-                            {
-                                <span class="not-favorite-heart">&#9825;</span> 
-                            }
-                            
-                        </span>
-                    </td>
-
-
-                    <td>
-                        @product.Reviews.Count
-                        <button type="button" class="btn btn-sm" style="font-size:15px; margin-top:-2px; margin-left:-7px;" data-toggle="modal" data-target="#reviewModal-@product.ProductId">
-                            <i class="las la-comment-dots"></i>
-                        </button>
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="reviewModal-@product.ProductId" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                        <!-- Modal penceresi -->
+                        <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h6 class="modal-title" id="reviewModalLabel">Reviews for @product.Name</h6>
+                                        <h5 class="modal-title" id="imageModalLabel">@product.Name</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        @foreach (var review in product.Reviews)
-                                        {
-                                            <div class="mb-2" style="border-bottom:1px solid black">
-                                                <span>@review.Review</span>
+                                        <div id="carouselImages" class="carousel slide" data-ride="false">
+                                            <div class="carousel-inner">
+                                                @foreach (var image in product.Images)
+                                                {
+                                                    <div class="carousel-item @(image == product.Images[0] ? "active" : "")">
+                                                        <img src="@Url.Content("~/images/" + image)" alt="@product.Name" class="d-block w-100 img-fluid img-thumbnail" style="object-fit: contain; max-height: 450px;" />
+                                                    </div>
+                                                }
                                             </div>
-                                        }
+                                            <a class="carousel-control-prev" href="#carouselImages" role="button" data-slide="prev">
+                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                <span class="sr-only">Previous</span>
+                                            </a>
+                                            <a class="carousel-control-next" href="#carouselImages" role="button" data-slide="next">
+                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                <span class="sr-only">Next</span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </td>
-                    <td>
-                        @if (product.isAvailable == "true")
-                        {
-                            <span class="text-success align-items-center">
-                                <span class="dot dot-green mr-2"></span>
-                                <span>Active</span>
+
+                        <td>@product.Name</td>
+                        <td class="table-description" onclick="showFullDescription('@product.Description')"  style=" white-space: nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 20px;">
+                            @product.Description
+                        
+                        </td>
+
+                    
+
+                        <!-- Description Modal -->
+                        <div class="modal fade " id="descriptionModal" tabindex="-1" role="dialog" aria-labelledby="descriptionModalLabel" aria-hidden="true">
+                            <div class="modal-dialog  modal-dialog-centered " role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h6 class="modal-title" id="descriptionModalLabel">Description</h6>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p id="modalDescription"  style="font-size:15px;"></p>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <td>$@product.Price</td>
+                        <td>@product.Stock</td>
+                        <td>@product.CreatedAt.ToShortDateString()</td>
+                        <td>@product.Category</td>
+                       <td>
+                            @if (@product.Rating >= 0 && @product.Rating <= 5)
+                            {
+                           
+                                var fullStars = (int)Math.Floor(@product.Rating);
+                                var halfStar = (@product.Rating - fullStars) >= 0.5;
+                                // Boş yıldızların sayısı
+                                var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+                                for (int i = 0; i < fullStars; i++)
+                                {
+                                    <span class="star full-star">&#9733;</span>
+                                }
+
+                                if (halfStar)
+                                {
+                                    <span class="star half-star">&#9733;</span>
+                                }
+
+                                for (int i = 0; i < emptyStars; i++)
+                                {
+                                    <span class="star">&#9734;</span>
+                                }
+                            }
+
+                        </td>
+
+
+                        <td>
+                            <span class="favorite ">
+                                <span class="favorite-count">@product.Favorite</span>
+                                @if (@product.Favorite>0)
+                                {
+                                    <span class="favorite-heart">&#9829;</span> 
+                                }
+                                else
+                                {
+                                    <span class="not-favorite-heart">&#9825;</span> 
+                                }
+                            
                             </span>
-                        }
-                        else
-                        {
-                            <span class="text-danger align-items-center">
-                                <span class="dot dot-red mr-2"></span>
-                                <span>Inactive</span>
-                            </span>
-                        }
-                    </td>
-                </tr>
+                        </td>
+
+
+                        <td>
+                            @product.Reviews.Count
+                            <button type="button" class="btn btn-sm" style="font-size:15px; margin-top:-2px; margin-left:-7px;" data-toggle="modal" data-target="#reviewModal-@product.ProductId">
+                                <i class="las la-comment-dots"></i>
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="reviewModal-@product.ProductId" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h6 class="modal-title" id="reviewModalLabel">Reviews for @product.Name</h6>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            @foreach (var review in product.Reviews)
+                                            {
+                                                <div class="mb-2" style="border-bottom:1px solid black">
+                                                    <span>@review.Review</span>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            @if (product.isAvailable == "true")
+                            {
+                                <span class="text-success align-items-center">
+                                    <span class="dot dot-green mr-2"></span>
+                                    <span>Active</span>
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-danger align-items-center">
+                                    <span class="dot dot-red mr-2"></span>
+                                    <span>Inactive</span>
+                                </span>
+                            }
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>

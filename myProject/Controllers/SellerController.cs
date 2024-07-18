@@ -33,13 +33,12 @@ namespace myProject.Controllers
         /* --------------------------------------------------- Products Page --------------------------------------------------- */
         public IActionResult Products(List<ProductModel> products_ = null, int page = 1, int pageSize = 7)
         {
-            List<ProductModel> allProducts = new List<ProductModel>();
+            List<ProductModel> allProducts;
             
             if (products_ == null)
             {
                 // Veri tabanından tüm ürünleri çek
                 allProducts = databaseControlModel.getAllProducts();
-               
             }
             else
             {
@@ -47,13 +46,14 @@ namespace myProject.Controllers
                 allProducts = products_;
             }
 
+            
             // Sayfalama işlemleri
             var pagedProducts = allProducts.Skip((page - 1) * pageSize).Take(pageSize).ToList();
             ViewBag.TotalPages = (int)Math.Ceiling((double)allProducts.Count / pageSize);
             ViewBag.CurrentPage = page;
             ViewBag.AllProducts = allProducts;
 
-            return View(pagedProducts); 
+            return View(pagedProducts);  
         }
 
 

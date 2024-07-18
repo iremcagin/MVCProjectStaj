@@ -7,12 +7,11 @@ namespace myProject.Models
     public class DatabaseControlModel
     {
         private SqlConnection conn;
-        //private SqlDataReader reader;
+        private string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\iremc\OneDrive\Documents\myProjectDatabase.mdf;Integrated Security=True;Connect Timeout=30";
 
 
         public DatabaseControlModel() {
-            string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\iremc\OneDrive\Documents\myProjectDatabase.mdf;Integrated Security=True;Connect Timeout=30";
-            conn = new SqlConnection(connectionString);
+            
          
         }
 
@@ -23,7 +22,7 @@ namespace myProject.Models
            
             int productId = 0;
 
-            using (conn)
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
                 Console.WriteLine("Connection Opened.");
@@ -93,63 +92,77 @@ namespace myProject.Models
         {
             List<ProductModel> products = new List<ProductModel>();
 
-            using (conn)
+            try
             {
-                try
+                // İlk bağlantıyı açarak ürünleri okuyun
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    string query = @"
-                                    SELECT p.ProductId, p.CompanyId, p.Name, p.Description, p.Price, p.Stock, p.CreatedAt, p.Category, p.Rating, p.Favorite, p.isAvailable, pi.ImageURL
-                                    FROM Products p
-                                    LEFT JOIN ProductImages pi ON p.ProductId = pi.ProductId";
-
-                        using (SqlCommand cmd = new SqlCommand(query, conn))
+                    string productQuery = "SELECT * FROM Products";
+                    using (SqlCommand cmd = new SqlCommand(productQuery, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            SqlDataReader reader = cmd.ExecuteReader();
-
                             while (reader.Read())
                             {
-                                int productId = (int)reader["ProductId"];
-                                ProductModel product = products.FirstOrDefault(p => p.ProductId == productId);
-                                if (product == null)
+                                ProductModel product = new ProductModel
                                 {
-                                    product = new ProductModel
-                                    {
-                                        ProductId = productId,
-                                        CompanyId = (int)reader["CompanyId"],
-                                        Name = reader["Name"].ToString(),
-                                        Description = reader["Description"].ToString(),
-                                        Price = (decimal)reader["Price"],
-                                        Stock = (int)reader["Stock"],
-                                        CreatedAt = (DateTime)reader["CreatedAt"],
-                                        Category = reader["Category"].ToString(),
-                                        Rating = (double)reader["Rating"],
-                                        Favorite = (int)reader["Favorite"],
-                                        isAvailable = reader["isAvailable"].ToString(),
-                                        Images = new List<string>()
-                                    };
-                                    products.Add(product);
-                                }
-
-                                // Her bir resmi Images listesine ekle
-                                if (reader["ImageURL"] != DBNull.Value)
-                                {
-                                    product.Images.Add(reader["ImageURL"].ToString());
-                                }
+                                    ProductId = (int)reader["ProductId"],
+                                    CompanyId = (int)reader["CompanyId"],
+                                    Name = reader["Name"].ToString(),
+                                    Description = reader["Description"].ToString(),
+                                    Price = (decimal)reader["Price"],
+                                    Stock = (int)reader["Stock"],
+                                    CreatedAt = (DateTime)reader["CreatedAt"],
+                                    Category = reader["Category"].ToString(),
+                                    Rating = Convert.ToSingle(reader["Rating"]),  // Float tipi için Convert.ToSingle kullanın
+                                    Favorite = (int)reader["Favorite"],
+                                    isAvailable = reader["isAvailable"].ToString(),
+                                    Images = new List<string>()
+                                };
+                                products.Add(product);
                             }
-                            reader.Close();
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Error while reading products: " + ex.Message);
                     }
                 }
 
+                // İkinci bağlantıyı kullanarak resimleri okuyun
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string imageQuery = "SELECT ProductId, ImageURL FROM ProductImages";
+                    using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.HasRows) // Check if there are rows returned by the query
+                            {
+                                while (reader.Read())
+                                {
+                                    int productId = (int)reader["ProductId"];
+                                    string imageUrl = reader["ImageURL"].ToString();
 
+                                    // İlgili ürünü bul ve resim ekle
+                                    ProductModel product = products.FirstOrDefault(p => p.ProductId == productId);
+                                    if (product != null && !product.Images.Contains(imageUrl)) // Check if image already exists
+                                    {
+                                        product.Images.Add(imageUrl);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error while reading products: " + ex.Message);
+            }
 
             return products;
         }
+
 
 
 
