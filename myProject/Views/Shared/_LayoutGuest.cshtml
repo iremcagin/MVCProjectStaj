@@ -28,7 +28,7 @@
             <div class="container">
                 <!-- Logo with image -->
                 <a class="navbar-brand" href="#">
-                    <img src="~/images/logooo.png" alt="Your Logo" height="60">
+                    <img src="~/images/logooo.png" alt="Your Logo" height="80">
                 </a>
 
                 <!-- Toggle button for mobile -->
@@ -38,7 +38,7 @@
                 </button>
 
                 <!-- Navbar links -->
-                <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent" style="font-size:15px;">
+                <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent" style="font-size:16px;">
                     <ul class="navbar-nav me-auto mb-2 gap-3"  style="margin-left:40px;">
                         <!-- Main categories -->
                         <li class="nav-item">
@@ -54,10 +54,10 @@
                                 <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Furniture
                                 </a>
-                                <ul class="dropdown-menu" aria-labelledby="furnitureDropdown" data-bs-auto-close="outside" style="font-size:14px;">
+                                <ul class="dropdown-menu" aria-labelledby="furnitureDropdown" data-bs-auto-close="outside" style="font-size:15px;">
                                     @foreach (var category in furnitureCategories)
                                     {
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="Guest" asp-action="@category.CategoryName">@category.CategoryName</a></li>
+                                        <li><a class="dropdown-item  align-items-center" asp-area="" asp-controller="Guest" asp-action="@category.CategoryName"> <i class="las la-caret-right" style="margin-right:5px;"></i>@category.CategoryName</a></li>
                                     }
                                 </ul>
                             </li>
@@ -70,7 +70,7 @@
                                 <ul class="dropdown-menu" aria-labelledby="decorationDropdown" data-bs-auto-close="outside" style="font-size:14px;">
                                     @foreach (var category in decorationCategories)
                                     {
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="Guest" asp-action="@category.CategoryName">@category.CategoryName</a></li>
+                                        <li><a class="dropdown-item align-items-center" asp-area="" asp-controller="Guest" asp-action="@category.CategoryName"> <i class="las la-caret-right" style="margin-right:5px;"></i> @category.CategoryName</a></li>
                                     }
                                 </ul>
                             </li>
@@ -94,7 +94,7 @@
     </header>
 
     <div class="container">
-        <main role="main" class="pb-3 bg-light">
+        <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>

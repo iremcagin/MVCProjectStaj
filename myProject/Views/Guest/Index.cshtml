@@ -1,4 +1,242 @@
 ﻿@{
     ViewData["Title"] = "Guest";
     Layout = "~/Views/Shared/_LayoutGuest.cshtml";
+    var allProducts = ViewBag.Products as List<ProductModel>;
+    var mostClickedProducts = ViewBag.MostClickedProducts as List<ProductModel>;
 }
+
+
+
+
+
+
+
+<!-- Site Information -->
+<div class="container mb-5 mt-2">
+    <div class="alert alert-info alert-dismissible fade show" role="alert" style="border: 1px solid #ddd; background-color: #e0f7fa;">
+        <h4 class="alert-heading" style="font-size: 21px;">
+            Welcome to Our Furniture Sales Site!</h4>
+        <p style="font-size: 15px;">
+            Explore a wide variety of furniture items for your home and office. Our selection includes desks, tables, sofas, and much more. Whether you're looking for modern, classic, or custom-made pieces, you'll find it here.
+            Use the search bar above to find specific products, or browse through our categories for inspiration.
+            Don't miss our top picks and latest arrivals!
+        </p>
+        <p style="font-size: 15px;">
+            Enjoy a seamless shopping experience with detailed product descriptions, high-quality images, and competitive prices.
+            If you have any questions or need assistance, feel free to contact our customer service team. Happy shopping!
+        </p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+    </div>
+</div>
+
+
+<!-- Most Viewed -->
+<h3 class="mb-4" style="border-bottom: 1px solid black; font-size: 20px;">Top 5 Most Viewed Products</h3>
+
+<div id="mostViewedCarousel" class="carousel slide bg-light" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        @if (mostClickedProducts != null && mostClickedProducts.Any())
+        {
+            @foreach (var product in mostClickedProducts)
+            {
+                <div class="carousel-item @(product == mostClickedProducts.First() ? "active" : "")">
+                    <div class="container-fluid">
+                        <div class="row p-3">
+                            <!-- Image -->
+                            <div class="col-md-8 order-md-1">
+                                @if (product.Images.Count > 0)
+                                {
+                                    <img src="~/images/@product.Category/@product.Images[0]" class="img-fluid rounded" alt="@product.Name">
+                                }
+                                else
+                                {
+                                    <img src="~/images/placeholder-1.png" class="img-fluid rounded" alt="@product.Name">
+                                }
+                            </div>
+
+                            <!-- Information -->
+                            <div class="col-md-4 order-md-2 d-flex flex-column justify-content-between" style="background-color: #fefefe; border-radius: 10px;">
+                                <div class="text-dark p-4">
+                                    <h2 class="fw-bold" style="margin-bottom: 20px; border-bottom: 1px solid black;">
+                                        $@product.Price<br>@product.Name
+                                    </h2>
+                                    <p class="mb-3">@product.Description</p>
+                                </div>
+
+                                <!-- Company -->
+                                <div class="text-dark d-flex align-items-center p-2" style="border-top: 1px solid black;">
+                                    <img src="~/images/company_logo.png" class="img-fluid rounded" style="max-width: 50px; max-height: 50px;" alt="Logo">
+                                    <div class="ms-3">
+                                        <h6 style="font-size: 14px;">Company Name</h6>
+                                        <h6 style="font-size: 14px;"><i class="las la-map-marker"></i> Location</h6>
+                                    </div>
+                                    <!-- Views, Likes -->
+                                    <div class="ms-auto">
+                                        <h6 style="font-size: 14px;" class="d-flex align-items-center"><i class="las la-eye me-2"></i> @product.Clicked</h6>
+                                        <h6 style="font-size: 14px;" class="d-flex align-items-center"><i class="las la-heart me-2"></i> @product.Favorite</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <button class="carousel-control-prev carousel-control-icon" type="button" data-bs-target="#mostViewedCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next carousel-control-icon" type="button" data-bs-target="#mostViewedCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+
+
+    <!-- Indicators -->
+    <ol class="carousel-indicators">
+        @for (int i = 0; i < mostClickedProducts.Count; i++)
+        {
+            <li data-bs-target="#mostViewedCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"></li>
+        }
+    </ol>
+</div>
+
+
+
+<!-- Sliding Divs -->
+<div class="side-panel-container  d-flex  justify-content-between" style="margin-top:300px; margin-bottom:300px;">
+    <div class="side-panel left-panel">
+        <h5>Latest Products</h5>
+        <!-- Latest Products Content -->
+    </div>
+    <div class="side-panel right-panel">
+        <h5>Product Reviews</h5>
+        <!-- Product Reviews Content -->
+    </div>
+</div>
+
+
+
+
+<!-- Search Button -->
+<div class="container mb-2 col-md-6" style="margin-top:200px;">
+    <form class="d-flex">
+        <input class="form-control me-2" type="search" placeholder="Search for Product..." aria-label="Search">
+        <button class="btn btn-outline-primary" type="submit">Search</button>
+    </form>
+</div>
+
+
+<h3 class=" mb-4" style="border-bottom: 1px solid black; font-size: 20px;">All Products</h3>
+<div class="container mt-5 bg-light">
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+        @foreach (var product in allProducts)
+        {
+            <div class="col">
+                <div class="card h-100">
+                    @if (product.Images.Count > 0)
+                    {
+                        <img src="~/images/@product.Category/@product.Images[0]" class="card-img-top" alt="@product.Name">
+                    }
+                    else
+                    {
+                        <img src="~/images/placeholder-1.png" class="card-img-top" alt="Placeholder Image">
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text">@product.Description</p>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+
+
+
+<style>
+    .carousel-indicators li {
+        background-color: white;
+        width: 12px;
+        height: 12px;
+    }
+
+    .carousel-indicators .active {
+        background-color: black;
+    }
+
+    .carousel-control-next-icon {
+        color: black;
+    }
+
+
+
+    /*  sliding divs  */
+    /* General Styles */
+    .container {
+       //position: relative;
+    }
+
+    /* Side Panel Styles */
+    .side-panel {
+        //position: absolute;
+       // top: 0;
+        width: 300px; /* Adjust as needed */
+        
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        transition: transform 0.3s ease-in-out;
+        z-index: 1000; /* Ensure it's above other content */
+    }
+
+        /* Left Panel */
+        .side-panel.left {
+            left: -300px; /* Start off-screen */
+        }
+
+        /* Right Panel */
+        .side-panel.right {
+            right: -300px; /* Start off-screen */
+        }
+
+        /* Active Class to Show Panel */
+        .side-panel.active {
+            transform: translateX(300px); /* Move to visible position */
+        }
+
+</style>
+
+
+
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const leftPanel = document.getElementById('leftPanel');
+        const rightPanel = document.getElementById('rightPanel');
+
+        function showPanels() {
+            if (window.scrollY > 200) { // Adjust scroll threshold as needed
+                leftPanel.classList.add('active');
+                rightPanel.classList.add('active');
+            } else {
+                leftPanel.classList.remove('active');
+                rightPanel.classList.remove('active');
+            }
+        }
+
+        // Add scroll event listener
+        window.addEventListener('scroll', showPanels);
+    });
+
+</script>
+
