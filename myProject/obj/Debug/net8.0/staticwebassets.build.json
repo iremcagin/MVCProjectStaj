@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "69y4VNDIAWm3JWc/I6wIRgVlv/UTW2suKADk6En4GLI=",
+  "Hash": "lfv84wBL6dMvh+1Nh2GewiDyQUXSGgkX1IV9MLU4UFI=",
   "Source": "myProject",
   "BasePath": "_content/myProject",
   "Mode": "Default",
@@ -112,12 +112,12 @@
       "OriginalItemSpec": "wwwroot\\images\\chair\\logo.png"
     },
     {
-      "Identity": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\koltuk1_2.webp",
+      "Identity": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\logooo.png",
       "SourceId": "myProject",
       "SourceType": "Discovered",
       "ContentRoot": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\",
       "BasePath": "_content/myProject",
-      "RelativePath": "images/koltuk1_2.webp",
+      "RelativePath": "images/logooo.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -128,15 +128,15 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\images\\koltuk1_2.webp"
+      "OriginalItemSpec": "wwwroot\\images\\logooo.png"
     },
     {
-      "Identity": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\koltuk1.webp",
+      "Identity": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\placeholder-1.png",
       "SourceId": "myProject",
       "SourceType": "Discovered",
       "ContentRoot": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\",
       "BasePath": "_content/myProject",
-      "RelativePath": "images/koltuk1.webp",
+      "RelativePath": "images/placeholder-1.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -147,26 +147,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\images\\koltuk1.webp"
-    },
-    {
-      "Identity": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\logo.png",
-      "SourceId": "myProject",
-      "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\",
-      "BasePath": "_content/myProject",
-      "RelativePath": "images/logo.png",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\images\\logo.png"
+      "OriginalItemSpec": "wwwroot\\images\\placeholder-1.png"
     },
     {
       "Identity": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\sofa\\koltuk1_2.webp",

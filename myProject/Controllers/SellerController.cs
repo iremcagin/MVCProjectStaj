@@ -12,14 +12,14 @@ namespace myProject.Controllers
 {
     public class SellerController : Microsoft.AspNetCore.Mvc.Controller
     {
-        private readonly DatabaseControlModel databaseControlModel;
+        private readonly SellerDatabaseControlModel databaseControlModel;
 
 
 
         /* --------------------------------------------------- Constructor --------------------------------------------------- */
         public SellerController()
         {
-            databaseControlModel = new DatabaseControlModel();
+            databaseControlModel = new SellerDatabaseControlModel();
         }
 
 
