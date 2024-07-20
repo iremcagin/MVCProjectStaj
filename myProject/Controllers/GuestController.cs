@@ -21,17 +21,16 @@ namespace myProject.Controllers
         {
             List<ProductModel> products = userDatabaseControlModel.getAllProducts();
             List<ProductModel> mostClickedProducts = userDatabaseControlModel.GetMostClickedProducts();
+            List<ProductModel> newestProducts = userDatabaseControlModel.GetNewestProducts();
+
+
 
             // ViewBag kullanarak view'a veri gönderme
             ViewBag.Products = products;
             ViewBag.MostClickedProducts = mostClickedProducts;
+            ViewBag.NewestProducts = newestProducts;
 
-            foreach (var product in mostClickedProducts)
-            {
-                //Console.WriteLine(product.Clicked);  // ???
-         
-            }
-
+          
           
 
             return View();

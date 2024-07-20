@@ -12,6 +12,7 @@ namespace myProject.Models
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string LogoUrl { get; set; }
+        public string isHighlighed { get; set; } = "false";
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public int Rating { get; set; }

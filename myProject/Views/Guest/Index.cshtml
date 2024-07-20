@@ -3,6 +3,7 @@
     Layout = "~/Views/Shared/_LayoutGuest.cshtml";
     var allProducts = ViewBag.Products as List<ProductModel>;
     var mostClickedProducts = ViewBag.MostClickedProducts as List<ProductModel>;
+    var newestProducts = ViewBag.NewestProducts as List<ProductModel>;
 }
 
 
@@ -34,7 +35,7 @@
 <!-- Most Viewed -->
 <h3 class="mb-4" style="border-bottom: 1px solid black; font-size: 20px;">Top 5 Most Viewed Products</h3>
 
-<div id="mostViewedCarousel" class="carousel slide bg-light" data-bs-ride="carousel">
+<div id="mostViewedCarousel" class="carousel slide" data-bs-ride="carousel" >
     <div class="carousel-inner">
         @if (mostClickedProducts != null && mostClickedProducts.Any())
         {
@@ -47,11 +48,17 @@
                             <div class="col-md-8 order-md-1">
                                 @if (product.Images.Count > 0)
                                 {
-                                    <img src="~/images/@product.Category/@product.Images[0]" class="img-fluid rounded" alt="@product.Name">
+                                    <div class="position-relative">
+                                        <img src="~/images/@product.Category/@product.Images[0]" class="img-fluid rounded" alt="@product.Name">
+                                        <a href="@Url.Action("Login", "Index")" class="btn btn-like position-absolute top-0 end-0 m-3 no-outline" style="font-size:16px;"><i class="lar la-heart"></i></a>
+                                    </div>
                                 }
                                 else
                                 {
-                                    <img src="~/images/placeholder-1.png" class="img-fluid rounded" alt="@product.Name">
+                                    <div class="position-relative">
+                                        <img src="~/images/placeholder-1.png" class="img-fluid rounded" alt="@product.Name">
+                                        <a href="@Url.Action("Login", "Index")" class="btn btn-like position-absolute top-0 end-0 m-3 no-outline" style="font-size:16px;"><i class="lar la-heart"></i></a>
+                                    </div>
                                 }
                             </div>
 
@@ -61,6 +68,7 @@
                                     <h2 class="fw-bold" style="margin-bottom: 20px; border-bottom: 1px solid black;">
                                         $@product.Price<br>@product.Name
                                     </h2>
+
                                     <p class="mb-3">@product.Description</p>
                                 </div>
 
@@ -73,8 +81,8 @@
                                     </div>
                                     <!-- Views, Likes -->
                                     <div class="ms-auto">
-                                        <h6 style="font-size: 14px;" class="d-flex align-items-center"><i class="las la-eye me-2"></i> @product.Clicked</h6>
-                                        <h6 style="font-size: 14px;" class="d-flex align-items-center"><i class="las la-heart me-2"></i> @product.Favorite</h6>
+                                        <h6 style="font-size: 14px;" class="d-flex align-items-center"><i class="las la-eye me-2 no-outline"></i> @product.Clicked</h6>
+                                        <h6 style="font-size: 14px;" class="d-flex align-items-center"><i class="las la-heart me-2 no-outline"></i> @product.Favorite</h6>
                                     </div>
                                 </div>
                             </div>
@@ -107,48 +115,192 @@
 
 
 <!-- Sliding Divs -->
-<div class="side-panel-container  d-flex  justify-content-between" style="margin-top:300px; margin-bottom:300px;">
-    <div class="side-panel left-panel">
-        <h5>Latest Products</h5>
-        <!-- Latest Products Content -->
+<div class="side-panel-container" style="margin-top: 200px; height:400px;">
+    <!-- Left Panel -->
+    <div class="side-panel left-panel d-flex flex-column">
+        <h5 style="border-bottom:1px solid black">Latest Products</h5>
+
+        <div class="row p-2 mt-2" >
+            @if (ViewBag.NewestProducts != null && ViewBag.NewestProducts.Count > 0)
+            {
+                foreach (var product in ViewBag.NewestProducts)
+                {
+                    <div class="col-6 col-md-3">
+                        <div class="card" style="max-width: 180px; min-height: 300px;">
+                            @if (product.Images.Count > 0)
+                            {
+                                <div class="position-relative">
+                                    <img src="~/images/@product.Category/@product.Images[0]" class="img-fluid  last-Items-img" alt="@product.Name" style="height: 120px; object-fit: cover;">
+                                    <a href="@Url.Action("Login", "Index")" class="btn btn-like position-absolute top-0 end-0 m-1 no-outline"><i class="lar la-heart"></i></a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="position-relative">
+                                    <img src="~/images/placeholder-1.png" class="img-fluid  last-Items-img" alt="@product.Name" style="height: 120px; object-fit: cover;">
+                                    <a href="@Url.Action("Login", "Index")" class="btn btn-like position-absolute top-0 end-0 m-1 no-outline"><i class="lar la-heart"></i></a>
+                                </div>
+                            }
+
+
+                            <div class="card-body p-2 d-flex justify-content-between last-Items-text">
+                                <div class="d-flex flex-column col-md-9 justify-content-between">
+
+                                    <div style="col-12">
+                                        <div class="card-title">
+                                            <span class="product-name" style="font-size:15px; font-weight:600;">@product.Name</span>
+                                            <span class="product-description" style="font-size:14px; color:grey;">@product.Description</span>
+                                        </div>
+
+                                        <div class="d-flex " style="font-size:15px;">
+                                            <p  style="margin-right:5px; font-size:14px; margin-top:2px;">@product.Rating</p>
+                                            @if (@product.Rating >= 0 && @product.Rating <= 5)
+                                            {
+
+                                                var fullStars = (int)Math.Floor(@product.Rating);
+                                                var halfStar = (@product.Rating - fullStars) >= 0.5;
+                                                // Boş yıldızların sayısı
+                                                var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+                                                for (int i = 0; i < fullStars; i++)
+                                                {
+                                                    <span class="star full-star">&#9733;</span>
+                                                }
+
+                                                if (halfStar)
+                                                {
+                                                    <span class="star half-star">&#9733;</span>
+                                                }
+
+                                                for (int i = 0; i < emptyStars; i++)
+                                                {
+                                                    <span class="star">&#9734;</span>
+                                                }
+                                            }
+                                       </div>
+                                    </div>
+
+                                    <h5 class="card-text" style="font-size: 16px; font-weight:600; color:#b46c2c; margin-top:15px;">$@product.Price</h5>
+                                </div>
+                             
+                                <div class="col-md-3  d-flex flex-column justify-content-end">
+                                    <!--h6 style="font-size: 14px; margin-bottom:-2px;" class="d-flex align-items-center"><i class="las la-heart me-1" style=""></i> @product.Favorite</!--h6-->
+                                    <h6 style="font-size: 14px;  margin-bottom:-1px;" class="d-flex align-items-center"><i class="las la-eye me-1 no-outline"></i> @product.Clicked</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
     </div>
-    <div class="side-panel right-panel">
-        <h5>Product Reviews</h5>
+
+    <!-- Right Panel -->
+    <div class="side-panel right-panel d-flex flex-column p-2">
+        <h5 style="border-bottom:1px solid black"> Product Reviews</h5>
         <!-- Product Reviews Content -->
     </div>
+    <div >
+
+    </div>
+
 </div>
+
+
 
 
 
 
 <!-- Search Button -->
 <div class="container mb-2 col-md-6" style="margin-top:200px;">
-    <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Search for Product..." aria-label="Search">
-        <button class="btn btn-outline-primary" type="submit">Search</button>
+    <form class="d-flex ">
+        <input class="form-control me-2 no-outline" type="search" placeholder="Search for Product..." aria-label="Search">
+        <button class="btn btn-outline-primary" type="submit"><i class="las la-search"></i></button>
     </form>
 </div>
 
 
+<style>
+    .no-outline:focus {
+        outline: none; 
+        box-shadow: none;
+    }
+
+    .product-description {
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Maksimum 2 satır */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal; /* Satırların kaydırılmasına izin verir */
+    }
+
+
+</style>
+
+
+
+<!-- All Products -->
 <h3 class=" mb-4" style="border-bottom: 1px solid black; font-size: 20px;">All Products</h3>
-<div class="container mt-5 bg-light">
-    <div class="row row-cols-1 row-cols-md-4 g-4">
+<div class="container mt-5 " style="">
+    <div class="row row-cols-1 row-cols-md-6 g-4 p-2">
         @foreach (var product in allProducts)
         {
             <div class="col">
                 <div class="card h-100">
                     @if (product.Images.Count > 0)
                     {
-                        <img src="~/images/@product.Category/@product.Images[0]" class="card-img-top" alt="@product.Name">
+                        <div class="position-relative">
+                            <img src="~/images/@product.Category/@product.Images[0]" class="card-img-top" alt="@product.Name">
+                            <a href="@Url.Action("Login", "Index")" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline"><i class="lar la-heart"></i></a>
+                        </div>
                     }
                     else
                     {
-                        <img src="~/images/placeholder-1.png" class="card-img-top" alt="Placeholder Image">
+                        <div class="position-relative">
+                            <img src="~/images/placeholder-1.png" class="card-img-top" alt="Placeholder Image">
+                            <a href="@Url.Action("Login", "Index")" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline"><i class="lar la-heart"></i></a>
+                        </div>
                     }
-                    <div class="card-body">
-                        <h5 class="card-title">@product.Name</h5>
-                        <p class="card-text">@product.Description</p>
+                    <div class="card-body d-flex flex-column justify-content">
+                        <div class="d-flex flex-column" style="font-size:15px;">
+                            <h5 class="card-title"><span style ="font-size:15px; font-weight:600;"> @product.Name </span><span style="font-size:14px; color:grey;">@product.Description</span></h5>
+
+                            <div class="d-flex">
+                                <p style="margin-right:5px;  font-size:14px; margin-top:2px;">@product.Rating</p>
+
+                                @if (@product.Rating >= 0 && @product.Rating <= 5)
+                                {
+
+                                    var fullStars = (int)Math.Floor(@product.Rating);
+                                    var halfStar = (@product.Rating - fullStars) >= 0.5;
+                                    // Boş yıldızların sayısı
+                                    var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+                                
+                                    for (int i = 0; i < fullStars; i++)
+                                    {
+                                        <span class="star full-star">&#9733;</span>
+                                    }
+
+                                    if (halfStar)
+                                    {
+                                        <span class="star half-star">&#9733;</span>
+                                    }
+
+                                    for (int i = 0; i < emptyStars; i++)
+                                    {
+                                        <span class="star">&#9734;</span>
+                                    }
+                                }
+                            </div>
+
+                        </div>
+
+                        <h5 class="card-text" style="font-size: 16px; font-weight:600; color:#b46c2c; margin-top:15px;">$@product.Price</h5>
                     </div>
+                  
+
                 </div>
             </div>
         }
@@ -157,9 +309,61 @@
 </div>
 
 
+<!-- Site Information -->
+<div class="container  p-5 d-flex flex-column justify-content-between" style="background-color: #f1f1f1;  margin-bottom:-100px;  margin-top:200px;">
+    <div class="row mb-5">
+        <div class="col-md-6 p-3">
+            <h5 style="border-bottom:1px solid black;">About Us</h5>
+            <p>Welcome to Our Furniture Sales Site! Explore a wide variety of furniture items for your home and office. Our selection includes desks, tables, sofas, and much more. Enjoy a seamless shopping experience with detailed product descriptions, high-quality images, and competitive prices.</p>
+        </div>
+        <div class="col-md-3 p-3">
+            <h5 style="border-bottom:1px solid black;">Contact Us</h5>
+            <ul class="list-unstyled">
+                <li><i class="las la-map-marker-alt"></i> Ata2 Sitesi, İstanbul, Turkey</li>
+                <li><i class="las la-phone"></i> +90 538 968 54 79</li>
+                <li><i class="las la-envelope"></i> iremcagiin@gmail.com</li>
+            </ul>
+        </div>
+        <div class="col-md-3 p-3">
+            <h5 style="border-bottom:1px solid black;">Follow Us</h5>
+            <ul class="list-unstyled social-links">
+                <li><a href="#"><i class="lab la-facebook"></i> Facebook</a></li>
+                <li><a href="#"><i class="lab la-twitter"></i> Twitter</a></li>
+                <li><a href="#"><i class="lab la-instagram"></i> Instagram</a></li>
+                <li><a href="#"><i class="lab la-linkedin"></i> LinkedIn</a></li>
+                <li><a href="#"><i class="lab la-github"></i> Github</a></li>
+            </ul>
+
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="text-center mt-5" style="margin-bottom:-40px;">
+        <div class="container">
+            <p>&copy; 2024 ModernNest. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+</div>
+
+
+
+
+
+
+
+
 
 
 <style>
+    .social-links a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+        .social-links a:hover {
+            color: #007bff; /* Optional: Change color on hover */
+        }
+
     .carousel-indicators li {
         background-color: white;
         width: 12px;
@@ -175,40 +379,130 @@
     }
 
 
-
-    /*  sliding divs  */
     /* General Styles */
-    .container {
-       //position: relative;
+    .side-panel-container {
+        position: relative;
+        overflow: hidden; /* To prevent the panels from affecting layout */
     }
 
     /* Side Panel Styles */
     .side-panel {
-        //position: absolute;
-       // top: 0;
-        width: 300px; /* Adjust as needed */
-        
-        background-color: #f9f9f9;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
-        transition: transform 0.3s ease-in-out;
-        z-index: 1000; /* Ensure it's above other content */
+        transition: transform 0.45s ease-in-out;
     }
 
-        /* Left Panel */
-        .side-panel.left {
-            left: -300px; /* Start off-screen */
+    .side-panel .row{
+       
+        border-radius: 10px;
+    }
+
+    /* Left Panel */
+    .side-panel.left-panel {
+        position: absolute;
+        top:0;
+        left: 0;
+        transform: translateX(-1000px); /* Start off-screen to the left */
+    }
+
+    /* Right Panel */
+    .side-panel.right-panel {
+        position: absolute;
+        bottom:0;
+        right: 0;
+        transform: translateX(1000px); /* Start off-screen to the right */
+    }
+
+    /* Active Class to Show Panel */
+    .side-panel.active-left-panel {
+        transform: translateX(0); /* Move to visible position */
+    }
+
+    .side-panel.active-right-panel {
+        transform: translateX(0); /* Move to visible position */
+    }
+
+    .last-Items-img:hover img {
+        height: 170px;
+    }
+
+    .last-Items-text:hover .card-body {
+        font-size: 16px;
+    }
+
+    .star {
+        font-size: 16px;
+    }
+
+    .full-star {
+        color: #ffd700;
+    }
+
+    .half-star {
+        color: #ffd700;
+        position: relative;
+    }
+
+        .half-star::before {
+            content: '\2605';
+            color: #000;
+            position: absolute;
+            left: 0;
+            width: 55%;
+            overflow: hidden;
         }
 
-        /* Right Panel */
-        .side-panel.right {
-            right: -300px; /* Start off-screen */
+    .empty-star {
+        color: #d3d3d3;
+    }
+
+        .empty-star::before {
+            content: '\2605';
+            color: #000;
+            position: absolute;
+            overflow: hidden;
         }
 
-        /* Active Class to Show Panel */
-        .side-panel.active {
-            transform: translateX(300px); /* Move to visible position */
-        }
+
+    /* Like button styles */
+    .btn-like {
+        background-color: rgba(255, 255, 255, 0.8);
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-like i {
+        color: black; /* Like icon color */
+        font-size: 13px;
+    }
+
+    .btn-like:hover {
+        background-color: rgba(255, 255, 255, 1);
+    }
+
+    .position-relative {
+        position: relative;
+    }
+
+    .position-absolute {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+    }
+
+    .top-0 {
+        top: 0px;
+    }
+
+    .top-0:focus,
+    .top-0:active{
+        border:none;
+    }
+
+    .end-0 {
+        right: 0;
+    }
+
 
 </style>
 
@@ -221,22 +515,38 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const leftPanel = document.getElementById('leftPanel');
-        const rightPanel = document.getElementById('rightPanel');
+        const leftPanel = document.querySelector('.left-panel');
+        const rightPanel = document.querySelector('.right-panel');
+        const panelContainer = document.querySelector('.side-panel-container');
 
-        function showPanels() {
-            if (window.scrollY > 200) { // Adjust scroll threshold as needed
-                leftPanel.classList.add('active');
-                rightPanel.classList.add('active');
-            } else {
-                leftPanel.classList.remove('active');
-                rightPanel.classList.remove('active');
-            }
+        if (!leftPanel || !rightPanel || !panelContainer) {
+            console.error("Left Panel, Right Panel, or Panel Container not found");
+            return;
         }
 
-        // Add scroll event listener
-        window.addEventListener('scroll', showPanels);
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1 // Adjust threshold as needed
+        };
+
+        function handleIntersect(entries, observer) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    leftPanel.classList.add('active-left-panel');
+                    rightPanel.classList.add('active-right-panel');
+                } else {
+                    leftPanel.classList.remove('active-left-panel');
+                    rightPanel.classList.remove('active-right-panel');
+                }
+            });
+        }
+
+        const observer = new IntersectionObserver(handleIntersect, observerOptions);
+        observer.observe(panelContainer);
     });
+
+
 
 </script>
 
