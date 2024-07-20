@@ -1,5 +1,261 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model myProject.Models.CombinedViewModel
+
+
 @{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_LayoutGuest.cshtml";
+    var errorMessage = TempData["ErrorMessage"] as string;
 }
+
+ 
+<div class="container-fluid d-flex justify-content-center align-items-center p-5 login-background" style="min-height:80vh;">
+    <div class="form-container d-flex flex-column align-items-center justify-content-center col-md-12" style="z-index: 5;">
+
+        <form id="login-form" class="form-content login-form-content col-md-5" asp-controller="Login" asp-action="Login">
+            <h2>Welcome Back</h2>
+            <input type="email" placeholder="Email" name="User.Email" required>
+            <input type="password" placeholder="Password" name="User.PasswordHash" required>
+            <button type="submit">Login</button>
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger mt-1" role="alert">
+                    @errorMessage
+                </div>
+            }
+            <p style="margin-top:10px; font-size:14px;">Don't have an account? <a href="#" onclick="showSignUp()" style="color:black;">Sign up</a></p>
+            <p style="margin-top:-20px; font-size:14px;">Looking to register your company? <a href="#" onclick="showCompanySignUp()" style=" color:black;">Register as a Seller</a></p>
+
+        </form>
+
+        <form id="signup-form" class="form-content login-form-content col-md-5" style="display:none;"  asp-controller="Login" asp-action="UserSignUp">
+            <h2>Sign Up</h2>
+            <input type="text" placeholder="Name" name="User.Name" required>
+            <input type="text" placeholder="Surname" name="User.Surname" required>
+            <input type="email" placeholder="Email" name=".User.Email" required>
+            <input type="password" placeholder="Password" name="User.PasswordHash" required>
+            <input type="tel" placeholder="Phone Number" name="User.PhoneNumber" required>
+            <input type="date" placeholder="Birthdate" name="User.Age" required>
+            <textarea placeholder="Address" name="User.Address" required></textarea>
+            <button type="submit">Sign Up</button>
+            <p style="margin-top:10px; font-size:14px;">Already have an account? <a href="#" onclick="showLogin()" style=" color:black;">Login</a></p>
+            <p style="margin-top:-20px; font-size:14px;">Looking to register your company? <a href="#" onclick="showCompanySignUp()" style=" color:black;">Register as a Seller</a></p>
+
+        </form>
+
+        <form id="company-signup-form" class="form-content login-form-content col-md-10" style="display:none;" asp-controller="Login" asp-action="CompanySignUp" enctype="multipart/form-data">
+            <h2>Company Registration</h2>
+            <div class="row">
+                <div class="d-flex col-md-6 flex-column">
+                   
+                    <input type="text" placeholder="Contact Person Name" name="User.Name" required>
+                    <input type="text" placeholder="Contact Person Surname" name="User.Surname" required>
+                    <input type="date" placeholder="Birthdate" name="User.Birthdate" required>
+                    <input type="text" placeholder="Company Name" name="Company.CompanyName" required>
+                    <input type="email" placeholder="Email" name="User.Email" required>
+                    <input type="password" placeholder="Password" name="User.PasswordHash" required>
+                    <input type="text" placeholder="Address" name="Company.Address" required>
+                    <input type="tel" placeholder="Phone Number" name="User.PhoneNumber" required>
+                    <textarea placeholder="Company Description" name="Company.Description" required></textarea>
+                </div>
+
+                <div class="col-md-6 d-flex flex-column">
+                    <!-- Logo alanı  -->
+                    <div class="upload-section col-md-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label for="logo-upload">Upload Logo:</label>
+                            <input type="file" id="logo-upload" name="Logo" accept="image/*" onchange="previewLogo()">
+                        </div>
+                       
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <label for="banner-upload">Upload Banner:</label>
+                            <input type="file" id="banner-upload" name="Banner" accept="image/*" onchange="previewBanner()">
+                        </div>
+                        <!-- Önizleme -->
+                        <div class="d-flex gap-3">
+                            <div id="logo-preview-container" class="preview-container">
+                                <img id="logo-preview" src="#" alt="Logo Preview" style="display:none;" />
+                            </div>
+                            <div id="banner-preview-container" class="preview-container mt-3">
+                                <img id="banner-preview" src="#" alt="Banner Preview" style="display:none;" />
+                            </div>
+                        </div>
+                       
+                    </div>
+
+                    <!-- IBAN bilgileri -->
+                    
+                    <input style="margin-top:15px;" type="text" placeholder="Tax ID Number: xxxxxxxxxx" name="Company.TaxIDNumber" required>
+                    <input type="text" placeholder="IBAN: xxxx xxxx xxxx xxxx" name="Company.IBAN" required>
+                    <button type="submit">Register Company</button>
+                    <p style="margin-top:10px; font-size:14px;">Already registered? <a href="#" onclick="showLogin()" style=" color:black;">Login</a></p>
+
+                </div>
+
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+<style>
+    .login-form-content {
+        background-color: rgba(255, 255, 255, 0.8); /* White background with 80% opacity */
+        border-radius: 8px; /* Optional: rounded corners for a nicer look */
+        padding: 20px; /* Optional: space inside the form */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: shadow for depth effect */
+        backdrop-filter: blur(5px); /* Optional: add blur effect behind the form */
+    }
+
+
+    .login-background {
+        position: relative;
+       background-image: url('@Url.Content("~/images/loginBG3.jpg")');
+        background-size:cover;
+        background-position: center;
+    }
+
+
+    .login-background::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.2); 
+        z-index: 1;
+    }
+ 
+
+    .form-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-content h2 {
+        margin-bottom: 20px;
+    }
+
+    .form-content input,
+    .form-content textarea{
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #000000;
+        border-radius: 5px;
+        background-color: #ffffff;
+        color: #000000;
+    }
+
+    .form-content button {
+        padding: 10px;
+        border: none;
+        background-color: #000000;
+        color: #ffffff;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    .form-content button:hover {
+        background-color: #333333;
+    }
+
+
+    /* ----------------------------------------------------------------------------- */
+    /* Önizleme */
+
+    .preview-container {
+        margin-top: 10px;
+    }
+
+    /* Style for the logo preview */
+    #logo-preview {
+        width:100px; 
+        height:100px;
+        border-radius: 50%; 
+        border:1px solid black;
+    }
+
+    /* Style for the banner preview */
+    #banner-preview {
+        width:300px; 
+        height:100px; 
+        object-fit: cover;
+        border: 1px solid black;
+    }
+
+</style>
+
+
+
+<script>
+    function showLogin() {
+        document.getElementById('login-form').style.display = 'flex';
+        document.getElementById('signup-form').style.display = 'none';
+        document.getElementById('company-signup-form').style.display = 'none';
+    }
+
+    function showSignUp() {
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('signup-form').style.display = 'flex';
+        document.getElementById('company-signup-form').style.display = 'none';
+    }
+
+    function showCompanySignUp() {
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('signup-form').style.display = 'none';
+        document.getElementById('company-signup-form').style.display = 'flex';
+    }
+
+    // Initialize with the login form visible
+    document.addEventListener('DOMContentLoaded', (event) => {
+        showLogin();
+    });
+
+
+
+    /* ----------------------------------------------------------------------------- */
+    /* Logo Önizleme */
+    function previewLogo() {
+        const logoInput = document.getElementById('logo-upload');
+        const logoPreview = document.getElementById('logo-preview');
+
+        if (logoInput.files && logoInput.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                logoPreview.src = e.target.result;
+                logoPreview.style.display = 'block';
+            }
+
+            reader.readAsDataURL(logoInput.files[0]);
+        } else {
+            logoPreview.style.display = 'none';
+        }
+    }
+
+    /* ----------------------------------------------------------------------------- */
+    /* Banner Önizleme */
+    function previewBanner() {
+        const bannerInput = document.getElementById('banner-upload');
+        const bannerPreview = document.getElementById('banner-preview');
+
+        if (bannerInput.files && bannerInput.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                bannerPreview.src = e.target.result;
+                bannerPreview.style.display = 'block';
+            }
+
+            reader.readAsDataURL(bannerInput.files[0]);
+        } else {
+            bannerPreview.style.display = 'none';
+        }
+    }
+
+</script>
+
+
+

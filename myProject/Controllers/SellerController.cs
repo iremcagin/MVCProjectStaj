@@ -12,14 +12,14 @@ namespace myProject.Controllers
 {
     public class SellerController : Microsoft.AspNetCore.Mvc.Controller
     {
-        private readonly SellerDatabaseControlModel databaseControlModel;
+        private readonly _SellerDatabaseControlModel databaseControlModel;
 
 
 
         /* --------------------------------------------------- Constructor --------------------------------------------------- */
         public SellerController()
         {
-            databaseControlModel = new SellerDatabaseControlModel();
+            databaseControlModel = new _SellerDatabaseControlModel();
         }
 
 
@@ -27,6 +27,7 @@ namespace myProject.Controllers
         /* --------------------------------------------------- Dashboard Page --------------------------------------------------- */
         public IActionResult Index()
         {
+
             return View();
         }
 

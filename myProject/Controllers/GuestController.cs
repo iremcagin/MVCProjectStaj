@@ -14,7 +14,7 @@ namespace myProject.Controllers
             _categoriesRepository = new CategoriesModel();
         } */
 
-        private readonly UserDatabaseControlModel userDatabaseControlModel = new UserDatabaseControlModel();
+        private readonly _UserDatabaseControlModel userDatabaseControlModel = new _UserDatabaseControlModel();
 
 
         public IActionResult Index()
@@ -29,9 +29,6 @@ namespace myProject.Controllers
             ViewBag.Products = products;
             ViewBag.MostClickedProducts = mostClickedProducts;
             ViewBag.NewestProducts = newestProducts;
-
-          
-          
 
             return View();
         }

@@ -2,13 +2,13 @@
 
 namespace myProject.Models
 {
-    public class UserDatabaseControlModel
+    public class _UserDatabaseControlModel
     {
 
         private string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\iremc\OneDrive\Documents\myProjectDatabase.mdf;Integrated Security=True;Connect Timeout=30";
 
 
-        public UserDatabaseControlModel()
+        public _UserDatabaseControlModel()
         {
 
 

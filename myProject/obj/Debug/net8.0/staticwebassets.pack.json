@@ -17,6 +17,14 @@
       "PackagePath": "staticwebassets\\images\\chair\\logo.png"
     },
     {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\loginBG.jpg",
+      "PackagePath": "staticwebassets\\images\\loginBG.jpg"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\loginBG3.jpg",
+      "PackagePath": "staticwebassets\\images\\loginBG3.jpg"
+    },
+    {
       "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\logooo.png",
       "PackagePath": "staticwebassets\\images\\logooo.png"
     },

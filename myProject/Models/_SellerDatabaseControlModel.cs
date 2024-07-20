@@ -4,13 +4,13 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace myProject.Models
 {
-    public class SellerDatabaseControlModel
+    public class _SellerDatabaseControlModel
     {
        
         private string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\iremc\OneDrive\Documents\myProjectDatabase.mdf;Integrated Security=True;Connect Timeout=30";
 
 
-        public SellerDatabaseControlModel() {
+        public _SellerDatabaseControlModel() {
             
          
         }

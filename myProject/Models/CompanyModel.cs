@@ -6,18 +6,23 @@ namespace myProject.Models
     {
         public int CompanyId { get; set; }
         public int UserId { get; set; }  // foreign key
-        public string Name { get; set; }
+        public string CompanyName { get; set; }
         public string Description { get; set; }
         public string Address { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string LogoUrl { get; set; }
+        public string BannerUrl { get; set; }
+        public string TaxIDNumber { get; set; }
+        public string IBAN { get; set; }
+
         public string isHighlighed { get; set; } = "false";
+        public bool isAccountActivated { get; set; } = false;
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public int Rating { get; set; }
-        public ICollection<int> ProductsList { get; set; }   // ProductID
-        public ICollection<int> FollowersList { get; set; }  // UserID
+        public int Rating { get; set; } = 0;
+        public List<int> ProductsList { get; set; }   // ProductID
+        public List<int> FollowersList { get; set; }  // UserID
 
 
     }
