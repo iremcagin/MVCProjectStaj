@@ -103,8 +103,6 @@ namespace myProject.Models
                             {
                                 loggedUser.Role = reader["Role"].ToString();
                                 loggedUser.UserId = Convert.ToInt32(reader["Id"]);
-
-                                Console.WriteLine("Modelll: " + loggedUser.Role);
                             }
                             else
                             {
@@ -193,7 +191,39 @@ namespace myProject.Models
                     cmd.ExecuteNonQuery();
                 }
             }
-
         }
+
+
+
+
+
+        /* ------------------------------------- COMPANY LOGIN ------------------------------------- */
+        public bool CheckIfAccountActivated(int UserId)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                string query = "SELECT IsAccountActivated FROM Companies WHERE UserId = @UserId";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserId", UserId);
+
+                    object result = cmd.ExecuteScalar();
+
+                    if (result != null && result != DBNull.Value)
+                    {
+                        return Convert.ToBoolean(result);
+                    }
+                }
+            }
+
+            return false;
+        }
+
+
+
+
     }
 }

@@ -1,0 +1,374 @@
+﻿@model List<myProject.Models.CombinedViewModel>
+@{
+    ViewData["Title"] = "Companies";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Thasadith&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sulphur+Point:wght@300;400;700&family=Thasadith&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: "Sulphur Point", sans-serif;
+    }
+
+    .no-outline:active,
+    .no-outline:focus{
+        outline: none;
+        box-shadow: none;
+    }
+
+</style>
+
+
+
+<div class="table-responsive" style="max-height: 700px; overflow-y: auto;">
+    <table class="table table-striped text-center">
+        <thead>
+            <tr style="font-size:16px;">
+                @{
+            /*
+        <th>UserId</th>
+        <th>Name</th>
+        <th>Surname</th>
+        <th>PhoneNumber</th>
+        <th>Email</th>
+        <th>Address</th>
+        <th>Role</th>
+        <th>Birthdate</th>
+        <th>CreatedAt</th>
+        <th>LogoUrl</th>
+        <th>BannerUrl</th>*/
+                }
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>AccountActivated</th>
+
+                <th>TaxIDNumber</th>
+                <th>IBAN</th>
+                <th>Highlighed</th>
+                <th>CreatedAt</th>
+                <th>Rating</th>
+            </tr>
+        </thead>
+        <tbody style="font-size:15px; font-weight:400;">
+            @foreach (var item in Model)
+            {
+                <tr data-bs-toggle="modal" data-bs-target="#companyDetailModal"
+                    data-company-id="@item.Company.CompanyId"
+                    data-company-name="@item.Company.CompanyName"
+                    data-company-description="@item.Company.Description"
+                    data-company-address="@item.Company.Address"
+                    data-company-phone="@item.Company.PhoneNumber"
+                    data-company-email="@item.Company.Email"
+                    data-company-taxidnumber="@item.Company.TaxIDNumber"
+                    data-company-iban="@item.Company.IBAN"
+                    data-company-createdat="@item.Company.CreatedAt.ToString("yyyy-MM-dd")"
+                    data-company-rating="@item.Company.Rating"
+                    data-company-highlighed="@item.Company.isHighlighed"
+                    data-company-accountactivated="@item.Company.isAccountActivated"
+                    data-user-name="@item.User?.Name"
+                    data-user-surname="@item.User?.Surname"
+                    data-user-email="@item.User?.Email"
+                    data-user-phone="@item.User?.PhoneNumber"
+                    data-company-logo="@item.Company.LogoUrl"
+                    data-company-banner="@item.Company.BannerUrl"
+                    data-company-products="@item.Company.ProductsList.Count"
+                    style="cursor:pointer;">
+                    @{
+                        /*
+                        <td>@item.User.UserId</td>
+                        <td>@item.User.Name</td>
+                        <td>@item.User.Surname</td>
+                        <td>@item.User.PhoneNumber</td>
+                        <td>@item.User.Email</td>
+                        <td>@item.User.Address</td>
+                        <td>@item.User.Role</td>
+                        <td>@item.User.Birthdate</td>
+                        <td>@item.User.CreatedAt</td>
+                        <td>@item.Company.LogoUrl</td>
+                        <td>@item.Company.BannerUrl</td>*/
+                    }
+                    <td class="open-modal">@item.Company.CompanyId</td>
+                    <td class="open-modal">@item.Company.CompanyName</td>
+                    <td class="open-modal"  style="white-space: nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 30px;">@item.Company.Description</td>
+                    <td class="open-modal">@item.Company.Address</td>
+                    <td class="open-modal">@item.Company.PhoneNumber</td>
+                    <td class="open-modal">@item.Company.Email</td>
+                    <td class="open-modal">@item.Company.isAccountActivated</td>
+                    <td class="open-modal">@item.Company.TaxIDNumber</td>
+                    <td class="open-modal">@item.Company.IBAN</td>
+                    <td class="open-modal">@item.Company.isHighlighed</td>
+                    <td class="open-modal">@item.Company.CreatedAt</td>
+                    <td class="open-modal">@item.Company.Rating</td>
+                    <td>
+                        <!-- Activation Button with Form -->
+                        <form id="activateForm-@item.Company.CompanyId" asp-controller="Admin" asp-action="ActivateAccountSubmit" method="post">
+                            <input type="hidden" name="companyId" value="@item.Company.CompanyId" />
+                            <button type="button" class="btn btn-outline-success btn-sm activate-btn  no-outline" data-company-id="@item.Company.CompanyId">
+                                Activate
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
+
+
+<!-- Confirmation Modal -->
+<div class="modal fade " id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Confirm Activation</h5>
+                <!--button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></!--button-->
+            </div>
+            <div class="modal-body">
+                Are you sure you want to activate this account?
+            </div>
+            <div class="modal-footer">
+                <!--button type="button" class="btn btn-secondary  no-outline" data-bs-dismiss="modal">Cancel</!--button-->
+                <button type="button" class="btn btn-outline-success  no-outline" id="confirmActivateBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Details Modal Structure -->
+<div class="modal fade" id="companyDetailModal" tabindex="-1" aria-labelledby="companyDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="companyDetailModalLabel">Company Details</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Company Banner and Logo -->
+                <div class="text-center mb-4 position-relative">
+                    <img id="modalCompanyBanner" src="" alt="Company Banner" class="img-fluid">
+                    <img id="modalCompanyLogo" src="" alt="Company Logo" class="img-fluid position-absolute bottom-0 start-0 mb-2 ms-2" style="max-width: 100px;">
+                </div>
+
+                <!-- User and Company Details -->
+                <h5 style="border-bottom: 1px solid black; color:black;">Seller Information</h5>
+                <!-- User Information -->
+                <div class="d-flex justify-content-between">
+                    <div class="d-flex">
+                        <p class="modal-info-label">Name: </p>
+                        <p id="modalUserName"></p>
+                    </div>
+                    <div class="d-flex">
+                        <p class="modal-info-label">Email: </p>
+                        <p id="modalUserEmail"></p>
+                    </div>
+                    <div class="d-flex">
+                        <p class="modal-info-label">Phone: </p>
+                        <p id="modalUserPhone"></p>
+                    </div>
+                </div>
+
+                <!-- Company Information -->
+                <h5 class="modal-heading">Company Information</h5>
+
+                <div class="d-flex">
+                    <p class="modal-info-label" style="margin-right:5px;">Company Name:</p>
+                    <p id="modalCompanyName"></p>
+                </div>
+                <div class="d-flex">
+                    <p class="modal-info-label" style="margin-right:5px;">Description:</p>
+                    <p id="modalCompanyDescription"></p>
+
+                </div>
+                <div class="d-flex">
+                    <div class="modal-info-columns">
+                        <div class="modal-info-item">
+                            <p class="modal-info-label">Address:</p>
+                            <p id="modalCompanyAddress"></p>
+                        </div>
+                        <div class="modal-info-item">
+                            <p class="modal-info-label">Tax ID Number:</p>
+                            <p id="modalCompanyTaxIDNumber"></p>
+                        </div>
+                        <div class="modal-info-item">
+                            <p class="modal-info-label">IBAN:</p>
+                            <p id="modalCompanyIBAN"></p>
+                        </div>
+                        <div class="modal-info-item">
+                            <p class="modal-info-label">Created At:</p>
+                            <p id="modalCompanyCreatedAt"></p>
+                        </div>
+                        <div class="modal-info-item">
+                            <p class="modal-info-label">Rating:</p>
+                            <p id="modalCompanyRating"></p>
+                        </div>
+                        <div class="modal-info-item">
+                            <p class="modal-info-label">Highlighted:</p>
+                            <p id="modalCompanyIsHighlighed"></p>
+                        </div>
+                        <div class="modal-info-item">
+                            <p class="modal-info-label">Account Activated:</p>
+                            <p id="modalCompanyAccountactivated"></p>
+                        </div>
+                        <div class="modal-info-item">
+                            <p class="modal-info-label">Products Count:</p>
+                            <p id="modalCompanyProducts"></p>
+                        </div>
+                    </div>
+
+                </div>
+ 
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+<style>
+    
+
+    #modalCompanyLogo {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        margin: 0.5rem; /* Adjust spacing as needed */
+        max-width: 120px;
+        max-height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    #modalCompanyBanner {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .modal-info-label {
+        color: #d42c72; /* Pink color */
+        margin-right: 5px;
+        font-weight: 600;
+        align-items: center;
+    }
+
+    .modal-heading {
+        border-bottom: 1px solid black;
+        color: black;
+        margin-bottom: 1rem;
+    }
+
+    .modal-info-column {
+        margin-right: 80px;
+    }
+
+    .d-flex {
+        display: flex;
+    }
+
+    .justify-content-between {
+        justify-content: space-between;
+    }
+
+    .modal-info-columns {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .modal-info-item {
+        display: flex;
+        width: 300px;
+    }
+
+    .modal-info-label {
+        color: #d42c72; /* Pink color */
+        margin-right: 5px;
+        font-weight: 600;
+    }
+
+</style>
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var table = document.querySelector('table');
+        table.addEventListener('click', function (event) {
+            var target = event.target;
+
+
+            // Check if the target has the 'open-modal' class
+            if (!target.classList.contains('open-modal')) {
+                return;
+            }
+
+
+            while (target && !target.matches('tr')) {
+                target = target.parentElement;
+            }
+            if (!target) return;
+
+            var row = target;
+            var modal = new bootstrap.Modal(document.getElementById('companyDetailModal'));
+
+            // Set the modal images
+            document.getElementById('modalCompanyLogo').src = '/images/_Logos/' + (row.dataset.companyLogo || 'placeholder-1.png');
+            document.getElementById('modalCompanyBanner').src = '/images/_Banners/' + (row.dataset.companyBanner || 'placeholder-1.png');
+
+            document.getElementById('modalUserName').textContent = row.dataset.userName + ' ' + row.dataset.userSurname;
+            document.getElementById('modalUserEmail').textContent = row.dataset.userEmail;
+            document.getElementById('modalUserPhone').textContent = row.dataset.userPhone;
+            document.getElementById('modalCompanyName').textContent = row.dataset.companyName;
+            document.getElementById('modalCompanyDescription').textContent = row.dataset.companyDescription;
+            document.getElementById('modalCompanyAddress').textContent = row.dataset.companyAddress;
+            document.getElementById('modalCompanyTaxIDNumber').textContent = row.dataset.companyTaxidnumber;
+            document.getElementById('modalCompanyIBAN').textContent = row.dataset.companyIban;
+            document.getElementById('modalCompanyCreatedAt').textContent = row.dataset.companyCreatedat;
+            document.getElementById('modalCompanyRating').textContent = row.dataset.companyRating;
+            document.getElementById('modalCompanyProducts').textContent = (row.dataset.companyProducts || 'N/A');
+            document.getElementById('modalCompanyIsHighlighed').textContent = (row.dataset.companyHighlighed || 'N/A');
+            document.getElementById('modalCompanyAccountactivated').textContent = (row.dataset.companyAccountactivated || 'N/A');
+
+            modal.show();
+        });
+
+
+        var activateButtons = document.querySelectorAll('.activate-btn');
+        activateButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                var companyId = button.dataset.companyId;
+                var confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                var confirmActivateBtn = document.getElementById('confirmActivateBtn');
+
+                confirmActivateBtn.onclick = function () {
+                    document.getElementById('activateForm-' + companyId).submit();
+                };
+
+                confirmationModal.show();
+            });
+        });
+
+
+    });
+
+
+
+
+
+
+
+
+</script>

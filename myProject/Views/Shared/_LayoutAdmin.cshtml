@@ -1,0 +1,195 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ModernNest</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/myProject.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+PE:wght@100..400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+PE:wght@100..400&family=Poppins&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Thasadith&display=swap" rel="stylesheet">
+
+</head>
+<body style="overflow:hidden;">
+
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light box-shadow2 px-3 rounded">
+            <div class="container-fluid">
+                <a class="navbar-brand text-center" style="display:flex; align-items:center;" asp-area="" asp-controller="Seller" asp-action="Index">
+                    <!--div class="poppins text-center" style="color:#fefefe; width:50px; height:50px;">
+                        <img src="~/images/logo.png" class="img-fluid rounded-circle" alt="logo">
+                    </!--div-->
+                    <div style="color:#fefefe; display:flex;flex-direction:column; font-family: 'Playwrite PE', sans-serif;">
+                        ModernNest
+                        <span style="font-size:10px; margin-top:-5px;">- Discover Your Style -</span>
+                    </div>
+
+                </a>
+
+                <!--h6 style=" font-family: "Poppins", sans-serif;">Seller Management System</!--h6-->
+
+                <div class="satici-info" style="display:flex; align-items:center;">
+                    <div style="width:25px;"></div>
+                    <!-- Sol tarafta resim -->
+                    <div class="poppins text-center" style="color:#fefefe; width:45px; height:45px;">
+                        <img src="~/images/user.jpg" class="img-fluid rounded-circle" alt="image">
+                    </div>
+                    <!-- Sağ tarafta mağaza adı ve satıcı ismi -->
+                    <div class=" " style="margin-left:10px; margin-right:5px; justify-content:center;">
+                        <h6 class="poppins" style="color:#fefefe;  margin-top:3px; margin-bottom:-1px;">Mağaza Adı</h6>
+                        <h6 class="poppins" style="color:#fefefe; font-size:13px;">Satıcı İsmi</h6>
+                    </div>
+
+                    <div class="dropdown">
+                        <button class="btn btn-link dropdown-toggle dropdown-outline" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:#fefefe;">
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-left" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" asp-area="" asp-controller="Admin" asp-action="Profile">
+                                <i class="las la-user-circle"></i> Profile
+                            </a>
+                            <a class="dropdown-item" asp-area="" asp-controller="Admin" asp-action="Messages">
+                                <i class="las la-envelope"></i> Messages
+                            </a>
+                            <a class="dropdown-item" asp-area="" asp-controller="Admin" asp-action="Signout">
+                                <i class="las la-sign-out-alt"></i> Sign Out
+                            </a>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container-fluid">
+        <div class="row px-2">
+            <!-- Sidebar -->
+            <nav class="col-md-2 d-md-block sidebar" style="height:100vh; overflow-y:scroll; box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.2);">
+                <div class="sidebar-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item rounded mt-3 @(ViewContext.RouteData.Values["Controller"].ToString() == "Admin" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
+                            <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Index">
+                                <i class="las la-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Admin" && ViewContext.RouteData.Values["Action"].ToString() == "Companies" ? "active" : "")">
+                            <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Companies">
+                                <i class="las la-building"></i> Companies
+                            </a>
+                        </li>
+                        <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Admin" && ViewContext.RouteData.Values["Action"].ToString() == "ActivateAccounts" ? "active" : "")">
+                            <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="ActivateAccounts">
+                                <i class="las la-user-check"></i> Activate Accounts
+                            </a>
+                        </li>
+
+                      
+
+                        <!--li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Seller" && ViewContext.RouteData.Values["Action"].ToString() == "Comments" ? "active" : "")">
+                            <a class="nav-link" asp-area="" asp-controller="Seller" asp-action="Comments">
+                                <i class="las la-comments"></i> Comments
+                            </a>
+                        </!--li-->
+
+
+
+                    </ul>
+
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main role="main" class="col-md-10 ml-sm-auto col-lg-10 px-4 mt-4">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+
+    <footer class="border-top footer text-muted col-md-2" style="position: fixed; bottom: 0;">
+        <div class="" style="font-size:12px; margin-left:4px;">
+            &copy; 2024 - ModernNest -  <a style="text-decoration: none; color:#4e54c8;" href="https://github.com/iremcagin">İrem Çağın Yurttürk</a>
+        </div>
+    </footer>
+
+    <style>
+        .navbar {
+            background-image: linear-gradient(to right, #ffc3a0, #FFAFBD);
+            background: linear-gradient(to right, #ffb3ba, #ffdfba);
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            background: linear-gradient(to right, #CB356B, #BD3F32);
+        }
+
+        .nav-item {
+            margin-bottom: 3px;
+        }
+
+        .nav-link {
+            color: #828282;
+            font-family: "Poppins", sans-serif;
+            font-size: 15px;
+        }
+
+            .nav-link:hover {
+                color: #4e54c8;
+                font-size: 15.2px;
+            }
+
+
+        .poppins {
+            font-family: "Poppins", sans-serif;
+            font-size: 15px;
+        }
+
+
+        .nav-item.active {
+            /*background-color:#cccccc; */
+            border-right: 1px solid #2d317a;
+            border-bottom: 1px solid #2d317a;
+        }
+
+            .nav-item.active a.nav-link {
+                /* Text color when active */
+                color: #2d317a;
+            }
+
+        .las {
+            margin-right: 6px;
+        }
+
+        /* Remove blue border when clicked */
+        .btn-link:focus, .btn-link:active {
+            outline: none;
+            box-shadow: none;
+        }
+        /* Ensure dropdown menu opens to the left */
+        .dropdown-menu-left {
+            margin-top: 7px;
+            right: 0;
+        }
+
+    </style>
+
+
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Popper.js (gerekiyorsa) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

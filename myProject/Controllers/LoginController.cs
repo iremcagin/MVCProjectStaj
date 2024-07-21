@@ -45,7 +45,13 @@ namespace myProject.Controllers
                     }
                     else if(role == "seller")
                     {
-                        return RedirectToAction("Index", "Seller");
+                        /* Hesap onaylanmış mı diye kontrol et */
+                        if(_loginDatabaseControlModel.CheckIfAccountActivated(loggedUser.UserId)) return RedirectToAction("Index", "Seller");
+                        else
+                        {
+                            TempData["ErrorMessage"] = "Account has not been activated yet.";
+                            return RedirectToAction("Index");
+                        }
                     }
                     else if(role == "user")
                     {
@@ -111,7 +117,7 @@ namespace myProject.Controllers
                         await model.Logo.CopyToAsync(stream);
                     }
 
-                    model.Company.LogoUrl = logoPath;
+                    model.Company.LogoUrl = logoFileName;
                 }
                 else { model.Company.LogoUrl = "wwwroot/images/placeholder-1.png"; }
                 /* Save the Banner to the folder */
@@ -126,7 +132,7 @@ namespace myProject.Controllers
                         await model.Banner.CopyToAsync(stream);
                     }
 
-                    model.Company.BannerUrl = bannerPath;
+                    model.Company.BannerUrl = bannerFileName;
                 }
                 else { model.Company.BannerUrl = "wwwroot/images/placeholder-1.png"; }
                 _loginDatabaseControlModel.CompanySignUp(model);
