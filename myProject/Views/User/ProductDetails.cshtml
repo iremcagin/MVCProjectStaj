@@ -1,0 +1,109 @@
+﻿@model myProject.Models.ProductDetailsModel
+
+@{
+    ViewData["Title"] = "User";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    var productDetails = ViewBag.ProductDetails as ProductDetailsModel;
+}
+
+
+
+
+<div class="container">
+    <!-- Product Details Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>@Model.Product.Name</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!--div class="col-md-4">
+                    <img src="~/images/products/@Model.ProductImages[0]" alt="Product Image" class="img-fluid" />
+                </!--div-->
+                <div class="col-md-8">
+                    <h3 class="text-primary">$@Model.Product.Price</h3>
+                    <p>@Model.Product.Description</p>
+                    <ul class="list-group">
+                        <li class="list-group-item"><strong>Category:</strong> @Model.Product.Category</li>
+                        <li class="list-group-item"><strong>Stock:</strong> @Model.Product.Stock</li>
+                        <li class="list-group-item"><strong>Rating:</strong> @Model.Product.Rating</li>
+                        <li class="list-group-item"><strong>Favorites:</strong> @Model.Product.Favorite</li>
+                        <li class="list-group-item"><strong>Clicks:</strong> @Model.Product.Clicked</li>
+                        <li class="list-group-item"><strong>Available:</strong> @Model.Product.isAvailable</li>
+                        <li class="list-group-item"><strong>Created At:</strong> @Model.Product.CreatedAt.ToShortDateString()</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Company Details Section -->
+    <!--div class="card mb-4">
+        <div class="card-header">
+            <h3>Company Information</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="~/images/_Logos/@Model.Company.LogoUrl" alt="Company Logo" class="img-fluid" />
+                </div>
+                <div class="col-md-8">
+                    <h4>@Model.Company.CompanyName</h4>
+                    <p>@Model.Company.Description</p>
+                    <ul class="list-group">
+                        <li class="list-group-item"><strong>Address:</strong> @Model.Company.Address</li>
+                        <li class="list-group-item"><strong>Phone Number:</strong> @Model.Company.PhoneNumber</li>
+                        <li class="list-group-item"><strong>Email:</strong> @Model.Company.Email</li>
+                        <li class="list-group-item"><strong>Tax ID Number:</strong> @Model.Company.TaxIDNumber</li>
+                        <li class="list-group-item"><strong>IBAN:</strong> @Model.Company.IBAN</li>
+                        <li class="list-group-item"><strong>Created At:</strong> @Model.Company.CreatedAt.ToShortDateString()</li>
+                        <li class="list-group-item"><strong>Rating:</strong> @Model.Company.Rating</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </!--div-->
+
+    <!-- User Details Section -->
+    <!--div class="card mb-4">
+        <div class="card-header">
+            <h3>User Information</h3>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                <li class="list-group-item"><strong>Name:</strong> @Model.User.Name @Model.User.Surname</li>
+                <li class="list-group-item"><strong>Email:</strong> @Model.User.Email</li>
+                <li class="list-group-item"><strong>Phone Number:</strong> @Model.User.PhoneNumber</li>
+                <li class="list-group-item"><strong>Address:</strong> @Model.User.Address</li>
+                <li class="list-group-item"><strong>Role:</strong> @Model.User.Role</li>
+                <li class="list-group-item"><strong>Birthdate:</strong> @Model.User.Birthdate.ToShortDateString()</li>
+                <li class="list-group-item"><strong>Created At:</strong> @Model.User.CreatedAt.ToShortDateString()</li>
+            </ul>
+        </div>
+    </!--div-->
+
+    <!-- Product Reviews Section -->
+    <!--div class="card mb-4">
+        <div class="card-header">
+            <h3>Product Reviews</h3>
+        </div>
+        <div class="card-body">
+            @if (Model.ProductReviews.Any())
+            {
+                foreach (var review in Model.ProductReviews)
+                {
+                    <div class="mb-3">
+                        <h5>@Model.ReviewedUsers.FirstOrDefault(u => u.UserId == review.UserId)?.Name</h5>
+                        <p><strong>Rating:</strong> @review.Rating</p>
+                        <p>@review.Review</p>
+                        <p><small>Reviewed on @review.CreatedAt.ToShortDateString()</small></p>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No reviews yet.</p>
+            }
+        </div>
+    </!--div-->
+</div>

@@ -55,7 +55,7 @@ namespace myProject.Controllers
                     }
                     else if(role == "user")
                     {
-                        return RedirectToAction("Index", "Guest");
+                        return RedirectToAction("Index", "User");
                     }
                 }
               

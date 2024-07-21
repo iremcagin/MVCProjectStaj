@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System.Collections.Generic;
+using System.Data.SqlClient;
 
 namespace myProject.Models
 {
@@ -344,14 +345,226 @@ namespace myProject.Models
                 Console.WriteLine("Error while reading products: " + ex.Message);
             }
 
-
-
-
-
             return products;
 
         }
 
+
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /*Return selected product's details */
+
+        public ProductDetailsModel ProductDetail(int productId)
+        {
+            ProductDetailsModel productDetailsModel = new ProductDetailsModel();
+
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                        SELECT *
+                        FROM Products where ProductId = @productId";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@productId", productId);
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                productDetailsModel.Product.ProductId = reader.GetInt32(reader.GetOrdinal("ProductId"));
+                                productDetailsModel.Product.CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId"));
+                                productDetailsModel.Product.Name = reader.GetString(reader.GetOrdinal("Name"));
+                                productDetailsModel.Product.Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description"));
+                                productDetailsModel.Product.Price = reader.GetDecimal(reader.GetOrdinal("Price"));
+                                productDetailsModel.Product.Stock = reader.GetInt32(reader.GetOrdinal("Stock"));
+                                productDetailsModel.Product.CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"));
+                                productDetailsModel.Product.Category = reader.GetString(reader.GetOrdinal("Category"));
+                                productDetailsModel.Product.Rating = reader.GetFloat(reader.GetOrdinal("Rating"));
+                                productDetailsModel.Product.Favorite = reader.GetInt32(reader.GetOrdinal("Favorite"));
+                                productDetailsModel.Product.Clicked = reader.GetInt32(reader.GetOrdinal("Clicked"));
+                                productDetailsModel.Product.isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"));
+
+                            }
+                        }
+                    }
+
+
+                    // Then, retrieve company details based on CompanyId
+                    string companyQuery = @"
+                    SELECT *
+                    FROM Companies
+                    WHERE Id = @companyId";
+
+                    using (SqlCommand cmd = new SqlCommand(companyQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@companyId", productDetailsModel.Product.CompanyId);
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                productDetailsModel.Company = new CompanyModel
+                                {
+                                    CompanyId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                                    CompanyName = reader.GetString(reader.GetOrdinal("CompanyName")),
+                                    Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description")),
+                                    Address = reader.GetString(reader.GetOrdinal("Address")),
+                                    PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
+                                    Email = reader.GetString(reader.GetOrdinal("Email")),
+                                    isAccountActivated = reader.GetBoolean(reader.GetOrdinal("isAccountActivated")),
+                                    LogoUrl = reader.IsDBNull(reader.GetOrdinal("LogoUrl")) ? null : reader.GetString(reader.GetOrdinal("LogoUrl")),
+                                    BannerUrl = reader.IsDBNull(reader.GetOrdinal("BannerUrl")) ? null : reader.GetString(reader.GetOrdinal("BannerUrl")),
+                                    TaxIDNumber = reader.GetString(reader.GetOrdinal("TaxIDNumber")),
+                                    IBAN = reader.GetString(reader.GetOrdinal("IBAN")),
+                                    isHighlighed = reader.IsDBNull(reader.GetOrdinal("IsHighlighted")) ? null : reader.GetString(reader.GetOrdinal("IsHighlighted")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                    Rating = reader.GetInt32(reader.GetOrdinal("Rating"))
+
+                                };
+                            }
+                        }
+                    }
+
+
+                    string userQuery = @"
+                    SELECT *
+                    FROM Users
+                    WHERE Id = @userId";
+
+                    using (SqlCommand cmd = new SqlCommand(userQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@userId", productDetailsModel.Company.UserId);
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                productDetailsModel.User = new UserModel
+                                {
+                                    UserId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Age = reader.GetInt32(reader.GetOrdinal("Age")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Surname = reader.GetString(reader.GetOrdinal("Surname")),
+                                    PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
+                                    PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
+                                    Email = reader.GetString(reader.GetOrdinal("Email")),
+                                    Address = reader.GetString(reader.GetOrdinal("Address")),
+                                    Role = reader.GetString(reader.GetOrdinal("Role")),
+                                    Birthdate = reader.GetDateTime(reader.GetOrdinal("Birthdate")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+                                };
+                            }
+                        }
+                    }
+
+                    // Ürün yorumlarını al
+                    string reviewsQuery = @"
+                    SELECT *
+                    FROM Reviews 
+                    WHERE ProductId = @productId";
+
+                    using (SqlCommand cmd = new SqlCommand(reviewsQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@productId", productId);
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            productDetailsModel.ProductReviews = new List<ProductReviewModel>();
+
+                            while (reader.Read())
+                            {
+                                productDetailsModel.ProductReviews.Add(new ProductReviewModel
+                                {
+                                    ReviewId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                    CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                    UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                                    Rating = reader.GetInt32(reader.GetOrdinal("Rating")),
+                                    Review = reader.GetString(reader.GetOrdinal("Review")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))                                  
+                                });
+                            }
+                        }
+                    }
+
+
+
+                    /* Yorum yapan kullanıcıların bilgilerini oku */
+                    for (int i = 0; i < productDetailsModel.ProductReviews.Count; i++)
+                    {
+                        string reviewsUsersQuery = @"
+                        SELECT *
+                        FROM Users 
+                        WHERE Id = @userId";
+
+                        using (SqlCommand cmd = new SqlCommand(reviewsUsersQuery, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@userId", productDetailsModel.ProductReviews[i].UserId);
+
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                productDetailsModel.ReviewedUsers.Add(new UserModel
+                                {
+                                    UserId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Age = reader.GetInt32(reader.GetOrdinal("Age")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Surname = reader.GetString(reader.GetOrdinal("Surname")),
+                                    PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
+                                    PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
+                                    Email = reader.GetString(reader.GetOrdinal("Email")),
+                                    Address = reader.GetString(reader.GetOrdinal("Address")),
+                                    Role = reader.GetString(reader.GetOrdinal("Role")),
+                                    Birthdate = reader.GetDateTime(reader.GetOrdinal("Birthdate")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+                                });
+                            }
+                        }
+                    }
+
+
+                    /* ürünün resimlerini döndür */
+                    string imagesQuery = @"
+                    SELECT *
+                    FROM ProductImages
+                    WHERE ProductId = @productId";
+
+                        using (SqlCommand cmd = new SqlCommand(imagesQuery, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@productId", productId);
+
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                productDetailsModel.ProductImages = new List<string>();
+
+                                while (reader.Read())
+                                {
+                                    productDetailsModel.ProductImages.Add(
+                                       reader.GetString(reader.GetOrdinal("ImageURL"))
+                                    );
+                                }
+                            }
+                        }
+
+
+
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error while reading products: " + ex.Message);
+            }
+
+            return productDetailsModel;
+        }
 
 
 

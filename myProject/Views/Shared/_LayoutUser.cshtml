@@ -1,4 +1,4 @@
-﻿@model CategoriesModel
+﻿@model myProject.Models.CategoriesModel
 
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Arapey:ital@0;1&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color:#fefefe;
+            background-color: #fefefe;
             font-family: 'Montserrat', sans-serif;
             font-family: "Arapey", serif;
         }
@@ -26,10 +26,10 @@
 
 <body>
     <header class=" d-flex justify-content-center" style=" font-family: " Montserrat", sans-serif;">
-        <nav class="navbar navbar-expand-md col-md-10 border-bottom box-shadow mb-3" >
+        <nav class="navbar navbar-expand-md col-md-10 border-bottom box-shadow mb-3">
             <div class="container">
                 <!-- Logo with image -->
-                <a class="navbar-brand" href="/Guest">
+                <a class="navbar-brand" href="/User">
                     <img src="~/images/logooo3.png" alt="Your Logo" height="90">
                 </a>
 
@@ -41,10 +41,10 @@
 
                 <!-- Navbar links -->
                 <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent" style="font-size:21px;">
-                    <ul class="navbar-nav me-auto mb-2 gap-3"  style="margin-left:30px;">
+                    <ul class="navbar-nav me-auto mb-2 gap-3" style="margin-left:30px;">
                         <!-- Main categories -->
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="/Guest">Home</a>
+                            <a class="nav-link text-dark" href="/User">Home</a>
                         </li>
                         @{
                             CategoriesModel categoriesModel = new CategoriesModel();
@@ -52,44 +52,44 @@
                             var decorationCategories = categoriesModel.GetAllDecorationCategories();
 
 
-                            
-                                <!-- Furniture Section -->
-                                <div class="nav-item dropdown">
-                                    <a class="nav-link text-dark" href="#" role="button">
-                                        Furniture
-                                    </a>
-                                    <ul class="list-unstyled small-list">
-                                        @foreach (var category in furnitureCategories)
-                                        {
-                                            <li>
-                                                <a class="text-dark" asp-area="" asp-controller="Guest" asp-action="@category.CategoryName">
+
+                            <!-- Furniture Section -->
+                            <div class="nav-item dropdown">
+                                <a class="nav-link text-dark" href="#" role="button">
+                                    Furniture
+                                </a>
+                                <ul class="list-unstyled small-list">
+                                    @foreach (var category in furnitureCategories)
+                                    {
+                                        <li>
+                                            <a class="text-dark" asp-area="" asp-controller="Guest" asp-action="@category.CategoryName">
                                                 <i class="las la-caret-right" style="margin-right:3px; color: #969696;"></i>
                                                 <span style="color: #969696;">
                                                     @category.CategoryName
                                                 </span>
-                                                </a>
-                                            </li>
-                                        }
-                                    </ul>
-                                </div>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
 
-                                <!-- Decoration Section -->
-                                <div class="nav-item dropdown">
-                                    <a class="nav-link text-dark" href="#" role="button">
-                                        Decoration
-                                    </a>
-                                    <ul class="list-unstyled small-list">
-                                        @foreach (var category in decorationCategories)
-                                        {
-                                            <li>
-                                                <a class="text-dark" asp-area="" asp-controller="Guest" asp-action="@category.CategoryName">
+                            <!-- Decoration Section -->
+                            <div class="nav-item dropdown">
+                                <a class="nav-link text-dark" href="#" role="button">
+                                    Decoration
+                                </a>
+                                <ul class="list-unstyled small-list">
+                                    @foreach (var category in decorationCategories)
+                                    {
+                                        <li>
+                                            <a class="text-dark" asp-area="" asp-controller="Guest" asp-action="@category.CategoryName">
                                                 <i class="las la-caret-right" style="margin-right:3px; color: #969696;"></i>
                                                 <span style="color: #969696;">@category.CategoryName</span>
-                                                </a>
-                                            </li>
-                                        }
-                                    </ul>
-                                </div>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
                         }
                     </ul>
                 </div>
@@ -106,10 +106,26 @@
 
                     <ul class="navbar-nav col-md-2">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Index" style="font-size:20px;">
-                                <i class="la la-user"></i> Login
+                            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Profile" style="font-size:20px;">
+                                <i class="la la-user"></i>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Basket" style="font-size:20px;">
+                                <i class="la la-shopping-basket"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Favorites" style="font-size:20px;">
+                                <i class="la la-heart"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Signout" style="font-size:20px;">
+                                <i class="la la-sign-out"></i>
+                            </a>
+                        </li>
+
                     </ul>
                 </div>
             </div>
@@ -129,22 +145,22 @@
         </div>
     </footer>
 
-    
+
     <style>
         #furnitureDropdown .nav-link:hover,
         #furnitureDropdown .nav-link:focus,
         #decorationDropdown .nav-link:hover,
         #decorationDropdown .nav-link:focus {
             color: #fcadb2;
-            background-color: transparent; 
+            background-color: transparent;
             border-color: transparent;
-            outline: none; 
-            box-shadow: none; 
+            outline: none;
+            box-shadow: none;
         }
 
         .small-list {
             margin-top: -5px;
-            display: block; 
+            display: block;
             max-height: 0;
             opacity: 0;
             overflow: hidden;
@@ -152,35 +168,35 @@
             padding-left: 0;
         }
 
-      
+
         .nav-item:hover .small-list {
-            max-height: 500px; 
-            opacity: 1; 
+            max-height: 500px;
+            opacity: 1;
         }
 
         /* Style for links */
         .small-list a {
             font-size: 0.875rem; /* Smaller font size */
-            color: #333; 
+            color: #333;
             text-decoration: none;
             display: block;
         }
 
-            
-        .small-list a:hover {
-            text-decoration: underline;
+
+            .small-list a:hover {
+                text-decoration: underline;
+            }
+
+
+        .no-outline:focus {
+            outline: none;
+            box-shadow: none;
         }
 
-        
-        .no-outline:focus {
-            outline: none; 
-            box-shadow: none; 
-        }
 
         .search-button:hover {
             background-color: #dbdbdb;
         }
-
     </style>
 
 
@@ -188,7 +204,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
-  
+
 
 
     </script>

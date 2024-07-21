@@ -98,5 +98,15 @@ namespace myProject.Controllers
             }
         }
 
+
+
+        /* --------------------------------------------------- Navbar --------------------------------------------------- */
+        public IActionResult Signout()
+        {
+            HttpContext.Session.Remove("UserId");
+            return RedirectToAction("Index", "Guest");
+        }
+
+
     }
 }

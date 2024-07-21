@@ -7,13 +7,14 @@ namespace myProject.Controllers
     {
         _AdminDatabaseControlModel _adminDatabaseControlModel = new _AdminDatabaseControlModel();
 
-
+        /* --------------------------------------------------- Dashboard Page --------------------------------------------------- */
         public IActionResult Index()
         {
             return View();
         }
 
 
+        /* --------------------------------------------------- Companies Page --------------------------------------------------- */
         [HttpGet]
         public IActionResult Companies()
         {
@@ -23,6 +24,7 @@ namespace myProject.Controllers
         }
 
 
+        /* --------------------------------------------------- Activate Accounts Page --------------------------------------------------- */
         public IActionResult ActivateAccounts()
         {
             List<CombinedViewModel> combinedViewModelList = _adminDatabaseControlModel.getNotAcitavedCompanies();
@@ -40,6 +42,16 @@ namespace myProject.Controllers
             _adminDatabaseControlModel.ActivateAccount(companyId);
             return RedirectToAction("ActivateAccounts");
         }
+
+        /* --------------------------------------------------- Navbar --------------------------------------------------- */
+        public IActionResult Signout()
+        {
+            HttpContext.Session.Remove("UserId");
+            return RedirectToAction("Index","Guest");
+          
+        }
+
+
 
     }
 }
