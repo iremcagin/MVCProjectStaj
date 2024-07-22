@@ -78,6 +78,7 @@ namespace myProject.Models
             UserModel loggedUser = new UserModel();
 
 
+
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();

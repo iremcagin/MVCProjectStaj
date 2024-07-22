@@ -548,24 +548,19 @@ namespace myProject.Models
 
                                 while (reader.Read())
                                 {
-                                    productDetailsModel.ProductImages.Add(
-                                       reader.GetString(reader.GetOrdinal("ImageURL"))
-                                    );
+                                    int imageUrlIndex = reader.GetOrdinal("ImageURL");
+                                    string imageUrl = reader.GetString(imageUrlIndex);
+
+                                    productDetailsModel.ProductImages.Add(imageUrl); 
                                 }
                             }
                         }
-
-                    
-
-
                 }
-
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error while reading products: " + ex.Message);
             }
-
             return productDetailsModel;
         }
 

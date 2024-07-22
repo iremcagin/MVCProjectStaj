@@ -38,9 +38,12 @@ namespace myProject.Controllers
         {
             ProductDetailsModel productDetailsModel = new ProductDetailsModel();
             productDetailsModel = userDatabaseControlModel.ProductDetail(productId);
+
+
             ViewBag.ProductDetails = productDetailsModel;
 
-            //Console.WriteLine(productDetailsModel.Product.Name);
+
+           // Console.WriteLine("aaaa" + productDetailsModel.ProductImages[0]);
 
             return View();
         }

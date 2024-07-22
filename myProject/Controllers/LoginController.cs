@@ -41,6 +41,7 @@ namespace myProject.Controllers
 
                     if (role == "admin")
                     {
+                        Console.WriteLine("Hereee");
                         return RedirectToAction("Index", "Admin");
                     }
                     else if(role == "seller")
