@@ -40,7 +40,9 @@ namespace myProject.Controllers
             productDetailsModel = userDatabaseControlModel.ProductDetail(productId);
             ViewBag.ProductDetails = productDetailsModel;
 
-            return View("ProductDetails");
+            //Console.WriteLine(productDetailsModel.Product.Name);
+
+            return View();
         }
 
 

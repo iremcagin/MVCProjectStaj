@@ -359,7 +359,7 @@ namespace myProject.Models
         {
             ProductDetailsModel productDetailsModel = new ProductDetailsModel();
 
-
+            
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
@@ -375,17 +375,18 @@ namespace myProject.Models
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            while (reader.Read())
+                            if (reader.Read())
                             {
+                                productDetailsModel.Product = new ProductModel();
                                 productDetailsModel.Product.ProductId = reader.GetInt32(reader.GetOrdinal("ProductId"));
                                 productDetailsModel.Product.CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId"));
                                 productDetailsModel.Product.Name = reader.GetString(reader.GetOrdinal("Name"));
-                                productDetailsModel.Product.Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description"));
+                                productDetailsModel.Product.Description = reader.GetString(reader.GetOrdinal("Description"));
                                 productDetailsModel.Product.Price = reader.GetDecimal(reader.GetOrdinal("Price"));
                                 productDetailsModel.Product.Stock = reader.GetInt32(reader.GetOrdinal("Stock"));
                                 productDetailsModel.Product.CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"));
                                 productDetailsModel.Product.Category = reader.GetString(reader.GetOrdinal("Category"));
-                                productDetailsModel.Product.Rating = reader.GetFloat(reader.GetOrdinal("Rating"));
+                                productDetailsModel.Product.Rating = Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("Rating")));
                                 productDetailsModel.Product.Favorite = reader.GetInt32(reader.GetOrdinal("Favorite"));
                                 productDetailsModel.Product.Clicked = reader.GetInt32(reader.GetOrdinal("Clicked"));
                                 productDetailsModel.Product.isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"));
@@ -394,7 +395,7 @@ namespace myProject.Models
                         }
                     }
 
-
+                    
                     // Then, retrieve company details based on CompanyId
                     string companyQuery = @"
                     SELECT *
@@ -433,6 +434,7 @@ namespace myProject.Models
                     }
 
 
+                    
                     string userQuery = @"
                     SELECT *
                     FROM Users
@@ -464,6 +466,7 @@ namespace myProject.Models
                         }
                     }
 
+                    
                     // Ürün yorumlarını al
                     string reviewsQuery = @"
                     SELECT *
@@ -496,7 +499,7 @@ namespace myProject.Models
 
 
 
-                    /* Yorum yapan kullanıcıların bilgilerini oku */
+                    // Yorum yapan kullanıcıların bilgilerini oku 
                     for (int i = 0; i < productDetailsModel.ProductReviews.Count; i++)
                     {
                         string reviewsUsersQuery = @"
@@ -529,7 +532,7 @@ namespace myProject.Models
                     }
 
 
-                    /* ürünün resimlerini döndür */
+                    // ürünün resimlerini döndür 
                     string imagesQuery = @"
                     SELECT *
                     FROM ProductImages
@@ -552,7 +555,7 @@ namespace myProject.Models
                             }
                         }
 
-
+                    
 
 
                 }
