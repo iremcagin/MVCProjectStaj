@@ -133,17 +133,37 @@
             @if (productDetails.ProductReviews.Any())
             {
                 int i = 0;
-                foreach (var review in productDetails.ProductReviews)
-                {
-                    <div class="mb-3">
-                        <h5>@productDetails.ReviewedUsers[i].Name</h5>
-                        <p><strong>Rating:</strong> @review.Rating</p>
-                        <p>@review.Review</p>
-                        <p><small>Reviewed on @review.CreatedAt.ToShortDateString()</small></p>
-                    </div>
-                    i++;
+
+                    foreach (var review in productDetails.ProductReviews)
+                    {
+                        <div class="mb-3">
+                            <h6>
+                                @productDetails.ReviewedUsers[i].Name @productDetails.ReviewedUsers[i].Surname
+                                <span style="font-size:15px; margin-left:5px;">
+                                    @for (int j = 0; j < 5; j++)
+                                    {
+                                        if (j < review.Rating)
+                                        {
+                                            <i class="las la-star text-warning"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="lar la-star text-warning"></i>
+                                        }
+                                    }
+                                </span>
+                            </h6>
+                            <p>@review.Review</p>
+                            <p style="margin-top: -15px;"><small>Reviewed on @review.CreatedAt.ToShortDateString()</small></p>
+                            @if (i < productDetails.ProductReviews.Count - 1)
+                            {
+                                <hr />
+                            }
+               
+                        </div>
+                        i++;
+                    }
                 }
-            }
             else
             {
                 <p>No reviews yet.</p>

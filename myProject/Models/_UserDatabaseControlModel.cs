@@ -466,39 +466,50 @@ namespace myProject.Models
                         }
                     }
 
-                    
+
                     // Ürün yorumlarını al
                     string reviewsQuery = @"
                     SELECT *
                     FROM Reviews 
                     WHERE ProductId = @productId";
 
+
                     using (SqlCommand cmd = new SqlCommand(reviewsQuery, conn))
                     {
                         cmd.Parameters.AddWithValue("@productId", productId);
 
+                      
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             productDetailsModel.ProductReviews = new List<ProductReviewModel>();
 
-                            while (reader.Read())
+                            if (reader.HasRows)
                             {
-                                productDetailsModel.ProductReviews.Add(new ProductReviewModel
+                                while (reader.Read())
                                 {
-                                    ReviewId = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
-                                    CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
-                                    UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
-                                    Rating = reader.GetInt32(reader.GetOrdinal("Rating")),
-                                    Review = reader.GetString(reader.GetOrdinal("Review")),
-                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))                                  
-                                });
+                                    productDetailsModel.ProductReviews.Add(new ProductReviewModel
+                                    {
+                                        ReviewId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                        ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                        CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                        UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                                        Rating = reader.GetInt32(reader.GetOrdinal("Rating")),
+                                        Review = reader.GetString(reader.GetOrdinal("Review")),
+                                        CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+                                    });
+
+                                    //Console.WriteLine($"Review Added");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("No reviews found for the given product ID.");
                             }
                         }
                     }
 
 
-
+                    
                     // Yorum yapan kullanıcıların bilgilerini oku 
                     for (int i = 0; i < productDetailsModel.ProductReviews.Count; i++)
                     {
@@ -513,23 +524,34 @@ namespace myProject.Models
 
                             using (SqlDataReader reader = cmd.ExecuteReader())
                             {
-                                productDetailsModel.ReviewedUsers.Add(new UserModel
+                                if (reader.HasRows)
                                 {
-                                    UserId = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    Age = reader.GetInt32(reader.GetOrdinal("Age")),
-                                    Name = reader.GetString(reader.GetOrdinal("Name")),
-                                    Surname = reader.GetString(reader.GetOrdinal("Surname")),
-                                    PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
-                                    PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
-                                    Email = reader.GetString(reader.GetOrdinal("Email")),
-                                    Address = reader.GetString(reader.GetOrdinal("Address")),
-                                    Role = reader.GetString(reader.GetOrdinal("Role")),
-                                    Birthdate = reader.GetDateTime(reader.GetOrdinal("Birthdate")),
-                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
-                                });
+                                    while (reader.Read())
+                                    {
+                                        productDetailsModel.ReviewedUsers.Add(new UserModel
+                                        {
+                                            UserId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                            Age = reader.GetInt32(reader.GetOrdinal("Age")),
+                                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                                            Surname = reader.GetString(reader.GetOrdinal("Surname")),
+                                            PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
+                                            PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
+                                            Email = reader.GetString(reader.GetOrdinal("Email")),
+                                            Address = reader.GetString(reader.GetOrdinal("Address")),
+                                            Role = reader.GetString(reader.GetOrdinal("Role")),
+                                            Birthdate = reader.GetDateTime(reader.GetOrdinal("Birthdate")),
+                                            CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+                                        });
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("No user found with Id: " + productDetailsModel.ProductReviews[i].UserId);
+                                }
                             }
                         }
                     }
+                    
 
 
                     // ürünün resimlerini döndür 
