@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using myProject.Models;
+using System.Collections.Generic;
 
 namespace myProject.Controllers
 {
@@ -26,6 +27,21 @@ namespace myProject.Controllers
         }
 
 
+        /* ------------------------------------------------------------------------------------------ */
+        public IActionResult GetBasketCount()
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(0); // Kullanıcı giriş yapmamışsa, sepet sayısı 0
+            }
+
+            int basketCount = userDatabaseControlModel.GetBasketCount(userId.Value);
+            return Json(basketCount);
+        }
+
+
+        /* ------------------------------------------------------------------------------------------ */
         public IActionResult Signout()
         {
             HttpContext.Session.Remove("UserId");
@@ -33,6 +49,9 @@ namespace myProject.Controllers
         }
 
 
+
+        /* ------------------------------------------------------------------------------------------ */
+        /* Ürüne tıklanınca açılan sayfa */
         [HttpGet("User/ProductDetails/{productId}")]
         public IActionResult ProductDetails(int productId)
         {
@@ -41,14 +60,32 @@ namespace myProject.Controllers
 
 
             ViewBag.ProductDetails = productDetailsModel;
-
-
-           // Console.WriteLine("aaaa" + productDetailsModel.ProductImages[0]);
-
             return View();
         }
 
 
+        /* ------------------------------------------------------------------------------------------ */
+        // Sepete ürün ekle
+        [HttpPost]
+        public IActionResult AddToCart(int productId, int companyId)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            userDatabaseControlModel.AddToCart(userId, productId, companyId);
+            return RedirectToAction("ProductDetails");
+        }
+
+
+        /* ------------------------------------------------------------------------------------------ */
+        // Sepetteki ürünleri döndür
+
+        public IActionResult Basket()
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            List<ProductModel> allProducts = userDatabaseControlModel.GetBasket(userId);
+           // ViewBag.allProducts = allProducts;
+
+            return View();
+        }
 
 
     }

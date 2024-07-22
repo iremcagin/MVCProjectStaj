@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Elfie.Diagnostics;
+using NuGet.Protocol.Plugins;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 
 namespace myProject.Models
@@ -55,7 +59,7 @@ namespace myProject.Models
                     }
                 }
 
-             
+
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
@@ -359,13 +363,27 @@ namespace myProject.Models
         {
             ProductDetailsModel productDetailsModel = new ProductDetailsModel();
 
-            
+
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    string query = @"
+
+
+
+                    // Update clicked value of product 
+                    string query = "UPDATE Products SET Clicked = Clicked + 1 WHERE ProductId = @ProductId";
+
+                    using (var command = new SqlCommand(query, conn))
+                    {
+                        command.Parameters.AddWithValue("@ProductId", productId);
+                        command.ExecuteNonQuery();
+                    }
+
+
+
+                    query = @"
                         SELECT *
                         FROM Products where ProductId = @productId";
 
@@ -395,7 +413,7 @@ namespace myProject.Models
                         }
                     }
 
-                    
+
                     // Then, retrieve company details based on CompanyId
                     string companyQuery = @"
                     SELECT *
@@ -434,7 +452,7 @@ namespace myProject.Models
                     }
 
 
-                    
+
                     string userQuery = @"
                     SELECT *
                     FROM Users
@@ -478,7 +496,7 @@ namespace myProject.Models
                     {
                         cmd.Parameters.AddWithValue("@productId", productId);
 
-                      
+
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             productDetailsModel.ProductReviews = new List<ProductReviewModel>();
@@ -501,15 +519,12 @@ namespace myProject.Models
                                     //Console.WriteLine($"Review Added");
                                 }
                             }
-                            else
-                            {
-                                Console.WriteLine("No reviews found for the given product ID.");
-                            }
+
                         }
                     }
 
 
-                    
+
                     // Yorum yapan kullanıcıların bilgilerini oku 
                     for (int i = 0; i < productDetailsModel.ProductReviews.Count; i++)
                     {
@@ -551,7 +566,7 @@ namespace myProject.Models
                             }
                         }
                     }
-                    
+
 
 
                     // ürünün resimlerini döndür 
@@ -560,23 +575,23 @@ namespace myProject.Models
                     FROM ProductImages
                     WHERE ProductId = @productId";
 
-                        using (SqlCommand cmd = new SqlCommand(imagesQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(imagesQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@productId", productId);
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            cmd.Parameters.AddWithValue("@productId", productId);
+                            productDetailsModel.ProductImages = new List<string>();
 
-                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            while (reader.Read())
                             {
-                                productDetailsModel.ProductImages = new List<string>();
+                                int imageUrlIndex = reader.GetOrdinal("ImageURL");
+                                string imageUrl = reader.GetString(imageUrlIndex);
 
-                                while (reader.Read())
-                                {
-                                    int imageUrlIndex = reader.GetOrdinal("ImageURL");
-                                    string imageUrl = reader.GetString(imageUrlIndex);
-
-                                    productDetailsModel.ProductImages.Add(imageUrl); 
-                                }
+                                productDetailsModel.ProductImages.Add(imageUrl);
                             }
                         }
+                    }
                 }
             }
             catch (Exception ex)
@@ -588,5 +603,155 @@ namespace myProject.Models
 
 
 
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        // Add product to user's cart
+
+        public void AddToCart(int? userId, int productId, int companyId)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = "INSERT INTO ProductsInBasket (UserId, CompanyId, ProductId) VALUES (@UserId, @CompanyId, @ProductId)";
+
+                    using (var command = new SqlCommand(query, conn))
+                    {
+                        command.Parameters.AddWithValue("@UserId", userId);
+                        command.Parameters.AddWithValue("@ProductId", productId);
+                        command.Parameters.AddWithValue("@CompanyId", companyId);
+
+                        command.ExecuteNonQuery();
+                    }
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error while saving to cart: " + ex.Message);
+            }
+        }
+
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Return number of basket products for navbar cart icon. */
+        public int GetBasketCount(int? userId)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "SELECT COUNT(*) FROM ProductsInBasket WHERE UserId = @UserId";
+
+                using (var command = new SqlCommand(query, conn))
+                {
+                    command.Parameters.AddWithValue("@UserId", userId);
+
+                    conn.Open();
+                    return (int)command.ExecuteScalar();
+                }
+            }
+        }
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Return basket products of the user. */
+        public List<ProductModel> GetBasket(int? userId)
+        {
+            List<ProductModel> basketProducts = new List<ProductModel>();
+            List<int> productIds = new List<int>();
+            var productImages = new List<Tuple<int, string>>();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                string queryProductIds = @"
+                SELECT ProductId
+                FROM ProductsInBasket
+                WHERE UserId = @UserId";
+
+                using (SqlCommand cmd = new SqlCommand(queryProductIds, conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            productIds.Add(reader.GetInt32(0));
+                        }
+                    }
+                }
+
+
+                
+                for(int i = 0; i < productIds.Count; i++) {
+                    string queryProducts = @"
+                    SELECT *
+                    FROM Products
+                    WHERE ProductId = @ProductId"
+                    ;
+
+
+                    using (SqlCommand cmd = new SqlCommand(queryProducts, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@ProductId", productIds[i]);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                ProductModel product = new ProductModel
+                                {
+                                    ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                    CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Description = reader.GetString(reader.GetOrdinal("Description")),
+                                    Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                    Stock = reader.GetInt32(reader.GetOrdinal("Stock")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                    Category = reader.GetString(reader.GetOrdinal("Category")),
+                                    Rating = Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("Rating"))),
+                                    Favorite = reader.GetInt32(reader.GetOrdinal("Favorite")),
+                                    Clicked = reader.GetInt32(reader.GetOrdinal("Clicked")),
+                                    isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"))
+                                };
+                                basketProducts.Add(product);
+                            }
+                        }
+                    }
+                }
+
+                // ürünün resimlerini döndür 
+                string imagesQuery = @"
+                    SELECT *
+                    FROM ProductImages
+                    WHERE ProductId = @productId";
+
+                using (SqlCommand cmd = new SqlCommand(imagesQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@productId", productId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        productDetailsModel.ProductImages = new List<string>();
+
+                        while (reader.Read())
+                        {
+                            int imageUrlIndex = reader.GetOrdinal("ImageURL");
+                            string imageUrl = reader.GetString(imageUrlIndex);
+
+                            productDetailsModel.ProductImages.Add(imageUrl);
+                        }
+                    }
+                }
+
+             }
+
+
+            return basketProducts;
+        
+        }
     }
 }

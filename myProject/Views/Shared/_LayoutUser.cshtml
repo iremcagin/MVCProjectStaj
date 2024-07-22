@@ -111,15 +111,19 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Basket" style="font-size:20px;">
-                                <i class="la la-shopping-basket"></i>
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Favorites" style="font-size:20px;">
                                 <i class="la la-heart"></i>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark d-flex align-items-center" asp-area="" asp-controller="User" asp-action="Basket" style="font-size:20px;">
+                                <i class="la la-shopping-basket ">
+                                   
+                                </i>
+                                <span id="basketCount" class="badge badge-danger" style="display:none; color:black;"></span>
+                            </a>
+                        </li>
+                       
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Signout" style="font-size:20px;">
                                 <i class="la la-sign-out"></i>
@@ -189,6 +193,7 @@
 
 
     <style>
+     
         #furnitureDropdown .nav-link:hover,
         #furnitureDropdown .nav-link:focus,
         #decorationDropdown .nav-link:hover,
@@ -247,6 +252,16 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
 
+        $(document).ready(function () {
+            $.getJSON('@Url.Action("GetBasketCount", "User")', function (data) {
+                if (data > 0) {
+
+                    $('#basketCount').text("("+data+")").show();
+                } else {
+                    $('#basketCount').hide();
+                }
+            });
+        });
 
 
     </script>

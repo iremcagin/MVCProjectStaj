@@ -19,6 +19,7 @@ namespace myProject.Models
         public int Favorite { get; set; } = 0;
         public int Clicked { get; set; } = 0;
         public string isAvailable { get; set; }
+        public int Sold { get; set; } = 0;
         public List<ProductReviewModel> Reviews { get; set; } = new List<ProductReviewModel>();  // reviewID
 
 
