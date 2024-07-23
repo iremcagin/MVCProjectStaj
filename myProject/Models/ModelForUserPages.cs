@@ -14,6 +14,17 @@ namespace myProject.Models
         public static decimal totalPrice = 0;
         public ProductsInBasket productsInBasket = new ProductsInBasket();
         public ProductDetailsModel productDetailsModel = new ProductDetailsModel();
+        public ProductsInBasket productsDeletedFromBasket = new ProductsInBasket();
+
+        // User profile için
+        public UserModel userProfile = new UserModel();
+        public List<ProductReviewModel> productReviews = new List<ProductReviewModel>();
+        public List<CardModel> creditCards { get; set; } = new List<CardModel>();
+        public List<CompanyModel> followedCompanies { get; set; } = new List<CompanyModel>();
+        public List<ProductModel> productsBought { get; set; } = new List<ProductModel>();
+
+
+
         string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\iremc\OneDrive\Documents\myProjectDatabase.mdf;Integrated Security=True;Connect Timeout=30";
 
 

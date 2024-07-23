@@ -12,5 +12,7 @@
         public ProductModel Product { get; set; } = new ProductModel();
         public List<string> Images { get; set; } = new List<string>();
 
+        public DateTime DeletedAt { get; set; }
+
     }
 }

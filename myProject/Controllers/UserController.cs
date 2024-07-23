@@ -36,7 +36,7 @@ namespace myProject.Controllers
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
-                return Json(0); // Kullanıcı giriş yapmamışsa, sepet sayısı 0
+                return Json(0);
             }
 
             int basketCount = userDatabaseControlModel.GetBasketCount(userId.Value);
@@ -86,6 +86,8 @@ namespace myProject.Controllers
             int? userId = HttpContext.Session.GetInt32("UserId");
             ModelForUserPages modelForUserPages = new ModelForUserPages();
             modelForUserPages.productsInBasket = userDatabaseControlModel.GetBasket(userId);
+            modelForUserPages.productsDeletedFromBasket = userDatabaseControlModel.GetPrevDeletedBasket(userId);
+
             UpdatePrice();
 
 
@@ -112,7 +114,7 @@ namespace myProject.Controllers
         public IActionResult UpdateQuantity(int productId, int companyId, int quantity)
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
-            userDatabaseControlModel.updateQuantity(userId,productId, companyId, quantity);
+            userDatabaseControlModel.updateQuantity(userId, productId, companyId, quantity);
             UpdatePrice();
 
 
@@ -131,5 +133,17 @@ namespace myProject.Controllers
             return RedirectToAction("Basket");
         }
 
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Get User Profile Info */
+        public IActionResult Profile()
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            ModelForUserPages modelForUserPages = new ModelForUserPages();
+            modelForUserPages = userDatabaseControlModel.GetUserProfileInfo(userId);
+
+            return View(modelForUserPages);
+        }
     }
 }

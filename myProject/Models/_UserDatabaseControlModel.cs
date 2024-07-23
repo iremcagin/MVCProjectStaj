@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using NuGet.Protocol.Plugins;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Data.SqlClient;
@@ -684,7 +685,8 @@ namespace myProject.Models
                     command.Parameters.AddWithValue("@UserId", userId);
 
                     conn.Open();
-                    return (int)command.ExecuteScalar();
+                    object result = command.ExecuteScalar();
+                    return result != DBNull.Value ? Convert.ToInt32(result) : 0;
                 }
             }
         }
@@ -800,13 +802,127 @@ namespace myProject.Models
         }
 
 
-      
-            
 
 
-            /* ------------------------------------------------------------------------------------------------------------- */
-            /* Delete product from the user's basket. */
-            public void DeleteItemInBasket(int? userId, int itemId)
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Return previously deleted basket products of the user. */
+        public ProductsInBasket GetPrevDeletedBasket(int? userId)
+        {
+            ProductsInBasket basketProducts = new ProductsInBasket();
+
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                string query = @"
+                SELECT TOP 10 *
+                FROM ProductsDeletedFromBasket
+                WHERE UserId = @UserId
+                ORDER BY DeletedAt DESC";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            basketProducts.Products.Add(new ProductInBasket
+                            {
+                                Id = reader.GetInt32(0),
+                                UserId = reader.GetInt32(1),
+                                CompanyId = reader.GetInt32(2),
+                                ProductId = reader.GetInt32(3),
+                                DeletedAt = reader.GetDateTime(4)
+                            });
+                        }
+                    }
+                }
+
+
+
+
+                for (int i = 0; i < basketProducts.Products.Count; i++)
+                {
+                    string queryProducts = @"
+                    SELECT *
+                    FROM Products
+                    WHERE ProductId = @ProductId";
+
+
+                    using (SqlCommand cmd = new SqlCommand(queryProducts, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@ProductId", basketProducts.Products[i].ProductId);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                ProductModel product = new ProductModel
+                                {
+                                    ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                    CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Description = reader.GetString(reader.GetOrdinal("Description")),
+                                    Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                    Stock = reader.GetInt32(reader.GetOrdinal("Stock")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                    Category = reader.GetString(reader.GetOrdinal("Category")),
+                                    Rating = Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("Rating"))),
+                                    Favorite = reader.GetInt32(reader.GetOrdinal("Favorite")),
+                                    Clicked = reader.GetInt32(reader.GetOrdinal("Clicked")),
+                                    isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"))
+                                };
+                                basketProducts.Products[i].Product = product;
+
+
+                            }
+                        }
+                    }
+                }
+
+                // Get images
+                for (int i = 0; i < basketProducts.Products.Count; i++)
+                {
+                    query = @"
+                    SELECT ProductId, ImageUrl
+                    FROM ProductImages
+                    WHERE ProductId = @productId";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@productId", basketProducts.Products[i].ProductId);
+
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+
+                                int productId = reader.GetInt32(0);
+                                string imageUrl = reader.GetString(1);
+
+                                // Add to the list as a Tuple
+                                basketProducts.Products[i].ProductId = productId;
+                                basketProducts.Products[i].Images.Add(imageUrl);
+
+                            }
+                        }
+                    }
+                }
+
+            }
+            return basketProducts;
+        }
+
+
+
+
+
+        /* ------------------------------------------------------------------------------------------------------------- */
+        /* Delete product from the user's basket. */
+        public void DeleteItemInBasket(int? userId, int itemId)
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
@@ -857,16 +973,33 @@ namespace myProject.Models
                     }
 
 
+               
+
                 // Begin transaction
                 using (SqlTransaction transaction = conn.BeginTransaction())
-                        {
-                            try
-                            {
-                                // SQL komutlarını hazırlayın
-                                string deleteQuery = "DELETE FROM ProductsInBasket WHERE Id = @Id";
-                                string insertQuery = "INSERT INTO ProductsDeletedFromBasket (UserId, CompanyId, ProductId) VALUES(@UserId, @CompanyId, @ProductId)";
+                {
+                    try
+                    {
+                        // Check if the ProductId already exists in ProductsDeletedFromBasket
+                        string checkQuery = @"
+                        SELECT COUNT(*)
+                        FROM ProductsDeletedFromBasket
+                        WHERE UserId = @UserId AND ProductId = @ProductId";
 
-                                // Ürünü silinenler tablosuna ekleme
+                        using (SqlCommand checkCommand = new SqlCommand(checkQuery, conn, transaction))
+                        {
+                            checkCommand.Parameters.AddWithValue("@UserId", userId);
+                            checkCommand.Parameters.AddWithValue("@ProductId", productId);
+
+                            int count = (int)checkCommand.ExecuteScalar();
+
+                            if (count == 0)
+                            {
+                                // ProductId does not exist, proceed with insertion
+                                string insertQuery = @"
+                                    INSERT INTO ProductsDeletedFromBasket (UserId, CompanyId, ProductId)
+                                    VALUES (@UserId, @CompanyId, @ProductId)";
+
                                 using (SqlCommand insertCommand = new SqlCommand(insertQuery, conn, transaction))
                                 {
                                     insertCommand.Parameters.AddWithValue("@UserId", userId);
@@ -874,51 +1007,304 @@ namespace myProject.Models
                                     insertCommand.Parameters.AddWithValue("@ProductId", productId);
                                     insertCommand.ExecuteNonQuery();
                                 }
-
-                                // Ürünü sepetten silme
-                                using (SqlCommand deleteCommand = new SqlCommand(deleteQuery, conn, transaction))
-                                {
-                                    deleteCommand.Parameters.AddWithValue("@Id", itemId);
-                                    deleteCommand.ExecuteNonQuery();
-                                }
-
-                               
-
-                                transaction.Commit();
                             }
-                            catch (Exception ex)
-                            {
-                                transaction.Rollback();
-                                throw;
-                            }
+                        }
+
+                        // Delete from ProductsInBasket
+                        string deleteQuery = "DELETE FROM ProductsInBasket WHERE Id = @Id";
+
+                        using (SqlCommand deleteCommand = new SqlCommand(deleteQuery, conn, transaction))
+                        {
+                            deleteCommand.Parameters.AddWithValue("@Id", itemId);
+                            deleteCommand.ExecuteNonQuery();
+                        }
+
+                        // Commit transaction
+                        transaction.Commit();
                     }
-
+                    catch (Exception ex)
+                    {
+                        // Rollback transaction on error
+                        transaction.Rollback();
+                        throw; // Re-throw the exception to handle it further up the call stack
+                    }
                 }
-
             }
 
 
+            }
+
+            /* -------------------------------------------------------------------------------------------------------------- */
+            /* Update quantity */
+            public void updateQuantity(int? userId, int productId, int companyId, int quantity)
+            {
+                var query = "UPDATE ProductsInBasket SET Count = @Quantity WHERE UserId = @UserId AND ProductId = @ProductId AND CompanyId = @CompanyId";
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    using (SqlCommand command = new SqlCommand(query, conn))
+                    {
+                        command.Parameters.AddWithValue("@Quantity", quantity);
+                        command.Parameters.AddWithValue("@UserId", userId);
+                        command.Parameters.AddWithValue("@ProductId", productId);
+                        command.Parameters.AddWithValue("@CompanyId", companyId);
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+
+
+
+
         /* -------------------------------------------------------------------------------------------------------------- */
-        /* Update quantity */
-        public void updateQuantity(int? userId, int productId, int companyId, int quantity)
+        /* Get User Profile Info */
+        public ModelForUserPages GetUserProfileInfo(int? userId)
         {
-            var query = "UPDATE ProductsInBasket SET Count = @Quantity WHERE UserId = @UserId AND ProductId = @ProductId AND CompanyId = @CompanyId";
+            ModelForUserPages user = new ModelForUserPages();
+
+
+            // Get User Info
+
+            string userQuery = @"
+                    SELECT *
+                    FROM Users
+                    WHERE Id = @userId";
+
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
-                using (SqlCommand command = new SqlCommand(query, conn))
+
+                using (SqlCommand cmd = new SqlCommand(userQuery, conn))
                 {
-                    command.Parameters.AddWithValue("@Quantity", quantity);
-                    command.Parameters.AddWithValue("@UserId", userId);
-                    command.Parameters.AddWithValue("@ProductId", productId);
-                    command.Parameters.AddWithValue("@CompanyId", companyId);
-                    command.ExecuteNonQuery();
+                    cmd.Parameters.AddWithValue("@userId", userId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            user.userProfile = new UserModel
+                            {
+                                UserId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Age = reader.GetInt32(reader.GetOrdinal("Age")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Surname = reader.GetString(reader.GetOrdinal("Surname")),
+                                PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
+                                PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
+                                Email = reader.GetString(reader.GetOrdinal("Email")),
+                                Address = reader.GetString(reader.GetOrdinal("Address")),
+                                Role = reader.GetString(reader.GetOrdinal("Role")),
+                                Birthdate = reader.GetDateTime(reader.GetOrdinal("Birthdate")),
+                                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+                            };
+                        }
+                    }
+                }
+
+
+
+                // Get Reviews
+
+                userQuery = @"
+                    SELECT *
+                    FROM Reviews
+                    WHERE Id = @userId";
+
+                using (SqlCommand cmd = new SqlCommand(userQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            user.productReviews.Add(new ProductReviewModel
+                            {
+                                ReviewId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                                Rating = reader.GetInt32(reader.GetOrdinal("Rating")),
+                                Review = reader.GetString(reader.GetOrdinal("Review")),
+                                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+                            });
+                        }
+                    }
+                }
+
+
+
+                // Get Credit Cards
+
+                string creditCardQuery = @"
+                SELECT *
+                FROM CreditCards
+                WHERE UserId = @userId";
+
+                using (SqlCommand cmd = new SqlCommand(creditCardQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        // Assuming user.creditCards is a collection to hold the credit card details
+                        user.creditCards = new List<CardModel>();
+
+                        while (reader.Read())
+                        {
+                            user.creditCards.Add(new CardModel
+                            {
+                                CardId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                                CardNumber = reader.GetString(reader.GetOrdinal("CardNumber")),
+                                CardHolderName = reader.GetString(reader.GetOrdinal("CardHolderName")),
+                                ExpirationDate = reader.GetString(reader.GetOrdinal("ExpirationDate")),
+                                CVV = reader.GetString(reader.GetOrdinal("CVV"))
+                            });
+                        }
+                    }
+                }
+
+
+                // Query to get Product IDs and purchase dates, sorted by purchase date
+                string productsBoughtQuery = @"
+                    SELECT ProductId, CreatedAt
+                    FROM ProductsBought
+                    WHERE UserId = @userId
+                    ORDER BY CreatedAt DESC";
+
+                List<(int ProductId, DateTime CreatedAt)> boughtProducts = new List<(int, DateTime)>();
+
+                using (SqlCommand cmd = new SqlCommand(productsBoughtQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            boughtProducts.Add((
+                                ProductId: reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                CreatedAt: reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+                            ));
+                        }
+                    }
+                }
+
+
+                // Prepare the list of Product IDs for the query
+                var productIds = boughtProducts.Select(p => p.ProductId).ToList();
+
+               
+                if (productIds.Any())
+                {
+                  
+                    string productDetailsQuery = @"
+                    SELECT ProductId, CompanyId, ProductName, Price, Description
+                    FROM Products
+                    WHERE ProductId IN (" + string.Join(",", productIds) + ")";
+
+                    using (SqlCommand cmd = new SqlCommand(productDetailsQuery, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            
+                            user.productsBought = new List<ProductModel>();
+
+                            while (reader.Read())
+                            {
+                                user.productsBought.Add(new ProductModel
+                                {
+                                    ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                    CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Description = reader.GetString(reader.GetOrdinal("Description")),
+                                    Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                    Stock = reader.GetInt32(reader.GetOrdinal("Stock")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                    Category = reader.GetString(reader.GetOrdinal("Category")),
+                                    Rating = Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("Rating"))),
+                                    Favorite = reader.GetInt32(reader.GetOrdinal("Favorite")),
+                                    Clicked = reader.GetInt32(reader.GetOrdinal("Clicked")),
+                                    isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"))
+                                });
+                            }
+                        }
+                    }
+                }
+
+
+                // Query to get followed company IDs and follow dates, sorted by follow date
+                string followedCompaniesQuery = @"
+                    SELECT CompanyId, CreatedAt
+                    FROM FollowedCompanies
+                    WHERE UserId = @userId
+                    ORDER BY CreatedAt DESC";
+
+                List<(int CompanyId, DateTime CreatedAt)> followedCompanies = new List<(int, DateTime)>();
+
+                using (SqlCommand cmd = new SqlCommand(followedCompaniesQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            followedCompanies.Add((
+                                CompanyId: reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                CreatedAt: reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+                            ));
+                        }
+                    }
+                }
+
+                // Prepare the list of Company IDs for the query
+                var companyIds = followedCompanies.Select(c => c.CompanyId).ToList();
+
+                if (companyIds.Any())
+                {
+                    string companyDetailsQuery = @"
+                    SELECT Id, CompanyName, Description, Address, PhoneNumber, Email, LogoUrl, BannerUrl
+                    FROM Companies
+                    WHERE Id IN (" + string.Join(",", companyIds) + ")";
+
+                    using (SqlCommand cmd = new SqlCommand(companyDetailsQuery, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                           
+                            user.followedCompanies = new List<CompanyModel>();
+
+                            while (reader.Read())
+                            {
+                                user.followedCompanies.Add(new CompanyModel
+                                {
+                                    CompanyId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                                    CompanyName = reader.GetString(reader.GetOrdinal("CompanyName")),
+                                    Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description")),
+                                    Address = reader.GetString(reader.GetOrdinal("Address")),
+                                    PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
+                                    Email = reader.GetString(reader.GetOrdinal("Email")),
+                                    isAccountActivated = reader.GetBoolean(reader.GetOrdinal("isAccountActivated")),
+                                    LogoUrl = reader.IsDBNull(reader.GetOrdinal("LogoUrl")) ? null : reader.GetString(reader.GetOrdinal("LogoUrl")),
+                                    BannerUrl = reader.IsDBNull(reader.GetOrdinal("BannerUrl")) ? null : reader.GetString(reader.GetOrdinal("BannerUrl")),
+                                    TaxIDNumber = reader.GetString(reader.GetOrdinal("TaxIDNumber")),
+                                    IBAN = reader.GetString(reader.GetOrdinal("IBAN")),
+                                    isHighlighed = reader.IsDBNull(reader.GetOrdinal("IsHighlighted")) ? null : reader.GetString(reader.GetOrdinal("IsHighlighted")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                    Rating = reader.GetInt32(reader.GetOrdinal("Rating"))
+                                });
+                            }
+                        }
+                    }
                 }
             }
+
+            return user;
         }
-
-
 
     }
 }
