@@ -82,7 +82,12 @@ namespace myProject.Controllers
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             List<ProductModel> allProducts = userDatabaseControlModel.GetBasket(userId);
-           // ViewBag.allProducts = allProducts;
+            List<Tuple<int, string>> Images = new List<Tuple<int, string>>();
+            Images = userDatabaseControlModel.GetProductImages(allProducts);
+
+
+            ViewBag.allProductsInBasket = allProducts;
+            ViewBag.ImagesOfProductsInBasket = Images;
 
             return View();
         }

@@ -723,35 +723,56 @@ namespace myProject.Models
                     }
                 }
 
-                // ürünün resimlerini döndür 
-                string imagesQuery = @"
-                    SELECT *
+             }
+            return basketProducts;
+        }
+
+
+
+
+        public List<Tuple<int, string>> GetProductImages(List<ProductModel> productIds)
+        {
+            var productImages = new List<Tuple<int, string>>();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+
+                for(int i = 0;i < productIds.Count; i++) {
+
+                    // Prepare a parameterized query to avoid SQL injection
+                        string query = @"
+                    SELECT ProductId, ImageUrl
                     FROM ProductImages
                     WHERE ProductId = @productId";
 
-                using (SqlCommand cmd = new SqlCommand(imagesQuery, conn))
-                {
-                    cmd.Parameters.AddWithValue("@productId", productId);
-
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        productDetailsModel.ProductImages = new List<string>();
+                        cmd.Parameters.AddWithValue("@productId", productIds[i].ProductId);
+                        
 
-                        while (reader.Read())
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            int imageUrlIndex = reader.GetOrdinal("ImageURL");
-                            string imageUrl = reader.GetString(imageUrlIndex);
+                            if (reader.Read())   // tüm resimleri almak istiyorsan while yap. Ben şuan sadece ilk resmi alıyorum.
+                            {
+                                int productId = reader.GetInt32(0);
+                                string imageUrl = reader.GetString(1);
 
-                            productDetailsModel.ProductImages.Add(imageUrl);
+
+
+                                // Add to the list as a Tuple
+                                productImages.Add(Tuple.Create(productId, imageUrl));
+                            }
                         }
                     }
                 }
+            }
 
-             }
-
-
-            return basketProducts;
-        
+            return productImages;
         }
+
+
+
     }
 }
