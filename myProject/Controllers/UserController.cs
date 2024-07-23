@@ -86,6 +86,14 @@ namespace myProject.Controllers
             Images = userDatabaseControlModel.GetProductImages(allProducts);
 
 
+            decimal totalPrice = 0;
+            for (int i = 0; i < allProducts.Count; i++)
+            {
+                totalPrice += allProducts[i].Price;
+            }
+
+
+            ViewBag.TotalPrice = totalPrice;
             ViewBag.allProductsInBasket = allProducts;
             ViewBag.ImagesOfProductsInBasket = Images;
 
@@ -93,5 +101,15 @@ namespace myProject.Controllers
         }
 
 
+
+        /* ------------------------------------------------------------------------------------------ */
+        // Delete from basket
+        public IActionResult DeleteItemInBasket(ProductModel product)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            userDatabaseControlModel.DeleteItemInBasket(userId, product);
+
+            return RedirectToAction("Basket");
+        }
     }
 }

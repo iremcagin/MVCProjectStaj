@@ -686,8 +686,9 @@ namespace myProject.Models
                 }
 
 
-                
-                for(int i = 0; i < productIds.Count; i++) {
+
+                for (int i = 0; i < productIds.Count; i++)
+                {
                     string queryProducts = @"
                     SELECT *
                     FROM Products
@@ -723,13 +724,14 @@ namespace myProject.Models
                     }
                 }
 
-             }
+            }
             return basketProducts;
         }
 
 
 
-
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Return images of the basket products of the user. */
         public List<Tuple<int, string>> GetProductImages(List<ProductModel> productIds)
         {
             var productImages = new List<Tuple<int, string>>();
@@ -739,10 +741,11 @@ namespace myProject.Models
                 conn.Open();
 
 
-                for(int i = 0;i < productIds.Count; i++) {
+                for (int i = 0; i < productIds.Count; i++)
+                {
 
                     // Prepare a parameterized query to avoid SQL injection
-                        string query = @"
+                    string query = @"
                     SELECT ProductId, ImageUrl
                     FROM ProductImages
                     WHERE ProductId = @productId";
@@ -750,7 +753,7 @@ namespace myProject.Models
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@productId", productIds[i].ProductId);
-                        
+
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -774,5 +777,71 @@ namespace myProject.Models
 
 
 
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Delete product from the user's basket. */
+        public void DeleteItemInBasket(int? userId, ProductModel product)
+        {
+            var productImages = new List<Tuple<int, string>>();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+
+                // Begin transaction
+                using (SqlTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // SQL komutlarını hazırlayın
+                        string deleteQuery = "DELETE FROM ProductsInBasket WHERE UserId = @UserId AND ProductId = @ProductId";
+                        string insertQuery = "INSERT INTO ProductsDeletedFromBasket (UserId, CompanyId, ProductId) " +
+                                              "SELECT UserId, CompanyId, ProductId FROM ProductsInBasket WHERE UserId = @UserId AND ProductId = @ProductId";
+
+                        // Ürünü sepetten silme
+                        using (SqlCommand deleteCommand = new SqlCommand(deleteQuery, conn, transaction))
+                        {
+                            deleteCommand.Parameters.AddWithValue("@UserId", userId);
+                            deleteCommand.Parameters.AddWithValue("@ProductId", product.ProductId);
+                            deleteCommand.ExecuteNonQuery();
+                        }
+
+                        // Ürünü silinenler tablosuna ekleme
+                        using (SqlCommand insertCommand = new SqlCommand(insertQuery, conn, transaction))
+                        {
+                            insertCommand.Parameters.AddWithValue("@UserId", userId);
+                            insertCommand.Parameters.AddWithValue("@ProductId", product.ProductId);
+                            insertCommand.ExecuteNonQuery();
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+
+            }
+
+
+
+            /* -------------------------------------------------------------------------------------------------------------- */
+            /* Return previously deleted items from the basket 
+            public List< DeleteItemInBasket(int? userId)
+            {
+                var productImages = new List<Tuple<int, string>>();
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+
+
+
+                }
+            }*/
+        }
     }
 }

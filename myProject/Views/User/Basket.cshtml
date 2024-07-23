@@ -39,7 +39,7 @@
     </div>
 
 
-    <div class="row row-cols-1 row-cols-md-6 g-4 p-2">
+    <div class="gap-4 mt-3">
         @for (int j = 0; j < allProductsInBasket.Count; j++)
         {
             var product = allProductsInBasket[j];
@@ -58,57 +58,73 @@
             : Url.Content("~/images/placeholder-1.png");
 
 
-            <div class="col">
-                <div class="card h-100 d-flex flex-column justify-content-between">
+            
+            <div class="row bg-light mb-4 img-fluid p-1" style="" >
+                <!-- resim kısmı -->
+                <div class="card-img-container col-md-3" style="overflow:hidden;">
+                    <a href="/User/ProductDetails/@product.ProductId">
+                        <img src="@imageUrl" class="card-img-top" alt="@product.Name" style="width: 100%; height: auto; object-fit: cover;">
+                    </a>
+                </div>
 
-                    <!-- Product Image -->
-                    <div class="position-relative">
-                        <a href="/User/ProductDetails/@product.ProductId">
-                            <img src="@imageUrl" class="card-img-top" alt="@product.Name">
-                        </a>
-                        <a href="/User/DeleteItemInBasket/@product.ProductId" class="btn btn-like position-absolute top-0 end-0 no-outline" style="font-size:21px;"><i class="las la-trash-alt"></i></a>
-                    </div>
-                  
-                    <div class="card-body d-flex flex-column justify-content-between" >
-                        <div class="d-flex flex-column" style="font-size:15px;">
-                            <h5 class="card-title"><span style="font-size:15px; font-weight:600;"> @product.Name </span><span style="font-size:14px; color:grey;">@product.Description</span></h5>
+                <div class="d-flex flex-column col-md-9 justify-content-between">
 
-                            <div class="d-flex">
-                                <p style="margin-right:5px;  font-size:14px; margin-top:2px;">@product.Rating</p>
+                    <div class="d-flex flex-column ">
 
-                                @if (@product.Rating >= 0 && @product.Rating <= 5)
-                                {
+                        <div class="d-flex justify-content-between align-items-center">
 
-                                    var fullStars = (int)Math.Floor(@product.Rating);
-                                    var halfStar = (@product.Rating - fullStars) >= 0.5;
-                                    // Boş yıldızların sayısı
-                                    var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+                            <!--isim ve yıldız divi  -->
+                            <div class="d-flex align-items-center">
+                                <h5 class="" style="font-size:21px; font-weight:600; margin-right:20px; margin-top:-8px;">@product.Name </h5>
+                                <div class="d-flex " style="font-size:15px;">
 
-
-                                    for (int i = 0; i < fullStars; i++)
+                                    @if (@product.Rating >= 0 && @product.Rating <= 5)
                                     {
-                                        <span class="star full-star">&#9733;</span>
+
+                                        var fullStars = (int)Math.Floor(@product.Rating);
+                                        var halfStar = (@product.Rating - fullStars) >= 0.5;
+                                        // Boş yıldızların sayısı
+                                        var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+
+                                        for (int i = 0; i < fullStars; i++)
+                                        {
+                                            <span class="star full-star">&#9733;</span>
+                                        }
+
+                                        if (halfStar)
+                                        {
+                                            <span class="star half-star">&#9733;</span>
+                                        }
+
+                                        for (int i = 0; i < emptyStars; i++)
+                                        {
+                                            <span class="star">&#9734;</span>
+                                        }
                                     }
 
-                                    if (halfStar)
-                                    {
-                                        <span class="star half-star">&#9733;</span>
-                                    }
-
-                                    for (int i = 0; i < emptyStars; i++)
-                                    {
-                                        <span class="star">&#9734;</span>
-                                    }
-                                }
+                                    <p style="font-size:15px; ">(@product.Rating)</p>
+                                </div>
                             </div>
 
-                        <h5 class="card-text" style="font-size: 16px; font-weight:600; color:#b46c2c; margin-top:15px;">$@product.Price</h5>
+                            <!-- çöp kutusu div -->
+                            <a href="/User/DeleteItemInBasket/@product" class="btn btn-like no-outline" style="font-size:21px;">
+                                <i class="las la-trash-alt"></i>
+                            </a>
+
                         </div>
 
+                        <span style="font-size:14px; color:grey;">Category: @product.Category</span>
+                        <span style="font-size:14px; color:grey;">Description: @product.Description</span>
+                        
                     </div>
 
+                   
+                    <h5 class="card-text" style="font-size: 22px; font-weight:600; color:#b46c2c;">$@product.Price</h5>
+                  
 
                 </div>
+
             </div>
         }
 
@@ -132,23 +148,23 @@
         position: relative;
     }
 
-        .half-star::before {
-            content: '\2605';
-            color: #000;
-            position: absolute;
-            left: 0;
-            width: 55%;
-            overflow: hidden;
-        }
+    .half-star::before {
+        content: '\2605';
+        color: #000;
+        position: absolute;
+        left: 0;
+        width: 55%;
+        overflow: hidden;
+    }
 
     .empty-star {
         color: #d3d3d3;
     }
 
-        .empty-star::before {
-            content: '\2605';
-            color: #000;
-            position: absolute;
-            overflow: hidden;
-        }
+    .empty-star::before {
+        content: '\2605';
+        color: #000;
+        position: absolute;
+        overflow: hidden;
+    }
 </style>
