@@ -806,97 +806,96 @@ namespace myProject.Models
 
             /* ------------------------------------------------------------------------------------------------------------- */
             /* Delete product from the user's basket. */
-            public void DeleteItemInBasket(int? userId, int productId)
-        {
-            var productImages = new List<Tuple<int, string>>();
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            public void DeleteItemInBasket(int? userId, int itemId)
             {
-                conn.Open();
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
 
 
-                /* Company Id al */
-                int itemId = 0;
-                int companyId = 0;
+                /* productId Id al */
+                int productId = 0;
 
                 string queryProductIds = @"
-                SELECT Id
-                FROM ProductsInBasket
-                WHERE UserId = @UserId";
+                        SELECT ProductId
+                        FROM ProductsInBasket
+                        WHERE Id = @itemId";
 
                 using (SqlCommand cmd = new SqlCommand(queryProductIds, conn))
                 {
-                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@itemId", itemId);
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            itemId = reader.GetInt32(0);
+                            
+                            productId = reader.GetInt32(0);
                         }
                     }
                 }
 
+                /* Company Id al */
+                int companyId = 0;
 
+                     queryProductIds = @"
+                    SELECT CompanyId
+                    FROM Products
+                    WHERE ProductId = @productId";
 
-                queryProductIds = @"
-                SELECT CompanyId
-                FROM Products
-                WHERE ProductId = @productId";
-
-                using (SqlCommand cmd = new SqlCommand(queryProductIds, conn))
-                {
-                    cmd.Parameters.AddWithValue("@productId", productId);
-
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    using (SqlCommand cmd = new SqlCommand(queryProductIds, conn))
                     {
-                        while (reader.Read())
+                        cmd.Parameters.AddWithValue("@productId", productId);
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            companyId = reader.GetInt32(0);
+                            while (reader.Read())
+                            {
+                                companyId = reader.GetInt32(0);
+                            }
                         }
                     }
-                }
-
-
 
 
                 // Begin transaction
                 using (SqlTransaction transaction = conn.BeginTransaction())
-                    {
-                        try
                         {
-                            // SQL komutlarını hazırlayın
-                            string deleteQuery = "DELETE FROM ProductsInBasket WHERE Id = @Id";
-                            string insertQuery = "INSERT INTO ProductsDeletedFromBasket (UserId, CompanyId, ProductId) VALUES(@UserId, @CompanyId, @ProductId)";
-
-                            // Ürünü sepetten silme
-                            using (SqlCommand deleteCommand = new SqlCommand(deleteQuery, conn, transaction))
+                            try
                             {
-                                deleteCommand.Parameters.AddWithValue("@Id", itemId);
-                                deleteCommand.ExecuteNonQuery();
-                            }
+                                // SQL komutlarını hazırlayın
+                                string deleteQuery = "DELETE FROM ProductsInBasket WHERE Id = @Id";
+                                string insertQuery = "INSERT INTO ProductsDeletedFromBasket (UserId, CompanyId, ProductId) VALUES(@UserId, @CompanyId, @ProductId)";
 
-                            // Ürünü silinenler tablosuna ekleme
-                            using (SqlCommand insertCommand = new SqlCommand(insertQuery, conn, transaction))
+                                // Ürünü silinenler tablosuna ekleme
+                                using (SqlCommand insertCommand = new SqlCommand(insertQuery, conn, transaction))
+                                {
+                                    insertCommand.Parameters.AddWithValue("@UserId", userId);
+                                    insertCommand.Parameters.AddWithValue("@CompanyId", companyId);
+                                    insertCommand.Parameters.AddWithValue("@ProductId", productId);
+                                    insertCommand.ExecuteNonQuery();
+                                }
+
+                                // Ürünü sepetten silme
+                                using (SqlCommand deleteCommand = new SqlCommand(deleteQuery, conn, transaction))
+                                {
+                                    deleteCommand.Parameters.AddWithValue("@Id", itemId);
+                                    deleteCommand.ExecuteNonQuery();
+                                }
+
+                               
+
+                                transaction.Commit();
+                            }
+                            catch (Exception ex)
                             {
-                                insertCommand.Parameters.AddWithValue("@UserId", userId);
-                                insertCommand.Parameters.AddWithValue("@CompanyId", companyId);
-                                insertCommand.Parameters.AddWithValue("@ProductId", productId);
-                                insertCommand.ExecuteNonQuery();
+                                transaction.Rollback();
+                                throw;
                             }
+                    }
 
-                            transaction.Commit();
-                        }
-                        catch (Exception ex)
-                        {
-                            transaction.Rollback();
-                            throw;
-                        }
                 }
 
             }
-
-        }
 
 
         /* -------------------------------------------------------------------------------------------------------------- */
@@ -921,24 +920,5 @@ namespace myProject.Models
 
 
 
-
-
-
-
-        /* -------------------------------------------------------------------------------------------------------------- */
-        /* Return previously deleted items from the basket 
-        public List< DeleteItemInBasket(int? userId)
-        {
-            var productImages = new List<Tuple<int, string>>();
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
-
-
-
-
-            }
-        }*/
     }
 }

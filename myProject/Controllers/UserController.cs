@@ -99,8 +99,8 @@ namespace myProject.Controllers
         [HttpGet("User/DeleteItemInBasket/{productId}")]
         public IActionResult DeleteItemInBasket(int productId)
         {
-
             int? userId = HttpContext.Session.GetInt32("UserId");
+
             userDatabaseControlModel.DeleteItemInBasket(userId, productId);
 
             return RedirectToAction("Basket");
