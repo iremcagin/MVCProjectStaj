@@ -4,22 +4,67 @@ using System.Data.SqlClient;
 
 namespace myProject.Models
 {
-    public class CategoriesModel
+    public class ModelForUserPages
     {
         public int Id { get; set; }
         public string CategoryName { get; set; }
         public string MainCategory { get; set; }
 
+        // User Basket için
+        public static decimal totalPrice = 0;
+        public ProductsInBasket productsInBasket = new ProductsInBasket();
+        public ProductDetailsModel productDetailsModel = new ProductDetailsModel();
+        string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\iremc\OneDrive\Documents\myProjectDatabase.mdf;Integrated Security=True;Connect Timeout=30";
 
 
-        public CategoriesModel() { }
 
-        /* Databasede bulununan tüm eşya sınıfı kategorileri okur. Koltuk masa gibi. */
-        public List<CategoriesModel> GetAllFurnitureCategories()
+        public ModelForUserPages() { }
+
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* CalculatePrice */
+        public static decimal CalculatePrice(int? userId)
         {
-            List<CategoriesModel> categories = new List<CategoriesModel>();
-            string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\iremc\OneDrive\Documents\myProjectDatabase.mdf;Integrated Security=True;Connect Timeout=30";
 
+            if (!userId.HasValue)
+            {
+                throw new ArgumentException("User ID cannot be null.");
+            }
+
+            string query = @"
+            SELECT SUM(p.Price * pb.Count) AS TotalPrice
+            FROM ProductsInBasket pb
+            INNER JOIN Products p ON pb.ProductId = p.ProductId
+            WHERE pb.UserId = @UserId
+            GROUP BY pb.UserId";
+
+            using (SqlConnection conn = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\iremc\\OneDrive\\Documents\\myProjectDatabase.mdf;Integrated Security=True;Connect Timeout=30"))
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserId", userId.Value);
+
+                    var result = cmd.ExecuteScalar();
+                    totalPrice = result != DBNull.Value ? Convert.ToDecimal(result) : 0;
+                }
+            }
+
+            return totalPrice;
+        }
+
+
+
+     
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Databasede bulununan tüm eşya sınıfı kategorileri okur. Koltuk masa gibi. */
+        public List<ModelForUserPages> GetAllFurnitureCategories()
+        {
+            List<ModelForUserPages> categories = new List<ModelForUserPages>();
+           
             try
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
@@ -33,7 +78,7 @@ namespace myProject.Models
                         {
                             while (reader.Read())
                             {
-                                CategoriesModel category = new CategoriesModel
+                                ModelForUserPages category = new ModelForUserPages
                                 {
                                     Id = reader.GetInt32(0),
                                     CategoryName = reader.GetString(1),
@@ -52,10 +97,12 @@ namespace myProject.Models
             return categories;
         }
 
+
+        /* -------------------------------------------------------------------------------------------------------------- */
         /* Databasede bulununan tüm dekorasyon sınıfı kategorileri okur. Perde halı gibi. */
-        public List<CategoriesModel> GetAllDecorationCategories()
+        public List<ModelForUserPages> GetAllDecorationCategories()
         {
-            List<CategoriesModel> categories = new List<CategoriesModel>();
+            List<ModelForUserPages> categories = new List<ModelForUserPages>();
             string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\iremc\OneDrive\Documents\myProjectDatabase.mdf;Integrated Security=True;Connect Timeout=30";
 
             try
@@ -71,7 +118,7 @@ namespace myProject.Models
                         {
                             while (reader.Read())
                             {
-                                CategoriesModel category = new CategoriesModel
+                                ModelForUserPages category = new ModelForUserPages
                                 {
                                     Id = reader.GetInt32(0),
                                     CategoryName = reader.GetString(1),

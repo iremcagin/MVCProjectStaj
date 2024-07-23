@@ -3,7 +3,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using NuGet.Protocol.Plugins;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Data.SqlClient;
+using System.Diagnostics;
 
 namespace myProject.Models
 {
@@ -359,9 +361,10 @@ namespace myProject.Models
         /* -------------------------------------------------------------------------------------------------------------- */
         /*Return selected product's details */
 
-        public ProductDetailsModel ProductDetail(int productId)
+        public ModelForUserPages ProductDetail(int productId)
         {
-            ProductDetailsModel productDetailsModel = new ProductDetailsModel();
+            ModelForUserPages modelForUserPages = new ModelForUserPages();
+            ProductDetailsModel productDetailsModel = modelForUserPages.productDetailsModel;
 
 
             try
@@ -369,8 +372,6 @@ namespace myProject.Models
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-
-
 
                     // Update clicked value of product 
                     string query = "UPDATE Products SET Clicked = Clicked + 1 WHERE ProductId = @ProductId";
@@ -393,6 +394,8 @@ namespace myProject.Models
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
+                           
+
                             if (reader.Read())
                             {
                                 productDetailsModel.Product = new ProductModel();
@@ -598,7 +601,7 @@ namespace myProject.Models
             {
                 Console.WriteLine("Error while reading products: " + ex.Message);
             }
-            return productDetailsModel;
+            return modelForUserPages;
         }
 
 
@@ -607,26 +610,59 @@ namespace myProject.Models
         /* -------------------------------------------------------------------------------------------------------------- */
         // Add product to user's cart
 
-        public void AddToCart(int? userId, int productId, int companyId)
+        public async Task AddToCart(int? userId, int productId, int companyId, int quantity)
         {
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    conn.Open();
-                    string query = "INSERT INTO ProductsInBasket (UserId, CompanyId, ProductId) VALUES (@UserId, @CompanyId, @ProductId)";
+                    await conn.OpenAsync();
+                    var queryCheck = "SELECT Count FROM ProductsInBasket WHERE UserId = @UserId AND ProductId = @ProductId AND CompanyId = @CompanyId";
+                    var queryUpdate = "UPDATE ProductsInBasket SET Count = Count + @Quantity WHERE UserId = @UserId AND ProductId = @ProductId AND CompanyId = @CompanyId";
+                    var queryInsert = "INSERT INTO ProductsInBasket (UserId, ProductId, CompanyId, Count) VALUES (@UserId, @ProductId, @CompanyId, @Quantity)";
 
-                    using (var command = new SqlCommand(query, conn))
+                    try
                     {
-                        command.Parameters.AddWithValue("@UserId", userId);
-                        command.Parameters.AddWithValue("@ProductId", productId);
-                        command.Parameters.AddWithValue("@CompanyId", companyId);
+                        // Check if the product already exists in the basket
+                        using (SqlCommand command = new SqlCommand(queryCheck, conn))
+                        {
+                            command.Parameters.AddWithValue("@UserId", userId);
+                            command.Parameters.AddWithValue("@ProductId", productId);
+                            command.Parameters.AddWithValue("@CompanyId", companyId);
 
-                        command.ExecuteNonQuery();
+                            var result = await command.ExecuteScalarAsync();
+
+                            if (result != null && result != DBNull.Value) // Product exists
+                            {
+                                // Update the Count value
+                                using (SqlCommand updateCommand = new SqlCommand(queryUpdate, conn))
+                                {
+                                    updateCommand.Parameters.AddWithValue("@Quantity", quantity);
+                                    updateCommand.Parameters.AddWithValue("@UserId", userId);
+                                    updateCommand.Parameters.AddWithValue("@ProductId", productId);
+                                    updateCommand.Parameters.AddWithValue("@CompanyId", companyId);
+                                    await updateCommand.ExecuteNonQueryAsync();
+                                }
+                            }
+                            else // Product does not exist
+                            {
+                                // Insert a new record
+                                using (SqlCommand insertCommand = new SqlCommand(queryInsert, conn))
+                                {
+                                    insertCommand.Parameters.AddWithValue("@Quantity", quantity);
+                                    insertCommand.Parameters.AddWithValue("@UserId", userId);
+                                    insertCommand.Parameters.AddWithValue("@ProductId", productId);
+                                    insertCommand.Parameters.AddWithValue("@CompanyId", companyId);
+                                    await insertCommand.ExecuteNonQueryAsync();
+                                }
+                            }
+                        }
                     }
-
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("Error: " + ex.Message);
+                    }
                 }
-
             }
             catch (Exception ex)
             {
@@ -635,14 +671,13 @@ namespace myProject.Models
         }
 
 
-
         /* -------------------------------------------------------------------------------------------------------------- */
         /* Return number of basket products for navbar cart icon. */
         public int GetBasketCount(int? userId)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = "SELECT COUNT(*) FROM ProductsInBasket WHERE UserId = @UserId";
+                string query = "SELECT SUM(Count) FROM ProductsInBasket WHERE UserId = @UserId";
 
                 using (var command = new SqlCommand(query, conn))
                 {
@@ -657,18 +692,17 @@ namespace myProject.Models
 
         /* -------------------------------------------------------------------------------------------------------------- */
         /* Return basket products of the user. */
-        public List<ProductModel> GetBasket(int? userId)
+        public ProductsInBasket GetBasket(int? userId)
         {
-            List<ProductModel> basketProducts = new List<ProductModel>();
-            List<int> productIds = new List<int>();
-            var productImages = new List<Tuple<int, string>>();
+            ProductsInBasket basketProducts = new ProductsInBasket();
+        
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
 
                 string queryProductIds = @"
-                SELECT ProductId
+                SELECT *
                 FROM ProductsInBasket
                 WHERE UserId = @UserId";
 
@@ -680,25 +714,30 @@ namespace myProject.Models
                     {
                         while (reader.Read())
                         {
-                            productIds.Add(reader.GetInt32(0));
+                            basketProducts.Products.Add(new ProductInBasket
+                            {
+                                Id = reader.GetInt32(0),
+                                UserId = reader.GetInt32(1),
+                                CompanyId = reader.GetInt32(2),
+                                ProductId = reader.GetInt32(3),
+                                count = reader.GetInt32(4)
+                            });
                         }
                     }
                 }
 
 
-
-                for (int i = 0; i < productIds.Count; i++)
+                for (int i = 0; i < basketProducts.Products.Count; i++)
                 {
                     string queryProducts = @"
                     SELECT *
                     FROM Products
-                    WHERE ProductId = @ProductId"
-                    ;
+                    WHERE ProductId = @ProductId";
 
 
                     using (SqlCommand cmd = new SqlCommand(queryProducts, conn))
                     {
-                        cmd.Parameters.AddWithValue("@ProductId", productIds[i]);
+                        cmd.Parameters.AddWithValue("@ProductId", basketProducts.Products[i].ProductId);
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -718,7 +757,39 @@ namespace myProject.Models
                                     Clicked = reader.GetInt32(reader.GetOrdinal("Clicked")),
                                     isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"))
                                 };
-                                basketProducts.Add(product);
+                                basketProducts.Products[i].Product = product;
+
+
+                            }
+                        }
+                    }
+                }
+
+                // Get images
+                for (int i = 0; i < basketProducts.Products.Count; i++)
+                {
+                    string query = @"
+                    SELECT ProductId, ImageUrl
+                    FROM ProductImages
+                    WHERE ProductId = @productId";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@productId", basketProducts.Products[i].ProductId);
+                      
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())  
+                            {
+
+                                int productId = reader.GetInt32(0);
+                                string imageUrl = reader.GetString(1);
+
+                                // Add to the list as a Tuple
+                                basketProducts.Products[i].ProductId = productId;
+                                basketProducts.Products[i].Images.Add(imageUrl);
+
                             }
                         }
                     }
@@ -729,10 +800,13 @@ namespace myProject.Models
         }
 
 
+      
+            
 
-        /* -------------------------------------------------------------------------------------------------------------- */
-        /* Return images of the basket products of the user. */
-        public List<Tuple<int, string>> GetProductImages(List<ProductModel> productIds)
+
+            /* ------------------------------------------------------------------------------------------------------------- */
+            /* Delete product from the user's basket. */
+            public void DeleteItemInBasket(int? userId, int productId)
         {
             var productImages = new List<Tuple<int, string>>();
 
@@ -741,107 +815,130 @@ namespace myProject.Models
                 conn.Open();
 
 
-                for (int i = 0; i < productIds.Count; i++)
+                /* Company Id al */
+                int itemId = 0;
+                int companyId = 0;
+
+                string queryProductIds = @"
+                SELECT Id
+                FROM ProductsInBasket
+                WHERE UserId = @UserId";
+
+                using (SqlCommand cmd = new SqlCommand(queryProductIds, conn))
                 {
+                    cmd.Parameters.AddWithValue("@UserId", userId);
 
-                    // Prepare a parameterized query to avoid SQL injection
-                    string query = @"
-                    SELECT ProductId, ImageUrl
-                    FROM ProductImages
-                    WHERE ProductId = @productId";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddWithValue("@productId", productIds[i].ProductId);
-
-
-                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        while (reader.Read())
                         {
-                            if (reader.Read())   // tüm resimleri almak istiyorsan while yap. Ben şuan sadece ilk resmi alıyorum.
-                            {
-                                int productId = reader.GetInt32(0);
-                                string imageUrl = reader.GetString(1);
-
-
-
-                                // Add to the list as a Tuple
-                                productImages.Add(Tuple.Create(productId, imageUrl));
-                            }
+                            itemId = reader.GetInt32(0);
                         }
                     }
                 }
-            }
-
-            return productImages;
-        }
 
 
 
-        /* -------------------------------------------------------------------------------------------------------------- */
-        /* Delete product from the user's basket. */
-        public void DeleteItemInBasket(int? userId, ProductModel product)
-        {
-            var productImages = new List<Tuple<int, string>>();
+                queryProductIds = @"
+                SELECT CompanyId
+                FROM Products
+                WHERE ProductId = @productId";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(queryProductIds, conn))
+                {
+                    cmd.Parameters.AddWithValue("@productId", productId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            companyId = reader.GetInt32(0);
+                        }
+                    }
+                }
+
+
 
 
                 // Begin transaction
                 using (SqlTransaction transaction = conn.BeginTransaction())
-                {
-                    try
                     {
-                        // SQL komutlarını hazırlayın
-                        string deleteQuery = "DELETE FROM ProductsInBasket WHERE UserId = @UserId AND ProductId = @ProductId";
-                        string insertQuery = "INSERT INTO ProductsDeletedFromBasket (UserId, CompanyId, ProductId) " +
-                                              "SELECT UserId, CompanyId, ProductId FROM ProductsInBasket WHERE UserId = @UserId AND ProductId = @ProductId";
-
-                        // Ürünü sepetten silme
-                        using (SqlCommand deleteCommand = new SqlCommand(deleteQuery, conn, transaction))
+                        try
                         {
-                            deleteCommand.Parameters.AddWithValue("@UserId", userId);
-                            deleteCommand.Parameters.AddWithValue("@ProductId", product.ProductId);
-                            deleteCommand.ExecuteNonQuery();
-                        }
+                            // SQL komutlarını hazırlayın
+                            string deleteQuery = "DELETE FROM ProductsInBasket WHERE Id = @Id";
+                            string insertQuery = "INSERT INTO ProductsDeletedFromBasket (UserId, CompanyId, ProductId) VALUES(@UserId, @CompanyId, @ProductId)";
 
-                        // Ürünü silinenler tablosuna ekleme
-                        using (SqlCommand insertCommand = new SqlCommand(insertQuery, conn, transaction))
+                            // Ürünü sepetten silme
+                            using (SqlCommand deleteCommand = new SqlCommand(deleteQuery, conn, transaction))
+                            {
+                                deleteCommand.Parameters.AddWithValue("@Id", itemId);
+                                deleteCommand.ExecuteNonQuery();
+                            }
+
+                            // Ürünü silinenler tablosuna ekleme
+                            using (SqlCommand insertCommand = new SqlCommand(insertQuery, conn, transaction))
+                            {
+                                insertCommand.Parameters.AddWithValue("@UserId", userId);
+                                insertCommand.Parameters.AddWithValue("@CompanyId", companyId);
+                                insertCommand.Parameters.AddWithValue("@ProductId", productId);
+                                insertCommand.ExecuteNonQuery();
+                            }
+
+                            transaction.Commit();
+                        }
+                        catch (Exception ex)
                         {
-                            insertCommand.Parameters.AddWithValue("@UserId", userId);
-                            insertCommand.Parameters.AddWithValue("@ProductId", product.ProductId);
-                            insertCommand.ExecuteNonQuery();
+                            transaction.Rollback();
+                            throw;
                         }
-
-                        transaction.Commit();
-                    }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        throw;
-                    }
                 }
 
             }
 
-
-
-            /* -------------------------------------------------------------------------------------------------------------- */
-            /* Return previously deleted items from the basket 
-            public List< DeleteItemInBasket(int? userId)
-            {
-                var productImages = new List<Tuple<int, string>>();
-
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-
-
-
-
-                }
-            }*/
         }
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Update quantity */
+        public void updateQuantity(int? userId, int productId, int companyId, int quantity)
+        {
+            var query = "UPDATE ProductsInBasket SET Count = @Quantity WHERE UserId = @UserId AND ProductId = @ProductId AND CompanyId = @CompanyId";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                using (SqlCommand command = new SqlCommand(query, conn))
+                {
+                    command.Parameters.AddWithValue("@Quantity", quantity);
+                    command.Parameters.AddWithValue("@UserId", userId);
+                    command.Parameters.AddWithValue("@ProductId", productId);
+                    command.Parameters.AddWithValue("@CompanyId", companyId);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+
+
+
+
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Return previously deleted items from the basket 
+        public List< DeleteItemInBasket(int? userId)
+        {
+            var productImages = new List<Tuple<int, string>>();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+
+
+
+            }
+        }*/
     }
 }

@@ -2,6 +2,8 @@
 using Microsoft.CodeAnalysis;
 using myProject.Models;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Data.SqlClient;
 
 namespace myProject.Controllers
 {
@@ -28,6 +30,7 @@ namespace myProject.Controllers
 
 
         /* ------------------------------------------------------------------------------------------ */
+        [HttpGet]
         public IActionResult GetBasketCount()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
@@ -55,22 +58,22 @@ namespace myProject.Controllers
         [HttpGet("User/ProductDetails/{productId}")]
         public IActionResult ProductDetails(int productId)
         {
-            ProductDetailsModel productDetailsModel = new ProductDetailsModel();
-            productDetailsModel = userDatabaseControlModel.ProductDetail(productId);
+            ModelForUserPages modelForUserPages = new ModelForUserPages();
+            modelForUserPages = userDatabaseControlModel.ProductDetail(productId);
 
-
-            ViewBag.ProductDetails = productDetailsModel;
-            return View();
+            return View(modelForUserPages);
         }
 
 
         /* ------------------------------------------------------------------------------------------ */
         // Sepete ürün ekle
         [HttpPost]
-        public IActionResult AddToCart(int productId, int companyId)
+        public IActionResult AddToCart(int productId, int companyId, int quantity)
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
-            userDatabaseControlModel.AddToCart(userId, productId, companyId);
+
+            userDatabaseControlModel.AddToCart(userId, productId, companyId, quantity);
+
             return RedirectToAction("ProductDetails");
         }
 
@@ -81,35 +84,52 @@ namespace myProject.Controllers
         public IActionResult Basket()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
-            List<ProductModel> allProducts = userDatabaseControlModel.GetBasket(userId);
-            List<Tuple<int, string>> Images = new List<Tuple<int, string>>();
-            Images = userDatabaseControlModel.GetProductImages(allProducts);
+            ModelForUserPages modelForUserPages = new ModelForUserPages();
+            modelForUserPages.productsInBasket = userDatabaseControlModel.GetBasket(userId);
+            UpdatePrice();
 
 
-            decimal totalPrice = 0;
-            for (int i = 0; i < allProducts.Count; i++)
-            {
-                totalPrice += allProducts[i].Price;
-            }
-
-
-            ViewBag.TotalPrice = totalPrice;
-            ViewBag.allProductsInBasket = allProducts;
-            ViewBag.ImagesOfProductsInBasket = Images;
-
-            return View();
+            return View(modelForUserPages);
         }
 
 
 
         /* ------------------------------------------------------------------------------------------ */
         // Delete from basket
-        public IActionResult DeleteItemInBasket(ProductModel product)
+        [HttpGet("User/DeleteItemInBasket/{productId}")]
+        public IActionResult DeleteItemInBasket(int productId)
         {
+
             int? userId = HttpContext.Session.GetInt32("UserId");
-            userDatabaseControlModel.DeleteItemInBasket(userId, product);
+            userDatabaseControlModel.DeleteItemInBasket(userId, productId);
 
             return RedirectToAction("Basket");
         }
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Update quantity */
+        public IActionResult UpdateQuantity(int productId, int companyId, int quantity)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            userDatabaseControlModel.updateQuantity(userId,productId, companyId, quantity);
+            UpdatePrice();
+
+
+            return RedirectToAction("Basket");
+        }
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Update price */
+        [HttpGet]
+        public IActionResult UpdatePrice()
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            ModelForUserPages.CalculatePrice(userId);
+
+            return RedirectToAction("Basket");
+        }
+
     }
 }

@@ -1,9 +1,7 @@
-﻿
+﻿@model myProject.Models.ModelForUserPages
 @{
     ViewData["Title"] = "User";
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
-    var productDetails = ViewBag.ProductDetails as myProject.Models.ProductDetailsModel;
-
 }
 
 
@@ -18,14 +16,14 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-7">
-                    @if (productDetails.ProductImages != null && productDetails.ProductImages.Count > 0)
+                    @if (@Model.productDetailsModel.ProductImages != null && @Model.productDetailsModel.ProductImages.Count > 0)
                     {
                         <div id="productImagesCarousel" class="carousel slide" data-bs-ride="carousel">
                             <div class="carousel-inner">
-                                @for (int i = 0; i < productDetails.ProductImages.Count; i++)
+                                @for (int i = 0; i < @Model.productDetailsModel.ProductImages.Count; i++)
                                 {
                                     <div class="carousel-item @(i == 0 ? "active" : "")">
-                                        <img src="~/images/@productDetails.Product.Category/@productDetails.ProductImages[i]" alt="Product Image" class="d-block w-100" style="max-height:600px;" />
+                                        <img src="~/images/@Model.productDetailsModel.Product.Category/@Model.productDetailsModel.ProductImages[i]" alt="Product Image" class="d-block w-100" style="max-height:600px;" />
                                         <a href="#" class="btn btn-like position-absolute top-0 end-0 m-3 no-outline" style="font-size:16px;"><i class="lar la-heart"></i></a>
                                     </div>
                                 }
@@ -48,14 +46,14 @@
                 <div class="col-md-5 d-flex flex-column justify-content-between">
                     <div class="d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between">
-                            <h2>@productDetails.Product.Name</h2>
+                            <h2> @Model.productDetailsModel.Product.Name</h2>
 
                             <div>
-                                @if (@productDetails.Product.Rating >= 0 && @productDetails.Product.Rating <= 5)
+                                @if ( @Model.productDetailsModel.Product.Rating >= 0 && @Model.productDetailsModel.Product.Rating <= 5)
                                 {
 
-                                    var fullStars = (int)Math.Floor(@productDetails.Product.Rating);
-                                    var halfStar = (@productDetails.Product.Rating - fullStars) >= 0.5;
+                                    var fullStars = (int)Math.Floor( @Model.productDetailsModel.Product.Rating);
+                                    var halfStar = ( @Model.productDetailsModel.Product.Rating - fullStars) >= 0.5;
                                     // Boş yıldızların <
                                     var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
 
@@ -81,19 +79,23 @@
                         <div class="d-flex justify-content-end" style="margin-top:-15px;">
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item" style="font-size:15px;">
-                                    <strong><i class="la la-heart"></i></strong> @productDetails.Product.Favorite
-                                    <strong style="margin-left:5px;"><i class="la la-eye"></i> </strong> @productDetails.Product.Clicked
+                                    <strong><i class="la la-heart"></i></strong> @Model.productDetailsModel.Product.Favorite
+                                    <strong style="margin-left:5px;"><i class="la la-eye"></i> </strong> @Model.productDetailsModel.Product.Clicked
                                 </li>
                             </ul>
                         </div>
-                        <p style="margin-top:30px;"> @productDetails.Product.Description</p>
+                        <p style="margin-top:30px;"> @Model.productDetailsModel.Product.Description</p>
                         
 
                     </div>
                     <div>
                         <div class="d-flex align-items-center justify-content-end">
-                            <h3 class="" style="color: #bf1b3c; font-weight:600; margin-right:20px;">$@productDetails.Product.Price</h3>
-                            <button id="buyButton" class="btn btn-outline-primary search-button no-outline" onclick="addToCart(@productDetails.Product.ProductId, @productDetails.Company.CompanyId)" style="border: 1px solid black; color:black;">Add To Cart</button>
+                            <h3 class="" style="color: #bf1b3c; font-weight:600; margin-right:20px;">$@Model.productDetailsModel.Product.Price</h3>
+                            <button id="buyButton" class="btn btn-outline-primary search-button no-outline"
+                                    onclick="addToCart(@Model.productDetailsModel.Product.ProductId, @Model.productDetailsModel.Company.CompanyId, getQuantity()); updateBasketCount();"
+                                    style="border: 1px solid black; color:black;">
+                                Add To Cart
+                            </button>
                         </div>
                         <div class="mt-3">
 
@@ -102,15 +104,28 @@
 
                                 @{
             /*
-            *  <li class="list-group-item"><strong>Favorites:</strong> @productDetails.Product.Favorite</li>
-                                    *     <li class="list-group-item"><strong>Clicks:</strong> @productDetails.Product.Clicked</li>
-                                    *    <li class="list-group-item"><strong>Available:</strong> @productDetails.Product.isAvailable</li>
-                                    *  <li class="list-group-item"><strong>Created At:</strong> @productDetails.Product.CreatedAt.ToShortDateString()</li>
+            *  <li class="list-group-item"><strong>Favorites:</strong> @Model.productDetailsModel.Product.Favorite</li>
+                                    *     <li class="list-group-item"><strong>Clicks:</strong> @Model.productDetailsModel.Product.Clicked</li>
+                                    *    <li class="list-group-item"><strong>Available:</strong> @Model.productDetailsModel.Product.isAvailable</li>
+                                    *  <li class="list-group-item"><strong>Created At:</strong> @Model.productDetailsModel.Product.CreatedAt.ToShortDateString()</li>
                                     */
                                 }
-                              
-                                <li class="list-group-item"><strong>Category:</strong> @productDetails.Product.Category</li>
-                                <li class="list-group-item"><strong>Stock:</strong> @productDetails.Product.Stock</li>
+                                <li class="list-group-item">
+                                    <div class="count-control mt-2" style="font-size:14px; color:grey;">
+                                        Quantity:
+                                        <button type="button" class="btn btn-dark btn-sm count-btn d-flex align-items-center justify-content-center" style="margin-left:10px;" onclick="updateQuantity('decrease')">-</button>
+                                        <span id="quantityDisplay" style="margin: 0 10px;">1</span>
+                                        <button type="button" class="btn btn-dark btn-sm count-btn d-flex align-items-center justify-content-center" onclick="updateQuantity('increase')">+</button>
+                                    </div>
+                                    <input type="hidden" id="quantity" name="quantity" value="1">
+                                </li>
+
+
+
+
+
+                                <li class="list-group-item"><strong>Category:</strong> @Model.productDetailsModel.Product.Category</li>
+                                <li class="list-group-item"><strong>Stock:</strong> @Model.productDetailsModel.Product.Stock</li>
                         </div>
                         </ul>
                     </div>
@@ -130,15 +145,15 @@
         </div>
         <div class="card-body">
             <div style="max-height:500px; overflow:scroll;">
-            @if (productDetails.ProductReviews.Any())
+            @if (Model.productDetailsModel.ProductReviews.Any())
             {
                 int i = 0;
 
-                    foreach (var review in productDetails.ProductReviews)
+                    foreach (var review in Model.productDetailsModel.ProductReviews)
                     {
                         <div class="mb-3">
                             <h6>
-                                @productDetails.ReviewedUsers[i].Name @productDetails.ReviewedUsers[i].Surname
+                                @Model.productDetailsModel.ReviewedUsers[i].Name @Model.productDetailsModel.ReviewedUsers[i].Surname
                                 <span style="font-size:15px; margin-left:5px;">
                                     @for (int j = 0; j < 5; j++)
                                     {
@@ -155,7 +170,7 @@
                             </h6>
                             <p>@review.Review</p>
                             <p style="margin-top: -15px;"><small>Reviewed on @review.CreatedAt.ToShortDateString()</small></p>
-                            @if (i < productDetails.ProductReviews.Count - 1)
+                            @if (i < Model.productDetailsModel.ProductReviews.Count - 1)
                             {
                                 <hr />
                             }
@@ -173,7 +188,7 @@
             <div class="mt-4" style="border-top: 1px solid #e6e7e8;">
                
                 <form method="post" action="@Url.Action("AddReview", "User")">
-                    <input type="hidden" name="ProductId" value="@productDetails.Product.ProductId" />
+                    <input type="hidden" name="ProductId" value="@Model.productDetailsModel.Product.ProductId" />
 
                     <div class="form-group d-flex align-items-center" >
                         <label for="rating" style="margin-right:10px;">Rating</label>
@@ -220,12 +235,12 @@
                 <div class="col-md-5 position-relative" >
                     <!-- Banner Image -->
                     <div class="banner-container">
-                        <img src="~/images/_Banners/@productDetails.Company.BannerUrl" alt="Company Banner" class="banner-image" />
+                        <img src="~/images/_Banners/@Model.productDetailsModel.Company.BannerUrl" alt="Company Banner" class="banner-image" />
                     </div>
 
                     <!-- Logo Image on top of Banner -->
                     <div class="logo-container">
-                        <img src="~/images/_Logos/@productDetails.Company.LogoUrl" alt="Company Logo" class="logo-image" />
+                        <img src="~/images/_Logos/@Model.productDetailsModel.Company.LogoUrl" alt="Company Logo" class="logo-image" />
                     </div>
                 </div>
 
@@ -233,22 +248,22 @@
 
 
                 <div class="col-md-6">
-                    <h4>@productDetails.Company.CompanyName</h4>
-                    <p>@productDetails.Company.Description</p>
+                    <h4>@Model.productDetailsModel.Company.CompanyName</h4>
+                    <p>@Model.productDetailsModel.Company.Description</p>
                     <ul class="list-group">
-                        <li class="list-group-item"><strong>Name:</strong> @productDetails.User.Name @productDetails.User.Surname</li>
-                        <li class="list-group-item"><strong>Address:</strong> @productDetails.Company.Address</li>                       
+                        <li class="list-group-item"><strong>Name:</strong> @Model.productDetailsModel.User.Name @Model.productDetailsModel.User.Surname</li>
+                        <li class="list-group-item"><strong>Address:</strong> @Model.productDetailsModel.Company.Address</li>                       
                         @{
                             /*
-                            * <li class="list-group-item"><strong>IBAN:</strong> @productDetails.Company.IBAN</li>
-                            * <li class="list-group-item"><strong>Tax ID Number:</strong> @productDetails.Company.TaxIDNumber</li>
-                            * <li class="list-group-item"><strong>Email:</strong> @productDetails.Company.Email</li>
-                            * <li class="list-group-item"><strong>Phone Number:</strong> @productDetails.Company.PhoneNumber</li>
+                            * <li class="list-group-item"><strong>IBAN:</strong> @Model.productDetailsModel.Company.IBAN</li>
+                            * <li class="list-group-item"><strong>Tax ID Number:</strong> @Model.productDetailsModel.Company.TaxIDNumber</li>
+                            * <li class="list-group-item"><strong>Email:</strong> @Model.productDetailsModel.Company.Email</li>
+                            * <li class="list-group-item"><strong>Phone Number:</strong> @Model.productDetailsModel.Company.PhoneNumber</li>
                             */
                         }
                      
-                        <li class="list-group-item"><strong>Created At:</strong> @productDetails.Company.CreatedAt.ToShortDateString()</li>
-                        <li class="list-group-item"><strong>Rating:</strong> @productDetails.Company.Rating</li>
+                        <li class="list-group-item"><strong>Created At:</strong> @Model.productDetailsModel.Company.CreatedAt.ToShortDateString()</li>
+                        <li class="list-group-item"><strong>Rating:</strong> @Model.productDetailsModel.Company.Rating</li>
 
                     </ul>
                 </div>
@@ -266,15 +281,39 @@
 
 @section Scripts {
     <script>
-        function addToCart(productId,companyId) {
+
+
+        function addToCart(productId, companyId, quantity){
             $.ajax({
                 url: '@Url.Action("AddToCart", "User")',
                 type: 'POST',
-                data: { productId: productId, companyId: companyId }
+                data: { productId: productId, companyId: companyId,quantity:quantity }
                 
             });
+            updateBasketCount();
         }
-    </script>
+
+
+        function updateQuantity(action) {
+            let quantityInput = document.getElementById('quantity');
+            let quantityDisplay = document.getElementById('quantityDisplay');
+            let quantity = parseInt(quantityInput.value);
+
+            if (action === 'increase') {
+                quantity += 1;
+            } else if (action === 'decrease' && quantity > 1) {
+                quantity -= 1;
+            }
+
+            quantityInput.value = quantity;
+            quantityDisplay.innerText = quantity;
+        }
+
+        function getQuantity() {
+            return parseInt(document.getElementById('quantity').value);
+        }
+
+</script>
 }
 
 
@@ -434,4 +473,26 @@
             color: #f5b301;
         }
 
+
+    .count-control {
+        display: flex;
+        align-items: center;
+    }
+
+    .count-input {
+        width: 20px;
+        height: 15px;
+        text-align: center;
+        border: 1px solid #000;
+        margin: 0 5px;
+    }
+
+    .count-btn {
+        width: 12px;
+        height: 12px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 </style>

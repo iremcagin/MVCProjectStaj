@@ -1,4 +1,4 @@
-﻿@model CategoriesModel
+﻿@model ModelForUserPages
 
 <!DOCTYPE html>
 <html lang="en">
@@ -47,7 +47,7 @@
                             <a class="nav-link text-dark" href="/Guest">Home</a>
                         </li>
                         @{
-                            CategoriesModel categoriesModel = new CategoriesModel();
+                            ModelForUserPages categoriesModel = new ModelForUserPages();
                             var furnitureCategories = categoriesModel.GetAllFurnitureCategories();
                             var decorationCategories = categoriesModel.GetAllDecorationCategories();
 

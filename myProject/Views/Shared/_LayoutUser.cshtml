@@ -1,4 +1,4 @@
-﻿@model myProject.Models.CategoriesModel
+﻿@model myProject.Models.ModelForUserPages
 
 <!DOCTYPE html>
 <html lang="en">
@@ -21,6 +21,26 @@
             font-family: "Arapey", serif;
         }
     </style>
+
+
+    <script>
+
+        // Define the function with a name
+        function updateBasketCount() {
+            $.getJSON('@Url.Action("GetBasketCount", "User")', function (data) {
+             
+
+                if (data > 0) {
+                    $('#basketCount').text("(" + data + ")").show();
+                } else {
+                    $('#basketCount').hide();
+                }
+            });
+        }
+
+
+
+    </script>
 </head>
 
 
@@ -47,7 +67,7 @@
                             <a class="nav-link text-dark" href="/User">Home</a>
                         </li>
                         @{
-                            CategoriesModel categoriesModel = new CategoriesModel();
+                            ModelForUserPages categoriesModel = new ModelForUserPages();
                             var furnitureCategories = categoriesModel.GetAllFurnitureCategories();
                             var decorationCategories = categoriesModel.GetAllDecorationCategories();
 
@@ -252,19 +272,12 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
 
+        // Call the function when the document is ready
         $(document).ready(function () {
-            $.getJSON('@Url.Action("GetBasketCount", "User")', function (data) {
-                if (data > 0) {
-
-                    $('#basketCount').text("("+data+")").show();
-                } else {
-                    $('#basketCount').hide();
-                }
-            });
+            updateBasketCount();
         });
-
-
-    </script>
+        </script>
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
