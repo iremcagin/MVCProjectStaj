@@ -23,6 +23,9 @@ namespace myProject.Models
         public List<ProductReviewModel> Reviews { get; set; } = new List<ProductReviewModel>();  // reviewID
 
 
+        //Profile için
+        public string category { get; set; }
+
 
 
 

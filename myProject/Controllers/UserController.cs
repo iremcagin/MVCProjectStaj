@@ -48,6 +48,7 @@ namespace myProject.Controllers
         public IActionResult Signout()
         {
             HttpContext.Session.Remove("UserId");
+
             return RedirectToAction("Index", "Guest");
         }
 
@@ -71,6 +72,10 @@ namespace myProject.Controllers
         public IActionResult AddToCart(int productId, int companyId, int quantity)
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                 return RedirectToAction("Index", "Login"); 
+            }
 
             userDatabaseControlModel.AddToCart(userId, productId, companyId, quantity);
 
@@ -84,8 +89,13 @@ namespace myProject.Controllers
         public IActionResult Basket()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                 return RedirectToAction("Index", "Login");
+            }
+
             ModelForUserPages modelForUserPages = new ModelForUserPages();
-            modelForUserPages.productsInBasket = userDatabaseControlModel.GetBasket(userId);
+            modelForUserPages = userDatabaseControlModel.GetBasket(userId);
             modelForUserPages.productsDeletedFromBasket = userDatabaseControlModel.GetPrevDeletedBasket(userId);
 
             UpdatePrice();
@@ -102,6 +112,11 @@ namespace myProject.Controllers
         public IActionResult DeleteItemInBasket(int productId)
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                 return RedirectToAction("Index", "Login");
+            }
+
 
             userDatabaseControlModel.DeleteItemInBasket(userId, productId);
 
@@ -114,6 +129,11 @@ namespace myProject.Controllers
         public IActionResult UpdateQuantity(int productId, int companyId, int quantity)
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                 return RedirectToAction("Index", "Login");
+            }
+
             userDatabaseControlModel.updateQuantity(userId, productId, companyId, quantity);
             UpdatePrice();
 
@@ -128,6 +148,11 @@ namespace myProject.Controllers
         public IActionResult UpdatePrice()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                 return RedirectToAction("Index", "Login");
+            }
+
             ModelForUserPages.CalculatePrice(userId);
 
             return RedirectToAction("Basket");
@@ -140,10 +165,67 @@ namespace myProject.Controllers
         public IActionResult Profile()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                 return RedirectToAction("Index", "Login");
+            }
+
             ModelForUserPages modelForUserPages = new ModelForUserPages();
             modelForUserPages = userDatabaseControlModel.GetUserProfileInfo(userId);
 
+
             return View(modelForUserPages);
         }
+
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Add Card */
+        [HttpPost]
+        public IActionResult AddCard(CardModel card)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                 return RedirectToAction("Index", "Login");
+            }
+
+            userDatabaseControlModel.AddCard(userId, card);
+
+            return RedirectToAction("Profile");
+
+        }
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Satın alım */
+        [HttpPost]
+        [HttpPost]
+        public IActionResult ClearCart()
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                // Kullanıcı giriş yapmamışsa JSON formatında hata döndür
+                return Json(new { success = false, message = "User not logged in" });
+            }
+
+            try
+            {
+                userDatabaseControlModel.ClearCart(userId);
+                // Başarılı olduğunda JSON formatında başarı yanıtı döndür
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                // Hata durumunda JSON formatında hata yanıtı döndür
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+
+
+
+
     }
 }

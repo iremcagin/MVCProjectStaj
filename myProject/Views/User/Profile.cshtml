@@ -5,3 +5,409 @@
 }
 
 
+<style>
+    .no-outline:hover {
+        background-color: #f2eeed;
+    }
+
+    .no-outline:focus,
+    .no-outline:active{
+        outline:none;
+        box-shadow:none;
+    }
+</style>
+
+
+
+<div class="container my-5">
+    <!-- User Information -->
+    <div class="mb-5 row ">
+        <div class="col p-2" style="border:1px solid black;">
+            <div class="" style="border-bottom: 1px solid black;  margin-bottom:10px;">
+                <h5>@Model.userProfile.Name @Model.userProfile.Surname</h5>
+            </div>
+            <div class="">
+                <p><i class="las la-envelope"></i> <strong>Email:</strong> @Model.userProfile.Email</p>
+                <p><i class="las la-phone"></i> <strong>Phone Number:</strong> @Model.userProfile.PhoneNumber</p>
+                <p><i class="las la-home"></i> <strong>Address:</strong> @Model.userProfile.Address</p>
+                <p><i class="las la-birthday-cake"></i> <strong>Age:</strong> @Model.userProfile.Age</p>
+                <p><i class="las la-calendar-day"></i> <strong>Birthdate:</strong> @Model.userProfile.Birthdate.ToShortDateString()</p>
+                <p><i class="las la-calendar-alt"></i> <strong>Member Since:</strong> @Model.userProfile.CreatedAt.ToShortDateString()</p>
+            </div>
+        </div>
+
+
+        <!-- Credit Cards -->
+        <div class="col-md-7 p-2" style="border:1px solid black; overflow-y:scroll;  max-height: 350px; overflow-x: hidden;">
+            <div class="d-flex justify-content-between align-items-center" style="border-bottom: 1px solid black; margin-bottom:10px;">
+                <h5>Credit Cards</h5>
+                <button class="btn btn-outline-primary d-flex align-items-center justify-content-center no-outline" data-bs-toggle="modal" data-bs-target="#addCardModal" style="border:1px solid black; color:black; width:100px; height:30px; margin-top:-8px;">
+                    Add Card
+                </button>
+            </div>
+            <div class="">
+                @if (Model.creditCards.Any())
+                {
+                    <!-- Credit Cards List -->
+                    <div class="row">
+                        @foreach (var card in Model.creditCards)
+                        {
+                            <div class="col-md-6 mb-2">
+                                <div class="credit-card-container">
+                                    <!-- Kredi Kartının Ön Yüzü -->
+                                    <div class="credit-card">
+                                        <div class="card-front">
+
+                                            <div class="card-type d-flex justinfy-content-end col-md-12">Credit Card</div>
+
+                                            <div class="card-number" style="margin-top:25px;">@card.CardNumber</div>
+                                            <div class="card-details" style="margin-top:25px;">
+                                                <div class="card-holder">Card Holder: @card.CardHolderName</div>
+                                                <div class="card-expiry">Expires: @card.ExpirationDate</div>
+                                            </div>
+                                        </div>
+                                        <!-- Kredi Kartının Arka Yüzü -->
+                                        <div class="card-back">
+                                            <div class="magnetic-strip"></div>
+                                            <div class="cvv">CVV: 123</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p>No credit cards available.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal for Adding Card -->
+    <div class="modal fade" id="addCardModal" tabindex="-1" aria-labelledby="addCardModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCardModalLabel">Add New Credit Card</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="post" action="/User/AddCard">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="cardHolderName" class="form-label">Card Holder Name</label>
+                            <input type="text" class="form-control" id="cardHolderName" name="CardHolderName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cardNumber" class="form-label">Card Number</label>
+                            <input type="text" class="form-control" id="cardNumber" name="CardNumber" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expirationDate" class="form-label">Expiration Date</label>
+                            <input type="text" class="form-control" id="expirationDate" name="ExpirationDate" placeholder="MM/YY" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cvv" class="form-label">CVV</label>
+                            <input type="text" class="form-control" id="cvv" name="CVV" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Card</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <!-- Followed Companies -->
+    <div class="mb-5" style="max-height:800px; overflow-y:scroll;">
+        <div class="" style="border-bottom: 1px solid black;  margin-bottom:10px;">
+            <h5>Followed Companies</h5>
+        </div>
+        <div class="">
+            @if (Model.followedCompanies.Any())
+            {
+                <ul class="list-group">
+                    @foreach (var company in Model.followedCompanies)
+                    {
+                        <li class="list-group-item">
+                            <p><strong>Company Name:</strong> @company.CompanyName</p>
+                            <p><strong>Description:</strong> @company.Description</p>
+                            <p><strong>Address:</strong> @company.Address</p>
+                            <p><strong>Phone Number:</strong> @company.PhoneNumber</p>
+                            <p><strong>Email:</strong> @company.Email</p>
+                            <p><strong>Followed At:</strong> @company.CreatedAt.ToShortDateString()</p>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>No followed companies available.</p>
+            }
+        </div>
+    </div>
+
+
+
+
+
+
+    <!-- Product Reviews -->
+    <div class="mb-5" style="max-height:800px; overflow-y:scroll;">
+        <div class="" style="border-bottom: 1px solid black;  margin-bottom:10px;">
+            <h5>Product Reviews</h5>
+        </div>
+        <div class="">
+            @if (Model.productReviews.Any())
+            {
+                <ul class="list-group">
+                    @foreach (var review in Model.productReviews)
+                    {
+                        <li class="list-group-item">
+                            <p class="align-items-center">
+
+                                <div class="review-images mb-3">
+                                    @if (review.Images.Any())
+                                    {
+                                        @foreach (var imageUrl in review.Images)
+                                        {   <a href="/User/ProductDetails/@review.ProductId">
+                                                <img src="~/images/@review.category/@imageUrl" alt="image" class="img-thumbnail" style="max-width: 100px; max-height: 100px; margin-right: 5px;">
+                                            </a>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <img src="~/images/placeholder-1.png" alt="No Image" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                                    }
+                                </div>
+                                <strong>Rating:</strong>
+                                @for (int i = 1; i <= review.Rating; i++)
+                                {
+                                    <i class="las la-star" style="color: #FFD700; font-size:15px;"></i>
+                                }
+                            </p>
+                            <p> @review.Review</p>
+                            <p> @review.CreatedAt.ToShortDateString()</p>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>No reviews available.</p>
+            }
+        </div>
+    </div>
+
+
+
+
+    <!-- Bought Products -->
+    <div class="mb-5">
+        <div class="border-bottom mb-3">
+            <h5>Bought Products</h5>
+        </div>
+        <div class="horizontal-scroll">
+            @if (Model.productsBought.Any())
+            {
+                <div class="d-flex flex-row">
+                    @foreach (var product in Model.productsBought)
+                    {
+                        <div class="card me-3" style="min-width: 250px;">
+                            <div id="carousel-@product.ProductId" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    @if (product.Images != null && product.Images.Any())
+                                    {
+                                        @for (int i = 0; i < product.Images.Count; i++)
+                                        {
+                                             <a href="/User/ProductDetails/@product.ProductId">
+                                                <div class="carousel-item @(i == 0 ? "active" : "")">
+                                                    <img src="~/images/@product.category/@product.Images[i]" class="d-block w-100 card-img-top" alt="Product Image">
+                                                </div>
+                                             </a>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="carousel-item active">
+                                            <img src="~/images/placeholder-1.png" class="d-block w-100 card-img-top" alt="Placeholder Image">
+                                        </div>
+                                    }
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carousel-@product.ProductId" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carousel-@product.ProductId" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">@product.Name</h5>
+                                <p class="card-text">@product.Description</p>
+                                <p class="card-text"><strong>Price:</strong> @product.Price.ToString("C")</p>
+                                <p class="card-text"><small class="text-muted">Bought At: @product.CreatedAt.ToShortDateString()</small></p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p>No bought products available.</p>
+            }
+        </div>
+    </div>
+
+
+
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<style>
+
+    .credit-card-container {
+        perspective: 1000px;
+        width: 300px;
+        height: 200px;
+    }
+
+    .credit-card {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.9s;
+        transform: rotateY(0deg);
+    }
+
+        .credit-card:hover {
+            transform: rotateY(180deg);
+        }
+
+    .card-front, .card-back {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        backface-visibility: hidden;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .card-front {
+        background: #333;
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .card-back {
+        background: #f0f0f0;
+        color: #333;
+        padding: 20px;
+        text-align: center;
+        transform: rotateY(180deg);
+    }
+
+    .card-logo {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .card-number {
+        font-size: 18px;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+    }
+
+    .card-details {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+    }
+
+    .card-holder {
+        font-weight: bold;
+    }
+
+    .card-expiry {
+        color: #ccc;
+    }
+
+    .magnetic-strip {
+        height: 20px;
+        background: #333;
+        margin-top: 10px;
+        border-radius: 3px;
+    }
+
+    .cvv {
+        margin-top: 10px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+
+
+    .horizontal-scroll {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+        .horizontal-scroll::-webkit-scrollbar {
+            height: 8px; /* Scroll bar yüksekliğini ayarlayın */
+        }
+
+        .horizontal-scroll::-webkit-scrollbar-thumb {
+            background-color: #888; /* Scroll bar rengi */
+            border-radius: 10px; /* Scroll bar köşe yuvarlama */
+        }
+
+            .horizontal-scroll::-webkit-scrollbar-thumb:hover {
+                background-color: #555; /* Scroll bar üzerine gelinceki rengi */
+            }
+
+    .card {
+        flex: 0 0 auto;
+    }
+
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+    }
+
+    .card-text {
+        margin-bottom: 0.5rem;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+
+
+
+</style>

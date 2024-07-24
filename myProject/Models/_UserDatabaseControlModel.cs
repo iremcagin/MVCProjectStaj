@@ -694,8 +694,9 @@ namespace myProject.Models
 
         /* -------------------------------------------------------------------------------------------------------------- */
         /* Return basket products of the user. */
-        public ProductsInBasket GetBasket(int? userId)
+        public ModelForUserPages GetBasket(int? userId)
         {
+            ModelForUserPages modelForUserPages = new ModelForUserPages();
             ProductsInBasket basketProducts = new ProductsInBasket();
         
 
@@ -797,8 +798,43 @@ namespace myProject.Models
                     }
                 }
 
+
+
+                // Get Credit Cards
+                string creditCardQuery = @"
+                SELECT *
+                FROM CreditCards
+                WHERE UserId = @userId";
+
+                using (SqlCommand cmd = new SqlCommand(creditCardQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        // Assuming user.creditCards is a collection to hold the credit card details
+                        modelForUserPages.creditCards = new List<CardModel>();
+
+                        while (reader.Read())
+                        {
+                            modelForUserPages.creditCards.Add(new CardModel
+                            {
+                                CardId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                                CardNumber = reader.GetString(reader.GetOrdinal("CardNumber")),
+                                CardHolderName = reader.GetString(reader.GetOrdinal("CardHolderName")),
+                                ExpirationDate = reader.GetString(reader.GetOrdinal("ExpirationDate")),
+                                CVV = reader.GetString(reader.GetOrdinal("CVV"))
+                            });
+                        }
+                    }
+                }
+
             }
-            return basketProducts;
+
+            modelForUserPages.productsInBasket = basketProducts;
+
+            return modelForUserPages;
         }
 
 
@@ -1104,12 +1140,14 @@ namespace myProject.Models
 
 
 
+
+
                 // Get Reviews
 
                 userQuery = @"
                     SELECT *
                     FROM Reviews
-                    WHERE Id = @userId";
+                    WHERE UserId = @userId";
 
                 using (SqlCommand cmd = new SqlCommand(userQuery, conn))
                 {
@@ -1119,6 +1157,8 @@ namespace myProject.Models
                     {
                         while (reader.Read())
                         {
+                            
+
                             user.productReviews.Add(new ProductReviewModel
                             {
                                 ReviewId = reader.GetInt32(reader.GetOrdinal("Id")),
@@ -1129,9 +1169,41 @@ namespace myProject.Models
                                 Review = reader.GetString(reader.GetOrdinal("Review")),
                                 CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
                             });
+
                         }
                     }
                 }
+
+
+
+                for (int i = 0; i < user.productReviews.Count; i++) {
+                    // Get images
+
+                    string query = @"
+                        SELECT p.Category, pi.ImageUrl
+                        FROM Products p
+                        LEFT JOIN ProductImages pi ON p.ProductId = pi.ProductId
+                        WHERE p.ProductId = @productId";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@productId", user.productReviews[i].ProductId);
+
+
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    string imageUrl = reader.GetString(1);
+                                    user.productReviews[i].Images.Add(imageUrl);
+
+                                    user.productReviews[i].category = reader.GetString(0);
+                                }
+                            }
+                        }
+                    }
+
+
 
 
 
@@ -1201,7 +1273,7 @@ namespace myProject.Models
                 {
                   
                     string productDetailsQuery = @"
-                    SELECT ProductId, CompanyId, ProductName, Price, Description
+                    SELECT *
                     FROM Products
                     WHERE ProductId IN (" + string.Join(",", productIds) + ")";
 
@@ -1233,6 +1305,40 @@ namespace myProject.Models
                         }
                     }
                 }
+
+
+
+
+                for (int i = 0; i < user.productsBought.Count; i++)
+                {
+                    // Get images
+
+                    string query = @"
+                        SELECT p.Category, pi.ImageUrl
+                        FROM Products p
+                        LEFT JOIN ProductImages pi ON p.ProductId = pi.ProductId
+                        WHERE p.ProductId = @productId";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@productId", user.productsBought[i].ProductId);
+
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                string imageUrl = reader.GetString(1);
+                                user.productsBought[i].Images.Add(imageUrl);
+
+                                user.productsBought[i].category = reader.GetString(0);
+                            }
+                        }
+                    }
+                }
+
+
+
 
 
                 // Query to get followed company IDs and follow dates, sorted by follow date
@@ -1305,6 +1411,133 @@ namespace myProject.Models
 
             return user;
         }
+
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Add card to the database */
+        public void AddCard(int? userId, CardModel card)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                string query = @"
+                    INSERT INTO CreditCards (UserId, CardNumber, CardHolderName, ExpirationDate, CVV)
+                    VALUES (@UserId, @CardNumber, @CardHolderName, @ExpirationDate, @CVV)";
+
+
+                // Create and configure the SqlCommand
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    // Add parameters to the command
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@CardNumber", card.CardNumber);
+                    cmd.Parameters.AddWithValue("@CardHolderName", card.CardHolderName);
+                    cmd.Parameters.AddWithValue("@ExpirationDate", card.ExpirationDate);
+                    cmd.Parameters.AddWithValue("@CVV", card.CVV);
+
+                    // Execute the command
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+
+
+        /* ------------------------------------------------------------------------------------------------------------- */
+        /* Delete product from the user's basket. */
+        public void ClearCart(int? userId)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                // Begin transaction
+                using (SqlTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // Get all products in the basket for the user
+                        string queryProductsInBasket = @"
+                    SELECT pib.ProductId, p.CompanyId
+                    FROM ProductsInBasket pib
+                    JOIN Products p ON pib.ProductId = p.ProductId
+                    WHERE pib.UserId = @UserId";
+
+                        var productsInBasket = new List<(int ProductId, int CompanyId)>();
+
+                        using (SqlCommand cmd = new SqlCommand(queryProductsInBasket, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@UserId", userId);
+
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    productsInBasket.Add((reader.GetInt32(0), reader.GetInt32(1)));
+                                }
+                            }
+                        }
+
+                        // Insert products into ProductsBought if they do not already exist
+                        string checkQuery = @"
+                    SELECT COUNT(*)
+                    FROM ProductsBought
+                    WHERE UserId = @UserId AND ProductId = @ProductId";
+
+                        string insertQuery = @"
+                    INSERT INTO ProductsBought (UserId, CompanyId, ProductId)
+                    VALUES (@UserId, @CompanyId, @ProductId)";
+
+                        foreach (var product in productsInBasket)
+                        {
+                            using (SqlCommand checkCommand = new SqlCommand(checkQuery, conn, transaction))
+                            {
+                                checkCommand.Parameters.AddWithValue("@UserId", userId);
+                                checkCommand.Parameters.AddWithValue("@ProductId", product.ProductId);
+
+                                int count = (int)checkCommand.ExecuteScalar();
+
+                                if (count == 0)
+                                {
+                                    using (SqlCommand insertCommand = new SqlCommand(insertQuery, conn, transaction))
+                                    {
+                                        insertCommand.Parameters.AddWithValue("@UserId", userId);
+                                        insertCommand.Parameters.AddWithValue("@CompanyId", product.CompanyId);
+                                        insertCommand.Parameters.AddWithValue("@ProductId", product.ProductId);
+                                        insertCommand.ExecuteNonQuery();
+                                    }
+                                }
+                            }
+                        }
+
+                        // Delete all products from ProductsInBasket for the user
+                        string deleteQuery = "DELETE FROM ProductsInBasket WHERE UserId = @UserId";
+
+                        using (SqlCommand deleteCommand = new SqlCommand(deleteQuery, conn, transaction))
+                        {
+                            deleteCommand.Parameters.AddWithValue("@UserId", userId);
+                            deleteCommand.ExecuteNonQuery();
+                        }
+
+                        // Commit transaction
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Rollback transaction on error
+                        transaction.Rollback();
+                        throw; // Re-throw the exception to handle it further up the call stack
+                    }
+                }
+            }
+
+        }
+
+
+
+
 
     }
 }

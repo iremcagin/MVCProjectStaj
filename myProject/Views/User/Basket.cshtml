@@ -30,11 +30,100 @@
             </div>
 
             <!-- Satın Alma Butonu -->
-            <a href="/User/Checkout" class="btn btn-outline-primary" style="font-size: 16px; font-weight:600;">
+            <a href="#" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#purchaseModal" style="font-size: 16px; font-weight:600;">
                 <i class="las la-credit-card"></i> Purchase
             </a>
+
         </div>
     </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="purchaseModal" tabindex="-1" aria-labelledby="purchaseModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="purchaseModalLabel"> <label for="totalPrice" style="font-size:20px;">Total Price: <strong style="color: #b8433b">@ModelForUserPages.totalPrice.ToString("C")</strong> </label></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Credit Card List -->
+                    <!-- Credit Card List -->
+                    <div class="mb-4 col-md-12">
+                        <h6><i class="las la-credit-card"></i>Select Credit Card</h6>
+                        <div class="card-container">
+                            @if (Model.creditCards.Count > 0){
+                                @foreach (var card in Model.creditCards)
+                                {
+                                    <div class="col-md-6">
+                                   
+                                            <input type="radio" name="creditCard" value="@card.CardId" id="card-@card.CardId">
+
+                                            <label for="card-@card.CardId" class="card-label">
+                                                <div class="credit-card-container">
+                                                    <!-- Kredi Kartının Ön Yüzü -->
+                                                    <div class="credit-card">
+                                                        <div class="card-front">
+                                                      
+                                                            <div class="card-type d-flex justinfy-content-end col-md-12">Credit Card</div>
+                                                       
+                                                            <div class="card-number" style="margin-top:25px;">@card.CardNumber</div>
+                                                        <div class="card-details" style="margin-top:25px;">
+                                                                <div class="card-holder">Card Holder: @card.CardHolderName</div>
+                                                                <div class="card-expiry">Expires: @card.ExpirationDate</div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Kredi Kartının Arka Yüzü -->
+                                                        <div class="card-back">
+                                                            <div class="magnetic-strip"></div>
+                                                            <div class="cvv">CVV: 123</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </label>
+
+                                    
+                                    </div>
+                                }
+                            }
+                            {
+                                <p>Plase Add Credit Card in the Profile !</p>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Purchase Details -->
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary" id="purchaseButton">Purchase</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Teşekkürler Modal -->
+    <div class="modal fade" id="thankYouModal" tabindex="-1" aria-labelledby="thankYouModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="thankYouModalLabel">Thank You!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Your purchase was successful. Thank you for shopping with us!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
 
     <div class="gap-4 mt-3">
         @for (int j = 0; j < @Model.productsInBasket.Products.Count; j++)
@@ -324,6 +413,40 @@
 
     }
 
+
+    document.getElementById('purchaseButton').addEventListener('click', function () {
+        // Seçili kart olup olmadığını kontrol et
+        var selectedCard = document.querySelector('input[name="creditCard"]:checked');
+    
+        if (!selectedCard) {
+            alert("Please select a card!");
+            return; // Eğer kart seçilmemişse işlemi durdur
+        }
+
+
+        // Send request to remove items from cart
+        fetch('/User/ClearCart', { method: 'POST' })
+            .then(response => {
+                if (response.ok) {
+                    // Show thank you modal
+                    var thankYouModal = new bootstrap.Modal(document.getElementById('thankYouModal'));
+                    thankYouModal.show();
+
+                    // Hide purchase modal
+                    var purchaseModal = bootstrap.Modal.getInstance(document.getElementById('purchaseModal'));
+                    purchaseModal.hide();
+
+                    window.location.reload();
+                } else {
+                    // Handle error
+                    console.error('Failed to clear cart');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+
     
 </script>
 
@@ -388,4 +511,140 @@
         align-items: center;
         justify-content: center;
     }
+
+
+
+
+    /* Style for the modal content */
+    .modal-body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-container {
+        padding:10px;
+        display: flex;
+        overflow-x: auto; /* Enable horizontal scrolling */
+        gap: 15px; /* Space between cards */
+    }
+
+    .card {
+        flex: 0 0 auto; /* Prevent cards from shrinking */
+        width: 300px; /* Set card width */
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card input[type="radio"] {
+        margin-right: 10px;
+    }
+
+
+    /* Scrollbar styling */
+    .card-container::-webkit-scrollbar {
+        height: 4px; /* Set the height of the scrollbar */
+    }
+
+    .card-container::-webkit-scrollbar-thumb {
+        background-color: #888; /* Color of the scrollbar */
+        border-radius: 3px; /* Rounded corners */
+    }
+
+        .card-container::-webkit-scrollbar-thumb:hover {
+            background-color: #555; /* Color when hovered */
+        }
+
+    .card-container::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Background of the scrollbar track */
+    }
+
+
+
+
+
+    .credit-card-container {
+        perspective: 1000px;
+        width: 300px;
+        height: 200px;
+    }
+
+    .credit-card {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.9s;
+        transform: rotateY(0deg);
+    }
+
+        .credit-card:hover {
+            transform: rotateY(180deg);
+        }
+
+    .card-front, .card-back {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        backface-visibility: hidden;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .card-front {
+        background: #333;
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .card-back {
+        background: #f0f0f0;
+        color: #333;
+        padding: 20px;
+        text-align: center;
+        transform: rotateY(180deg);
+    }
+
+    .card-logo {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .card-number {
+        font-size: 18px;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+    }
+
+    .card-details {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+    }
+
+    .card-holder {
+        font-weight: bold;
+    }
+
+    .card-expiry {
+        color: #ccc;
+    }
+
+    .magnetic-strip {
+        height: 20px;
+        background: #333;
+        margin-top: 10px;
+        border-radius: 3px;
+    }
+
+    .cvv {
+        margin-top: 10px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+
 </style>
