@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Transactions;
 
 namespace myProject.Models
 {
@@ -1194,11 +1195,14 @@ namespace myProject.Models
                             {
                                 while (reader.Read())
                                 {
-                                    string imageUrl = reader.GetString(1);
-                                    user.productReviews[i].Images.Add(imageUrl);
-
                                     user.productReviews[i].category = reader.GetString(0);
-                                }
+                                    string imageUrl = reader.IsDBNull(1) ? null : reader.GetString(1);
+                                    if (!string.IsNullOrEmpty(imageUrl))
+                                    {
+                                        user.productReviews[i].Images.Add(imageUrl);
+                                    }
+
+                            }
                             }
                         }
                     }
@@ -1534,6 +1538,243 @@ namespace myProject.Models
             }
 
         }
+
+
+
+        public void AddReview(ProductReviewModel model, int? userId)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                string query = @"
+                    INSERT INTO Reviews (ProductId, CompanyId, UserId, Rating, Review, CreatedAt)
+                    VALUES (@ProductId, @CompanyId, @UserId, @Rating, @Review, @CreatedAt)";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+
+                    cmd.Parameters.AddWithValue("@ProductId", model.ProductId);
+                    cmd.Parameters.AddWithValue("@CompanyId", model.CompanyId);
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@Rating", model.Rating);
+                    cmd.Parameters.AddWithValue("@Review", model.Review);
+                    cmd.Parameters.AddWithValue("@CreatedAt", DateTime.Now);
+
+                    cmd.ExecuteNonQuery();
+                }
+
+
+
+                // Ortalama puanı hesaplayan SQL komutu
+                query = @"
+                UPDATE Products
+                SET Rating = (
+                    SELECT AVG(CAST(Rating AS FLOAT))
+                    FROM Reviews
+                    WHERE ProductId = @ProductId
+                )
+                WHERE ProductId = @ProductId";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ProductId", model.ProductId);
+
+                    // SQL komutunu çalıştır
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+
+
+
+        /* ------------------------------------------------------------------------------------------------------------- */
+        /* Return all company info. */
+        public List<CompanyModel> GetAllCompanies()
+        {
+            List <CompanyModel>  companies= new List<CompanyModel>();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+
+                try
+                {
+                    // Then, retrieve company details based on CompanyId
+                    string companyQuery = @"
+                    SELECT *
+                    FROM Companies
+                   ";
+
+                    using (SqlCommand cmd = new SqlCommand(companyQuery, conn))
+                    {
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                companies.Add(new CompanyModel
+                                {
+                                    CompanyId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                                    CompanyName = reader.GetString(reader.GetOrdinal("CompanyName")),
+                                    Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description")),
+                                    Address = reader.GetString(reader.GetOrdinal("Address")),
+                                    PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
+                                    Email = reader.GetString(reader.GetOrdinal("Email")),
+                                    isAccountActivated = reader.GetBoolean(reader.GetOrdinal("isAccountActivated")),
+                                    LogoUrl = reader.IsDBNull(reader.GetOrdinal("LogoUrl")) ? null : reader.GetString(reader.GetOrdinal("LogoUrl")),
+                                    BannerUrl = reader.IsDBNull(reader.GetOrdinal("BannerUrl")) ? null : reader.GetString(reader.GetOrdinal("BannerUrl")),
+                                    TaxIDNumber = reader.GetString(reader.GetOrdinal("TaxIDNumber")),
+                                    IBAN = reader.GetString(reader.GetOrdinal("IBAN")),
+                                    isHighlighed = reader.IsDBNull(reader.GetOrdinal("IsHighlighted")) ? null : reader.GetString(reader.GetOrdinal("IsHighlighted")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                    Rating = reader.GetInt32(reader.GetOrdinal("Rating"))
+                                   
+                                });
+
+                            }
+                        }
+                    }
+                }  
+                catch (Exception ex)
+                {
+                    throw; // Re-throw the exception to handle it further up the call stack
+                }
+            }
+            return companies;
+        }
+
+
+
+        /* ------------------------------------------------------------------------------------------------------------- */
+        /* Return products by category */
+        public List<ProductModel> GetProductsByCategory(string category)
+        {
+            List<ProductModel> products = new List<ProductModel>();
+            
+
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    // Ürünleri kategoriye göre filtreleyen sorgu
+                    string productQuery = "SELECT * FROM Products WHERE Category = @Category";
+                    using (SqlCommand cmd = new SqlCommand(productQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Category", category);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                ProductModel product = new ProductModel
+                                {
+                                    ProductId = (int)reader["ProductId"],
+                                    CompanyId = (int)reader["CompanyId"],
+                                    Name = reader["Name"].ToString(),
+                                    Description = reader["Description"].ToString(),
+                                    Price = (decimal)reader["Price"],
+                                    Stock = (int)reader["Stock"],
+                                    CreatedAt = (DateTime)reader["CreatedAt"],
+                                    Category = reader["Category"].ToString(),
+                                    Rating = Convert.ToSingle(reader["Rating"]),  // Float tipi için Convert.ToSingle
+                                    Favorite = (int)reader["Favorite"],
+                                    isAvailable = reader["isAvailable"].ToString(),
+                                    Images = new List<string>()
+                                };
+                                products.Add(product);
+
+                            }
+                        }
+                    }
+                }
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string imageQuery = "SELECT ProductId, ImageURL FROM ProductImages";
+                    using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.HasRows) // Sorgudan dönen satır olup olmadığını kontrol et
+                            {
+                                while (reader.Read())
+                                {
+                                    int productId = (int)reader["ProductId"];
+                                    string imageUrl = reader["ImageURL"].ToString();
+
+                                    // İlgili ürünü bul ve resim ekle
+                                    ProductModel product = products.FirstOrDefault(p => p.ProductId == productId);
+                                    if (product != null && !product.Images.Contains(imageUrl)) // Resim zaten var mı kontrol et
+                                    {
+                                        product.Images.Add(imageUrl);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ürünler okunurken hata oluştu: " + ex.Message);
+            }
+
+            return products;
+        }
+
+
+        /* ------------------------------------------------------------------------------------------------------------- */
+        /* Eğer main category seçilmiş ise tüm alt categorilerdeki ürünleri döndürmek için alt kategorileri bul. */
+        public List<ProductModel> GetSubcategoriesByMainCategory(string mainCategory)
+        {
+            List<ProductModel> products = new List<ProductModel>();
+            List<string> subcategories = new List<string>();
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string subcategoryQuery = "SELECT CategoryName FROM Categories WHERE MainCategory = @MainCategory";
+                    using (SqlCommand cmd = new SqlCommand(subcategoryQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@MainCategory", mainCategory);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                subcategories.Add(reader["CategoryName"].ToString());
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Subkategoriler alınırken hata oluştu: " + ex.Message);
+            }
+
+
+
+
+            foreach (var subcategory in subcategories)
+            {
+                var subcategoryProducts = GetProductsByCategory(subcategory);
+                products.AddRange(subcategoryProducts);
+            }
+
+            return products;
+        }
+
+
+
 
 
 

@@ -61,10 +61,13 @@
 
                 <!-- Navbar links -->
                 <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent" style="font-size:21px;">
-                    <ul class="navbar-nav me-auto mb-2 gap-3" style="margin-left:30px;">
+                    <ul class="navbar-nav me-auto mb-2 gap-2" style="margin-left:30px;">
                         <!-- Main categories -->
                         <li class="nav-item">
                             <a class="nav-link text-dark" href="/User">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-category="all">All Products</a>
                         </li>
                         @{
                             ModelForUserPages categoriesModel = new ModelForUserPages();
@@ -75,14 +78,14 @@
 
                             <!-- Furniture Section -->
                             <div class="nav-item dropdown">
-                                <a class="nav-link text-dark" href="#" role="button">
+                                <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-category="Furniture">
                                     Furniture
                                 </a>
                                 <ul class="list-unstyled small-list">
                                     @foreach (var category in furnitureCategories)
                                     {
                                         <li>
-                                            <a class="text-dark" asp-area="" asp-controller="Guest" asp-action="@category.CategoryName">
+                                            <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-category="@category.CategoryName">
                                                 <i class="las la-caret-right" style="margin-right:3px; color: #969696;"></i>
                                                 <span style="color: #969696;">
                                                     @category.CategoryName
@@ -95,14 +98,14 @@
 
                             <!-- Decoration Section -->
                             <div class="nav-item dropdown">
-                                <a class="nav-link text-dark" href="#" role="button">
+                                <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-category="Decoration">
                                     Decoration
                                 </a>
                                 <ul class="list-unstyled small-list">
                                     @foreach (var category in decorationCategories)
                                     {
                                         <li>
-                                            <a class="text-dark" asp-area="" asp-controller="Guest" asp-action="@category.CategoryName">
+                                            <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-category="@category.CategoryName">
                                                 <i class="las la-caret-right" style="margin-right:3px; color: #969696;"></i>
                                                 <span style="color: #969696;">@category.CategoryName</span>
                                             </a>
@@ -207,7 +210,7 @@
 
     <footer class="border-top footer text-muted col-md-2" style="position: fixed; width:100%; bottom: 0;">
         <div class="" style="font-size:12px; margin-left:4px;">
-            &copy; 2024 - ModernNest -  <a style="text-decoration: none; color:#4e54c8;" href="https://github.com/iremcagin">İrem Çağın Yurttürk</a>
+            &copy; 2024 - ModernNest -  <a style="text-decoration: none; color:#4e54c8;" href="https://github.com/iremcagin/MVCProjectStaj">İrem Çağın Yurttürk</a>
         </div>
     </footer>
 

@@ -87,7 +87,7 @@
                                     </div>
                                 }
                             }
-                            {
+                            else{
                                 <p>Plase Add Credit Card in the Profile !</p>
                             }
                         </div>
@@ -190,17 +190,17 @@
 
                                         for (int i = 0; i < fullStars; i++)
                                         {
-                                            <span class="star full-star">&#9733;</span>
+                                            <i class="las la-star" style="color: #ffd700"></i>
                                         }
 
                                         if (halfStar)
                                         {
-                                            <span class="star half-star">&#9733;</span>
+                                            <i class="las la-star-half-alt" style="color: #ffd700"></i>
                                         }
 
                                         for (int i = 0; i < emptyStars; i++)
                                         {
-                                            <span class="star">&#9734;</span>
+                                            <span class="las la-star" style="color: lightgrey"></span>
                                         }
                                     }
 
@@ -331,17 +331,17 @@
 
                                         for (int i = 0; i < fullStars; i++)
                                         {
-                                            <span class="star full-star">&#9733;</span>
+                                            <i class="las la-star" style="color: #ffd700"></i>
                                         }
 
                                         if (halfStar)
                                         {
-                                            <span class="star half-star">&#9733;</span>
+                                            <i class="las la-star-half-alt" style="color: #ffd700"></i>
                                         }
 
                                         for (int i = 0; i < emptyStars; i++)
                                         {
-                                            <span class="star">&#9734;</span>
+                                            <span class="las la-star" style="color: lightgrey"></span>
                                         }
                                     }
 
@@ -454,41 +454,7 @@
 
 
 <style>
-    .star {
-        font-size: 16px;
-    }
-
-    .full-star {
-        color: #ffd700;
-    }
-
-    .half-star {
-        color: #ffd700;
-        position: relative;
-    }
-
-    .half-star::before {
-        content: '\2605';
-        color: #000;
-        position: absolute;
-        left: 0;
-        width: 55%;
-        overflow: hidden;
-    }
-
-    .empty-star {
-        color: #d3d3d3;
-    }
-
-    .empty-star::before {
-        content: '\2605';
-        color: #000;
-        position: absolute;
-        overflow: hidden;
-    }
-
-
-
+   
 
     .count-control {
         display: flex;

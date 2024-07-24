@@ -60,17 +60,17 @@
 
                                     for (int i = 0; i < fullStars; i++)
                                     {
-                                        <span class="star full-star">&#9733;</span>
+                                        <i class="las la-star" style="color: #ffd700"></i>
                                     }
 
                                     if (halfStar)
                                     {
-                                        <span class="star half-star">&#9733;</span>
+                                        <i class="las la-star-half-alt" style="color: #ffd700"></i>
                                     }
 
                                     for (int i = 0; i < emptyStars; i++)
                                     {
-                                        <span class="star">&#9734;</span>
+                                        <span class="las la-star" style="color: lightgrey"></span>
                                     }
                                 }
                             </div>
@@ -111,8 +111,9 @@
                                     */
                                 }
                                 <li class="list-group-item">
-                                    <div class="count-control mt-2" style="font-size:14px; color:grey;">
-                                        Quantity:
+                                    <div class="count-control mt-2">
+                                        <strong>
+                                            Quantity:</strong>
                                         <button type="button" class="btn btn-dark btn-sm count-btn d-flex align-items-center justify-content-center" style="margin-left:10px;" onclick="updateQuantity('decrease')">-</button>
                                         <span id="quantityDisplay" style="margin: 0 10px;">1</span>
                                         <button type="button" class="btn btn-dark btn-sm count-btn d-flex align-items-center justify-content-center" onclick="updateQuantity('increase')">+</button>
@@ -141,7 +142,7 @@
     <!-- Product Reviews Section -->
     <div class="card mb-4">
         <div class="card-header">
-            <h5>Product Reviews</h5>
+            <h5>Product Reviews <i class="las la-comment-dots"></i></h5>
         </div>
         <div class="card-body">
             <div style="max-height:500px; overflow:scroll;">
@@ -189,6 +190,8 @@
                
                 <form method="post" action="@Url.Action("AddReview", "User")">
                     <input type="hidden" name="ProductId" value="@Model.productDetailsModel.Product.ProductId" />
+                    <input type="hidden" name="CompanyId" value="@Model.productDetailsModel.Product.CompanyId" />
+
 
                     <div class="form-group d-flex align-items-center" >
                         <label for="rating" style="margin-right:10px;">Rating</label>
@@ -235,7 +238,9 @@
                 <div class="col-md-5 position-relative" >
                     <!-- Banner Image -->
                     <div class="banner-container">
-                        <img src="~/images/_Banners/@Model.productDetailsModel.Company.BannerUrl" alt="Company Banner" class="banner-image" />
+                        <a href="@Url.Action("CompanyDetails", "User", new { id = @Model.productDetailsModel.Company.CompanyId })">
+                            <img src="~/images/_Banners/@Model.productDetailsModel.Company.BannerUrl" alt="Company Banner" class="banner-image" />
+                        </a>
                     </div>
 
                     <!-- Logo Image on top of Banner -->
@@ -339,40 +344,6 @@
         outline: none;
         box-shadow: none;
     }
-
-
-      .star {
-        font-size: 16px;
-    }
-
-    .full-star {
-        color: #ffd700;
-    }
-
-    .half-star {
-        color: #ffd700;
-        position: relative;
-    }
-
-        .half-star::before {
-            content: '\2605';
-            color: #000;
-            position: absolute;
-            left: 0;
-            width: 55%;
-            overflow: hidden;
-        }
-
-    .empty-star {
-        color: #d3d3d3;
-    }
-
-        .empty-star::before {
-            content: '\2605';
-            color: #000;
-            position: absolute;
-            overflow: hidden;
-        }
 
 
 

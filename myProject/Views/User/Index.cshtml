@@ -54,7 +54,7 @@
                                         <a href="/User/ProductDetails/@product.ProductId" class="stretched-link">
                                             <img src="~/images/@product.Category/@product.Images[0]" class="img-fluid rounded" alt="@product.Name">
                                         </a>
-                                        <a href="/Login" class="btn btn-like position-absolute top-0 end-0 m-3 no-outline" style="font-size:16px;"><i class="lar la-heart"></i></a>
+                                        <a href="/User/LikeButton" class="btn btn-like position-absolute top-0 end-0 m-3 no-outline" style="font-size:16px;"><i class="lar la-heart"></i></a>
                                     </div>
                                 }
                                 else
@@ -63,7 +63,7 @@
                                         <a href="/User/ProductDetails/@product.ProductId" class="stretched-link">
                                             <img src="~/images/placeholder-1.png" class="img-fluid rounded" alt="@product.Name">
                                         </a>
-                                        <a href="/Login" class="btn btn-like position-absolute top-0 end-0 m-3 no-outline" style="font-size:16px;"><i class="lar la-heart"></i></a>
+                                        <a href="/User/LikeButton" class="btn btn-like position-absolute top-0 end-0 m-3 no-outline" style="font-size:16px;"><i class="lar la-heart"></i></a>
                                     </div>
                                 }
                             </div>
@@ -139,7 +139,7 @@
                                     <a href="/User/ProductDetails/@product.ProductId" class="stretched-link">
                                         <img src="~/images/@product.Category/@product.Images[0]" class="img-fluid  last-Items-img" alt="@product.Name" style="height: 120px; object-fit: cover;">
                                     </a>
-                                    <a href="/Login" class="btn btn-like position-absolute top-0 end-0 m-1 no-outline"><i class="lar la-heart"></i></a>
+                                    <a href="/User/LikeButton" class="btn btn-like position-absolute top-0 end-0 m-1 no-outline"><i class="lar la-heart"></i></a>
                                 </div>
                             }
                             else
@@ -148,7 +148,7 @@
                                     <a href="/User/ProductDetails/@product.ProductId" class="stretched-link">
                                         <img src="~/images/placeholder-1.png" class="img-fluid  last-Items-img" alt="@product.Name" style="height: 120px; object-fit: cover;">
                                     </a>
-                                    <a href="/Login" class="btn btn-like position-absolute top-0 end-0 m-1 no-outline"><i class="lar la-heart"></i></a>
+                                    <a href="/User/LikeButton" class="btn btn-like position-absolute top-0 end-0 m-1 no-outline"><i class="lar la-heart"></i></a>
                                 </div>
                             }
 
@@ -174,17 +174,17 @@
 
                                                 for (int i = 0; i < fullStars; i++)
                                                 {
-                                                    <span class="star full-star">&#9733;</span>
+                                                    <i class="las la-star" style="color: #ffd700"></i>
                                                 }
 
                                                 if (halfStar)
                                                 {
-                                                    <span class="star half-star">&#9733;</span>
+                                                    <i class="las la-star-half-alt" style="color: #ffd700"></i>
                                                 }
 
                                                 for (int i = 0; i < emptyStars; i++)
                                                 {
-                                                    <span class="star">&#9734;</span>
+                                                    <span class="las la-star" style="color: lightgrey"></span>
                                                 }
                                             }
                                         </div>
@@ -220,6 +220,48 @@
 
 
 
+
+
+
+<div class="container" style="margin-top:200px;">
+    <div class="row">
+        @if(ModelForUserPages.companies.Count > 0){
+            @foreach (var company in ModelForUserPages.companies)
+            {
+                @if(company.isHighlighed == "true"){
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <div class="card h-100 position-relative">
+                            <a href="@Url.Action("CompanyDetails", "User", new { id = company.CompanyId })">
+                                <img class="card-img-top" src="@Url.Content(string.IsNullOrEmpty(company.BannerUrl) ? "~/images/placeholder-1.png" : "~/images/_Banners/" + company.BannerUrl)" alt="Banner">
+                                <img class="logo-img position-absolute" src="@Url.Content(string.IsNullOrEmpty(company.LogoUrl) ? "~/images/placeholder-1.png" : "~/images/_Logos/" + company.LogoUrl)" alt="Logo">
+                            </a>
+                            <div class="card-body" style="text-align:center;">
+                                <h5 class="card-title">@company.CompanyName</h5>
+                                <p class="card-text">@company.Description</p>
+                                <!--p class="card-text"><small class="text-muted">Rating: @company.Rating</small></!--p-->
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        }
+     </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- Search Button -->
 <div class="container mb-2 col-md-6" style="margin-top:200px;">
     <form class="d-flex ">
@@ -245,82 +287,6 @@
     }
 
 </style>
-
-
-
-<!-- All Products -->
-<h3 class=" mb-4" style="border-bottom: 1px solid black; font-size: 20px;">All Products</h3>
-<div class="container mt-5 " style="">
-    <div class="row row-cols-1 row-cols-md-6 g-4 p-2">
-        @foreach (var product in allProducts)
-        {
-            <div class="col">
-                <div class="card h-100">
-                    @if (product.Images.Count > 0)
-                    {
-                        <div class="position-relative">
-                            <a href="/User/ProductDetails/@product.ProductId" class="stretched-link">
-                                <img src="~/images/@product.Category/@product.Images[0]" class="card-img-top" alt="@product.Name">
-                            </a>
-                            <a href="/Login" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline"><i class="lar la-heart"></i></a>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="position-relative">
-                            <a href="/User/ProductDetails/@product.ProductId" class="stretched-link">
-                                <img src="~/images/placeholder-1.png" class="card-img-top" alt="Placeholder Image">
-                            </a>
-                            <a href="/Login" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline"><i class="lar la-heart"></i></a>
-                        </div>
-                    }
-                    <div class="card-body d-flex flex-column justify-content">
-                        <div class="d-flex flex-column" style="font-size:15px;">
-                            <h5 class="card-title"><span style="font-size:15px; font-weight:600;"> @product.Name </span><span style="font-size:14px; color:grey;">@product.Description</span></h5>
-
-                            <div class="d-flex">
-                                <p style="margin-right:5px;  font-size:14px; margin-top:2px;">@product.Rating</p>
-
-                                @if (@product.Rating >= 0 && @product.Rating <= 5)
-                                {
-
-                                    var fullStars = (int)Math.Floor(@product.Rating);
-                                    var halfStar = (@product.Rating - fullStars) >= 0.5;
-                                    // Boş yıldızların sayısı
-                                    var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-
-
-                                    for (int i = 0; i < fullStars; i++)
-                                    {
-                                        <span class="star full-star">&#9733;</span>
-                                    }
-
-                                    if (halfStar)
-                                    {
-                                        <span class="star half-star">&#9733;</span>
-                                    }
-
-                                    for (int i = 0; i < emptyStars; i++)
-                                    {
-                                        <span class="star">&#9734;</span>
-                                    }
-                                }
-                            </div>
-
-                        </div>
-
-                        <h5 class="card-text" style="font-size: 16px; font-weight:600; color:#b46c2c; margin-top:15px;">$@product.Price</h5>
-                    </div>
-
-
-                </div>
-            </div>
-        }
-
-    </div>
-</div>
-
-
 
 
 
@@ -403,40 +369,7 @@
         font-size: 16px;
     }
 
-    .star {
-        font-size: 16px;
-    }
-
-    .full-star {
-        color: #ffd700;
-    }
-
-    .half-star {
-        color: #ffd700;
-        position: relative;
-    }
-
-        .half-star::before {
-            content: '\2605';
-            color: #000;
-            position: absolute;
-            left: 0;
-            width: 55%;
-            overflow: hidden;
-        }
-
-    .empty-star {
-        color: #d3d3d3;
-    }
-
-        .empty-star::before {
-            content: '\2605';
-            color: #000;
-            position: absolute;
-            overflow: hidden;
-        }
-
-
+ 
     /* Like button styles */
     .btn-like {
         background-color: rgba(255, 255, 255, 0.8);
@@ -477,6 +410,42 @@
     .end-0 {
         right: 0;
     }
+
+
+
+
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.3s;
+    }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+    .card-img-top {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    .logo-img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        border: 2px solid white;
+        box-shadow: 0 0px 6px rgba(0, 0, 0, 0.1); /* Example shadow */
+    }
+
+  
+
+
 
 </style>
 

@@ -6,6 +6,8 @@ namespace myProject.Models
 {
     public class ModelForUserPages
     {
+        string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\iremc\OneDrive\Documents\myProjectDatabase.mdf;Integrated Security=True;Connect Timeout=30";
+
         public int Id { get; set; }
         public string CategoryName { get; set; }
         public string MainCategory { get; set; }
@@ -24,8 +26,15 @@ namespace myProject.Models
         public List<ProductModel> productsBought { get; set; } = new List<ProductModel>();
 
 
+        // Home sayfası için
+        public static List<CompanyModel> companies {  get; set; } = new List<CompanyModel>();
 
-        string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\iremc\OneDrive\Documents\myProjectDatabase.mdf;Integrated Security=True;Connect Timeout=30";
+
+        // Alt Linkler için
+        public List<ProductModel> productsByCategory { get; set; } = new List<ProductModel>();
+        public string category {  get; set; }
+
+        
 
 
 

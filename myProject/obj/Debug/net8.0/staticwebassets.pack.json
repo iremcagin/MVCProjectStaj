@@ -13,6 +13,10 @@
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\Chair\\logo.png",
+      "PackagePath": "staticwebassets\\images\\Chair\\logo.png"
+    },
+    {
       "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Banners\\Home Interior_banner.jpg",
       "PackagePath": "staticwebassets\\images\\_Banners\\Home Interior_banner.jpg"
     },
@@ -23,10 +27,6 @@
     {
       "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Logos\\Home Interior_logo.webp",
       "PackagePath": "staticwebassets\\images\\_Logos\\Home Interior_logo.webp"
-    },
-    {
-      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\chair\\logo.png",
-      "PackagePath": "staticwebassets\\images\\chair\\logo.png"
     },
     {
       "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\loginBG.jpg",

@@ -18,12 +18,15 @@ namespace myProject.Controllers
             List<ProductModel> mostClickedProducts = userDatabaseControlModel.GetMostClickedProducts();
             List<ProductModel> newestProducts = userDatabaseControlModel.GetNewestProducts();
 
-
-
+            
             // ViewBag kullanarak view'a veri gönderme
             ViewBag.Products = products;
             ViewBag.MostClickedProducts = mostClickedProducts;
             ViewBag.NewestProducts = newestProducts;
+
+
+            ModelForUserPages.companies = userDatabaseControlModel.GetAllCompanies();
+
 
             return View();
         }
@@ -74,7 +77,7 @@ namespace myProject.Controllers
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
-                 return RedirectToAction("Index", "Login"); 
+                return RedirectToAction("Index", "Login");
             }
 
             userDatabaseControlModel.AddToCart(userId, productId, companyId, quantity);
@@ -91,7 +94,7 @@ namespace myProject.Controllers
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
-                 return RedirectToAction("Index", "Login");
+                return RedirectToAction("Index", "Login");
             }
 
             ModelForUserPages modelForUserPages = new ModelForUserPages();
@@ -114,7 +117,7 @@ namespace myProject.Controllers
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
-                 return RedirectToAction("Index", "Login");
+                return RedirectToAction("Index", "Login");
             }
 
 
@@ -131,7 +134,7 @@ namespace myProject.Controllers
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
-                 return RedirectToAction("Index", "Login");
+                return RedirectToAction("Index", "Login");
             }
 
             userDatabaseControlModel.updateQuantity(userId, productId, companyId, quantity);
@@ -150,7 +153,7 @@ namespace myProject.Controllers
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
-                 return RedirectToAction("Index", "Login");
+                return RedirectToAction("Index", "Login");
             }
 
             ModelForUserPages.CalculatePrice(userId);
@@ -167,7 +170,7 @@ namespace myProject.Controllers
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
-                 return RedirectToAction("Index", "Login");
+                return RedirectToAction("Index", "Login");
             }
 
             ModelForUserPages modelForUserPages = new ModelForUserPages();
@@ -187,7 +190,7 @@ namespace myProject.Controllers
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
-                 return RedirectToAction("Index", "Login");
+                return RedirectToAction("Index", "Login");
             }
 
             userDatabaseControlModel.AddCard(userId, card);
@@ -224,8 +227,40 @@ namespace myProject.Controllers
         }
 
 
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Review Ekleme */
+        [HttpPost]
+        public IActionResult AddReview(ProductReviewModel model)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+            userDatabaseControlModel.AddReview(model, userId);
 
 
+            return RedirectToAction("ProductDetails", new { productId = model.ProductId });
+        }
+
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Kategoriye göre ürün listeleme (filter) */
+        public IActionResult ProductsByCategory(string category)
+        {
+
+            ModelForUserPages modelForUserPages = new ModelForUserPages();
+            modelForUserPages.category = category;
+
+            if(category=="Furniture") { modelForUserPages.productsByCategory = userDatabaseControlModel.GetSubcategoriesByMainCategory(category); }
+            else if(category=="Decoration") { modelForUserPages.productsByCategory = userDatabaseControlModel.GetSubcategoriesByMainCategory(category); }
+            else if (category == "all") modelForUserPages.productsByCategory = userDatabaseControlModel.getAllProducts();
+            else { modelForUserPages.productsByCategory = userDatabaseControlModel.GetProductsByCategory(category);}
+
+            return View(modelForUserPages);
+        }
+        
 
     }
 }
