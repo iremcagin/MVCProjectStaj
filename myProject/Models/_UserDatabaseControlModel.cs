@@ -597,6 +597,78 @@ namespace myProject.Models
                             }
                         }
                     }
+
+
+
+
+
+                    query = @"
+                        SELECT *
+                        FROM Products
+                        WHERE Category = @category
+                        AND ProductId != @excludedProductId";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@category", productDetailsModel.Product.Category);
+                        cmd.Parameters.AddWithValue("@excludedProductId", productDetailsModel.Product.ProductId);
+
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                modelForUserPages.recommendatitons.Add(new ProductModel
+                                {
+                                    ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                    CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Description = reader.GetString(reader.GetOrdinal("Description")),
+                                    Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                    Stock = reader.GetInt32(reader.GetOrdinal("Stock")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                    Category = reader.GetString(reader.GetOrdinal("Category")),
+                                    Rating = Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("Rating"))),
+                                    Favorite = reader.GetInt32(reader.GetOrdinal("Favorite")),
+                                    Clicked = reader.GetInt32(reader.GetOrdinal("Clicked")),
+                                    isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"))
+                                });
+                            }
+                        }
+                    }
+
+
+
+                    for (int i = 0; i < modelForUserPages.recommendatitons.Count; i++)
+                    {
+                        // ürünün resimlerini döndür 
+                        imagesQuery = @"
+                            SELECT *
+                            FROM ProductImages
+                            WHERE ProductId = @productId";
+
+                        using (SqlCommand cmd = new SqlCommand(imagesQuery, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@productId", modelForUserPages.recommendatitons[i].ProductId);
+
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                productDetailsModel.ProductImages = new List<string>();
+
+                                while (reader.Read())
+                                {
+                                    int imageUrlIndex = reader.GetOrdinal("ImageURL");
+                                    string imageUrl = reader.GetString(imageUrlIndex);
+
+                                    modelForUserPages.recommendatitons[i].Images.Add(imageUrl);
+                                }
+                            }
+                        }
+                    }
+
+
+
+
                 }
             }
             catch (Exception ex)

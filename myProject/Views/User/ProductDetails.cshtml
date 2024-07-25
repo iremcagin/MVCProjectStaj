@@ -79,8 +79,8 @@
                         <div class="d-flex justify-content-end" style="margin-top:-15px;">
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item" style="font-size:15px;">
-                                    <strong><i class="la la-heart"></i></strong> @Model.productDetailsModel.Product.Favorite
-                                    <strong style="margin-left:5px;"><i class="la la-eye"></i> </strong> @Model.productDetailsModel.Product.Clicked
+                                    <strong><i class="la la-heart" style="color:red;"></i></strong> @Model.productDetailsModel.Product.Favorite
+                                    <strong style="margin-left:5px;"><i class="la la-eye" style="color:blue;"></i> </strong> @Model.productDetailsModel.Product.Clicked
                                 </li>
                             </ul>
                         </div>
@@ -293,6 +293,88 @@
             </div>
         </div>
     </div>
+
+
+
+
+    <!-- Recommendations Section -->
+    <div class="container" style="margin-top:150px;">
+        <h4 style="border-bottom:1px solid black;">Recommended Products</h4>
+        <div id="recommendationsCarousel" class="carousel slide" data-bs-ride="carousel"  style="margin-top:50px;">
+            <div class="carousel-inner">
+                @for (int i = 0; i < Model.recommendatitons.Count; i += 3) // Show 3 products per slide
+                {
+                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                        <div class="d-flex">
+                            @for (int j = i; j < i + 3 && j < Model.recommendatitons.Count; j++)
+                            {
+                                var imageUrl = Model.recommendatitons[j].Images.Any()
+                                ? Url.Content($"~/images/" + @Model.recommendatitons[j].Category + "/" + Model.recommendatitons[j].Images[0])
+                                : Url.Content("~/images/placeholder-1.png");
+
+
+                                <div class="card mx-2" style="width: 12rem;">
+                                    <!-- Adjusted width here -->
+                                    <!-- Image -->
+                                    <div class="position-relative">
+                                        <a href="/User/ProductDetails/@Model.recommendatitons[j].ProductId">
+                                            <img src="@imageUrl" class="card-img-top" alt="">
+                                        </a>
+                                        <a href="/User/LikeButton" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline"><i class="lar la-heart"></i></a>
+                                    </div>
+
+                                    <div class="card-body d-flex flex-column justify-content">
+                                        <div class="d-flex flex-column" style="font-size:15px;">
+                                            <h5 class="card-title"><span style="font-size:15px; font-weight:600;"> @Model.recommendatitons[j].Name </span><span style="font-size:14px; color:grey;">@Model.recommendatitons[j].Description</span></h5>
+
+                                            <div class="d-flex">
+                                                <p style="margin-right:5px;  font-size:14px; margin-top:2px;">@Model.recommendatitons[j].Rating</p>
+
+                                                @if (@Model.recommendatitons[j].Rating >= 0 && @Model.recommendatitons[j].Rating <= 5)
+                                                {
+                                                    var fullStars = (int)Math.Floor(@Model.recommendatitons[j].Rating);
+                                                    var halfStar = (@Model.recommendatitons[j].Rating - fullStars) >= 0.5;
+                                                    // Boş yıldızların sayısı
+                                                    var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+                                                    for (int k = 0; k < fullStars; k++)
+                                                    {
+                                                        <i class="las la-star" style="color: #ffd700"></i>
+                                                    }
+
+                                                    if (halfStar)
+                                                    {
+                                                        <i class="las la-star-half-alt" style="color: #ffd700"></i>
+                                                    }
+
+                                                    for (int k = 0; k < emptyStars; k++)
+                                                    {
+                                                        <span class="las la-star" style="color: lightgrey"></span>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                        <h5 class="card-text" style="font-size: 16px; font-weight:600; color:#b46c2c; margin-top:15px;">$@Model.recommendatitons[j].Price</h5>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#recommendationsCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#recommendationsCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+
+
+
 
 
 

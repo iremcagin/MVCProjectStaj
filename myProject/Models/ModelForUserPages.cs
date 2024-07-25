@@ -12,6 +12,12 @@ namespace myProject.Models
         public string CategoryName { get; set; }
         public string MainCategory { get; set; }
 
+
+        // User Product Details için
+        public List<ProductModel>  recommendatitons = new List<ProductModel>();
+
+
+
         // User Basket için
         public static decimal totalPrice = 0;
         public ProductsInBasket productsInBasket = new ProductsInBasket();
