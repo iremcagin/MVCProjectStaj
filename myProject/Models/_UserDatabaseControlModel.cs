@@ -2209,6 +2209,96 @@ namespace myProject.Models
 
 
 
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Return favorite products */
+        public List<ProductModel> GetFavoriteProducts(int? userId)
+        {
+            List<ProductModel> products = new List<ProductModel>();
+            List<int> productIds = new List<int>();
+
+            productIds = GetLikedProductIds(userId);
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+
+                    for (int i = 0; i < productIds.Count; ++i)
+                    {
+                        string productQuery = "SELECT * FROM Products Where ProductId = @ProductId";
+                        using (SqlCommand cmd = new SqlCommand(productQuery, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@ProductId", productIds[i]);
+
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    ProductModel product = new ProductModel
+                                    {
+                                        ProductId = (int)reader["ProductId"],
+                                        CompanyId = (int)reader["CompanyId"],
+                                        Name = reader["Name"].ToString(),
+                                        Description = reader["Description"].ToString(),
+                                        Price = (decimal)reader["Price"],
+                                        Stock = (int)reader["Stock"],
+                                        CreatedAt = (DateTime)reader["CreatedAt"],
+                                        Category = reader["Category"].ToString(),
+                                        Rating = Convert.ToSingle(reader["Rating"]),  // Float tipi için Convert.ToSingle
+                                        Favorite = (int)reader["Favorite"],
+                                        isAvailable = reader["isAvailable"].ToString(),
+                                        Images = new List<string>()
+                                    };
+                                    products.Add(product);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                for (int i = 0; i < products.Count; ++i)
+                {
+                    using (SqlConnection conn = new SqlConnection(connectionString))
+                    {
+                        conn.Open();
+                        string imageQuery = "SELECT ProductId, ImageURL FROM ProductImages Where ProductId = @ProductId";
+                        using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@ProductId", products[i].ProductId);
+
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                if (reader.HasRows) // Check if there are rows returned by the query
+                                {
+                                    while (reader.Read())
+                                    {
+                                        int productId = (int)reader["ProductId"];
+                                        string imageUrl = reader["ImageURL"].ToString();
+
+                                        // İlgili ürünü bul ve resim ekle
+                                        ProductModel product = products.FirstOrDefault(p => p.ProductId == productId);
+                                        if (product != null && !product.Images.Contains(imageUrl))
+                                        {
+                                            product.Images.Add(imageUrl);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error while reading products: " + ex.Message);
+            }
+
+            return products;
+        }
+
 
     }
 }

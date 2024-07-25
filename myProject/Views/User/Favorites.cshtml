@@ -1,5 +1,103 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model myProject.Models.ModelForUserPages
 @{
+    ViewData["Title"] = "User";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
 }
+
+
+<!-- All Products -->
+<h3 class=" mb-4" style="border-bottom: 1px solid black; font-size: 20px; margin-top:20px;">Favorites</h3>
+<div class="row p-2 mt-2">
+    @foreach (var product in Model.favoriteProducts)
+    {
+        <div class=" col-md-2">
+            <div class="card  product-card" style="max-width: 180px; min-height: 300px; overflow:hidden;">
+                @if (product.Images != null && product.Images.Count > 0)
+                {
+                    <div class="position-relative">
+                        <a href="/User/ProductDetails/@product.ProductId" class="">
+                            <img src="~/images/@product.Category/@product.Images[0]" class="img-fluid last-Items-img" alt="" style="height: 120px; object-fit: cover;">
+                        </a>
+
+                        @if (ModelForUserPages.productsLiked != null && ModelForUserPages.productsLiked.Contains(product.ProductId))
+                        {
+                            <a href="/User/UnlikeButton/@product.ProductId" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline">
+                                <i class="las la-heart" style="color:red;"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="/User/LikeButton/@product.ProductId" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline">
+                                <i class="lar la-heart"></i>
+                            </a>
+                        }
+
+                    </div>
+                }
+                else
+                {
+                    <div class="position-relative">
+                        <a href="/User/ProductDetails/@product.ProductId" class="">
+                            <img src="~/images/placeholder-1.png" class="img-fluid last-Items-img" alt="" style="height: 120px; object-fit: cover;">
+                        </a>
+
+                        @if (ModelForUserPages.productsLiked != null && ModelForUserPages.productsLiked.Contains(product.ProductId))
+                        {
+                            <a href="/User/UnlikeButton/@product.ProductId" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline">
+                                <i class="las la-heart" style="color:red;"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="/User/LikeButton/@product.ProductId" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline">
+                                <i class="lar la-heart"></i>
+                            </a>
+                        }
+                    </div>
+                }
+
+                <div class="card-body p-2 d-flex justify-content-between last-Items-text">
+                    <div class="d-flex flex-column col-md-9 justify-content-between">
+                        <div style="col-12">
+                            <div class="card-title d-flex flex-column">
+                                <span class="product-name" style="font-size:15px; font-weight:600;">@product.Name</span>
+                                <span class="product-description" style="font-size:14px; color:grey;">@product.Description</span>
+                            </div>
+
+                            <div class="d-flex " style="font-size:15px;">
+                                <p style="margin-right:5px; font-size:14px; margin-top:2px;">@product.Rating</p>
+                                @if (@product.Rating >= 0 && @product.Rating <= 5)
+                                {
+                                    var fullStars = (int)Math.Floor(@product.Rating);
+                                    var halfStar = (@product.Rating - fullStars) >= 0.5;
+                                    var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+                                    for (int i = 0; i < fullStars; i++)
+                                    {
+                                        <i class="las la-star" style="color: #ffd700"></i>
+                                    }
+
+                                    if (halfStar)
+                                    {
+                                        <i class="las la-star-half-alt" style="color: #ffd700"></i>
+                                    }
+
+                                    for (int i = 0; i < emptyStars; i++)
+                                    {
+                                        <span class="las la-star" style="color: lightgrey"></span>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        <h5 class="card-text" style="font-size: 16px; font-weight:600; color:#b46c2c; margin-top:15px;">$@product.Price</h5>
+                    </div>
+
+                    <div class="col-md-3  d-flex flex-column justify-content-end">
+                        <h6 style="font-size: 14px; margin-bottom:-1px;" class="d-flex align-items-center"><i class="las la-eye me-1 no-outline"></i> @product.Clicked</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

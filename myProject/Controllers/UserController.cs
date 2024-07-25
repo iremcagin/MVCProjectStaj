@@ -364,7 +364,7 @@ namespace myProject.Controllers
             {
                 return RedirectToAction("Index", "Login");
             }
-            userDatabaseControlModel.LikeButton(userId,productId);
+            userDatabaseControlModel.LikeButton(userId, productId);
 
 
             // Redirect back to the referrer URL
@@ -376,8 +376,6 @@ namespace myProject.Controllers
         [HttpGet("User/UnlikeButton/{productId}")]
         public IActionResult UnlikeButton(int productId)
         {
-            Console.WriteLine(productId+"aaa");
-
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
@@ -391,6 +389,22 @@ namespace myProject.Controllers
             return Redirect(referrerUrl);
         }
 
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Favorites Page */
+        public IActionResult Favorites(int productId)
+        {
+            ModelForUserPages modelForUserPages = new ModelForUserPages();
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            modelForUserPages.favoriteProducts = userDatabaseControlModel.GetFavoriteProducts(userId);
+
+
+            return View(modelForUserPages);
+        }
 
 
 

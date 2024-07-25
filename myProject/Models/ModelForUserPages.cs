@@ -50,6 +50,14 @@ namespace myProject.Models
         public bool isFollowing;
 
 
+
+        // Favorites için
+        public List<ProductModel> favoriteProducts { get; set; } = new List<ProductModel>();
+
+
+
+
+
         public ModelForUserPages() { }
 
 
