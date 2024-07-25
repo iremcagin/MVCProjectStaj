@@ -4,6 +4,8 @@ using myProject.Models;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Data.SqlClient;
+using System.Text.Json;
+
 
 namespace myProject.Controllers
 {
@@ -18,7 +20,7 @@ namespace myProject.Controllers
             List<ProductModel> mostClickedProducts = userDatabaseControlModel.GetMostClickedProducts();
             List<ProductModel> newestProducts = userDatabaseControlModel.GetNewestProducts();
 
-            
+
             // ViewBag kullanarak view'a veri gönderme
             ViewBag.Products = products;
             ViewBag.MostClickedProducts = mostClickedProducts;
@@ -247,20 +249,57 @@ namespace myProject.Controllers
 
         /* -------------------------------------------------------------------------------------------------------------- */
         /* Kategoriye göre ürün listeleme (filter) */
-        public IActionResult ProductsByCategory(string category)
+        public IActionResult ProductsByCategory(string categoryyy)
         {
 
             ModelForUserPages modelForUserPages = new ModelForUserPages();
-            modelForUserPages.category = category;
+            modelForUserPages.subcategory = categoryyy;
 
-            if(category=="Furniture") { modelForUserPages.productsByCategory = userDatabaseControlModel.GetSubcategoriesByMainCategory(category); }
-            else if(category=="Decoration") { modelForUserPages.productsByCategory = userDatabaseControlModel.GetSubcategoriesByMainCategory(category); }
-            else if (category == "all") modelForUserPages.productsByCategory = userDatabaseControlModel.getAllProducts();
-            else { modelForUserPages.productsByCategory = userDatabaseControlModel.GetProductsByCategory(category);}
+            if (categoryyy == "Furniture") { modelForUserPages.productsByCategory = userDatabaseControlModel.GetSubcategoriesByMainCategory(categoryyy); }
+            else if (categoryyy == "Decoration") { modelForUserPages.productsByCategory = userDatabaseControlModel.GetSubcategoriesByMainCategory(categoryyy); }
+            else if (categoryyy == "all") modelForUserPages.productsByCategory = userDatabaseControlModel.getAllProducts();
+            else { modelForUserPages.productsByCategory = userDatabaseControlModel.GetProductsByCategory(categoryyy); }
 
             return View(modelForUserPages);
         }
-        
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Şirketin sayfası */
+        [HttpGet("User/CompanyDetails/{companyId}")]
+        public IActionResult CompanyDetails(int companyId)
+        {
+            ModelForUserPages modelForUserPages = new ModelForUserPages();
+            modelForUserPages = userDatabaseControlModel.CompanyDetails(companyId);
+
+            return View(modelForUserPages);
+        }
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Satın alınan ürünlerin stoğunu azaltmak için */
+
+        [HttpPost]
+        public IActionResult PurchaseBasket(int[] productIds, int[] productQuantities)
+        {
+            if (productIds != null && productQuantities != null && productIds.Length == productQuantities.Length)
+            {
+                userDatabaseControlModel.PurchaseBasket(productIds, productQuantities);
+            }
+            else
+            {
+                Console.WriteLine("Invalid data received.");
+            }
+
+            return RedirectToAction("Basket");
+        }
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+
+
+
+
 
     }
 }

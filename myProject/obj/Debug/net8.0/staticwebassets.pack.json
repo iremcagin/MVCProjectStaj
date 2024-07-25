@@ -17,6 +17,14 @@
       "PackagePath": "staticwebassets\\images\\Chair\\logo.png"
     },
     {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\Sofa\\koltuk1.webp",
+      "PackagePath": "staticwebassets\\images\\Sofa\\koltuk1.webp"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\Sofa\\koltuk1_2.webp",
+      "PackagePath": "staticwebassets\\images\\Sofa\\koltuk1_2.webp"
+    },
+    {
       "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Banners\\Home Interior_banner.jpg",
       "PackagePath": "staticwebassets\\images\\_Banners\\Home Interior_banner.jpg"
     },
@@ -43,14 +51,6 @@
     {
       "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\placeholder-1.png",
       "PackagePath": "staticwebassets\\images\\placeholder-1.png"
-    },
-    {
-      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\sofa\\koltuk1.webp",
-      "PackagePath": "staticwebassets\\images\\sofa\\koltuk1.webp"
-    },
-    {
-      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\sofa\\koltuk1_2.webp",
-      "PackagePath": "staticwebassets\\images\\sofa\\koltuk1_2.webp"
     },
     {
       "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\table\\koltuk1.webp",

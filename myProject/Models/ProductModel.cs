@@ -24,7 +24,7 @@ namespace myProject.Models
 
 
         //Profile için
-        public string category { get; set; }
+        public string categoryyy_ { get; set; }
 
 
 

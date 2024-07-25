@@ -32,9 +32,13 @@ namespace myProject.Models
 
         // Alt Linkler için
         public List<ProductModel> productsByCategory { get; set; } = new List<ProductModel>();
-        public string category {  get; set; }
+        public string subcategory {  get; set; }
 
         
+        // Company Sayfası için
+        public CompanyModel companyDetails { get; set; }
+        public List<ProductModel> companyProducts { get; set; } = new List<ProductModel>();
+
 
 
 

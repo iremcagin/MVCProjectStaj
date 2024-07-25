@@ -95,8 +95,23 @@
 
                     <!-- Purchase Details -->
                     <div class="d-flex justify-content-end">
-                        <button type="button" class="btn btn-primary" id="purchaseButton">Purchase</button>
+                        <form id="purchaseForm" method="post" action="@Url.Action("PurchaseBasket", "User")">
+                            @for (int i = 0; i < Model.productsInBasket.Products.Count; i++)
+                            {
+                                <input type="hidden" name="productIds[@i]" value="@Model.productsInBasket.Products[i].ProductId" />
+                                <input type="hidden" name="productQuantities[@i]" value="@Model.productsInBasket.Products[i].count" />
+                            }
+
+                            <!-- Purchase Button -->
+                            <button id="purchaseButton" type="submit" class="btn btn-outline-primary" style="font-size: 16px; font-weight:600;">
+                                <i class="las la-credit-card"></i> Purchase
+                            </button>
+                        </form>
+
+
+
                     </div>
+
                 </div>
             </div>
         </div>

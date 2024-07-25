@@ -67,7 +67,7 @@
                             <a class="nav-link text-dark" href="/User">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-category="all">All Products</a>
+                            <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-categoryyy="all">All Products</a>
                         </li>
                         @{
                             ModelForUserPages categoriesModel = new ModelForUserPages();
@@ -78,17 +78,17 @@
 
                             <!-- Furniture Section -->
                             <div class="nav-item dropdown">
-                                <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-category="Furniture">
+                                <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-categoryyy="Furniture">
                                     Furniture
                                 </a>
                                 <ul class="list-unstyled small-list">
-                                    @foreach (var category in furnitureCategories)
+                                    @foreach (var categoryyy in furnitureCategories)
                                     {
                                         <li>
-                                            <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-category="@category.CategoryName">
+                                            <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-categoryyy="@categoryyy.CategoryName">
                                                 <i class="las la-caret-right" style="margin-right:3px; color: #969696;"></i>
                                                 <span style="color: #969696;">
-                                                    @category.CategoryName
+                                                    @categoryyy.CategoryName
                                                 </span>
                                             </a>
                                         </li>
@@ -98,16 +98,16 @@
 
                             <!-- Decoration Section -->
                             <div class="nav-item dropdown">
-                                <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-category="Decoration">
+                                <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-categoryyy="Decoration">
                                     Decoration
                                 </a>
                                 <ul class="list-unstyled small-list">
-                                    @foreach (var category in decorationCategories)
+                                    @foreach (var categoryyy in decorationCategories)
                                     {
                                         <li>
-                                            <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-category="@category.CategoryName">
+                                            <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-categoryyy="@categoryyy.CategoryName">
                                                 <i class="las la-caret-right" style="margin-right:3px; color: #969696;"></i>
-                                                <span style="color: #969696;">@category.CategoryName</span>
+                                                <span style="color: #969696;">@categoryyy.CategoryName</span>
                                             </a>
                                         </li>
                                     }

@@ -89,19 +89,34 @@
 
                     </div>
                     <div>
+                        <!-- Button -->
                         <div class="d-flex align-items-center justify-content-end">
-                            <h3 class="" style="color: #bf1b3c; font-weight:600; margin-right:20px;">$@Model.productDetailsModel.Product.Price</h3>
-                            <button id="buyButton" class="btn btn-outline-primary search-button no-outline"
-                                    onclick="addToCart(@Model.productDetailsModel.Product.ProductId, @Model.productDetailsModel.Company.CompanyId, getQuantity()); updateBasketCount();"
-                                    style="border: 1px solid black; color:black;">
-                                Add To Cart
-                            </button>
+                            <h3 class="" style="color: #bf1b3c; font-weight:600; margin-right:20px;">
+                                $@Model.productDetailsModel.Product.Price
+                            </h3>
+
+                            @if (Model.productDetailsModel.Product.Stock > 0)
+                            {
+                                <!-- Stock is available, show Add To Cart button -->
+                                <button id="buyButton" class="btn btn-outline-primary search-button no-outline"
+                                        onclick="addToCart(@Model.productDetailsModel.Product.ProductId, @Model.productDetailsModel.Company.CompanyId, getQuantity()); updateBasketCount();"
+                                        style="border: 1px solid black; color:black;">
+                                    Add To Cart
+                                </button>
+                            }
+                            else
+                            {
+                                <!-- Stock is not available, show out of stock message -->
+                                <span style="color: red; font-weight: bold;">Out of Stock</span>
+                            }
                         </div>
+
+
+
+
+
                         <div class="mt-3">
-
                             <ul class="list-group">
-
-
                                 @{
             /*
             *  <li class="list-group-item"><strong>Favorites:</strong> @Model.productDetailsModel.Product.Favorite</li>
@@ -110,6 +125,8 @@
                                     *  <li class="list-group-item"><strong>Created At:</strong> @Model.productDetailsModel.Product.CreatedAt.ToShortDateString()</li>
                                     */
                                 }
+
+                                <!-- QUANTİTY  -->
                                 <li class="list-group-item">
                                     <div class="count-control mt-2">
                                         <strong>
@@ -119,6 +136,7 @@
                                         <button type="button" class="btn btn-dark btn-sm count-btn d-flex align-items-center justify-content-center" onclick="updateQuantity('increase')">+</button>
                                     </div>
                                     <input type="hidden" id="quantity" name="quantity" value="1">
+                                    <input type="hidden" id="stock" value="@Model.productDetailsModel.Product.Stock">
                                 </li>
 
 
@@ -303,17 +321,26 @@
         function updateQuantity(action) {
             let quantityInput = document.getElementById('quantity');
             let quantityDisplay = document.getElementById('quantityDisplay');
+            let stock = parseInt(document.getElementById('stock').value);
             let quantity = parseInt(quantityInput.value);
 
             if (action === 'increase') {
-                quantity += 1;
-            } else if (action === 'decrease' && quantity > 1) {
-                quantity -= 1;
+                if (quantity < stock) { // Check if quantity is less than stock
+                    quantity += 1;
+                }
+            } else if (action === 'decrease') {
+                if (quantity > 1) { // Ensure quantity is greater than 1
+                    quantity -= 1;
+                }
             }
 
             quantityInput.value = quantity;
             quantityDisplay.innerText = quantity;
         }
+
+
+
+
 
         function getQuantity() {
             return parseInt(document.getElementById('quantity').value);
