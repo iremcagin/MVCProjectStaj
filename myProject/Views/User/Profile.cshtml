@@ -127,34 +127,44 @@
 
 
 
+    <!-- Followed Companies Section -->
+    <div class="container" style="margin-top:80px;">
+        <div class="" style="border-bottom: 1px solid black;  margin-bottom:20px;">
+            <h5 class="">Followed Companies</h5>
+        </div>
+        @if (Model.followedCompanies.Any())
+        {
+            <div class="row">
+                @foreach (var company in Model.followedCompanies)
+                {
+                    <div class="col-md-3 mb-4">
+                        <div class="card">
+                            <!-- Banner Image -->
+                            <div class="position-relative">
+                                <a href="@Url.Action("CompanyDetails", "User", new { id = company.CompanyId })">
+                                    <img src="~/images/_Banners/@company.BannerUrl" class="card-img-top" alt="@company.CompanyName">
+                                </a>
+                                <!-- Logo in Bottom-Left Corner -->
+                                @if (!string.IsNullOrEmpty(company.LogoUrl))
+                                {
+                                    <img src="~/images/_Logos/@company.LogoUrl" class="company-logo position-absolute bottom-0 start-0 m-2" style="width:70px; height:70px;  border-radius:50%;" alt="@company.CompanyName Logo">
+                                }
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">@company.CompanyName</h5>
 
-    <!-- Followed Companies -->
-    <div class="mb-5" style="max-height:800px; overflow-y:scroll;">
-        <div class="" style="border-bottom: 1px solid black;  margin-bottom:10px;">
-            <h5>Followed Companies</h5>
-        </div>
-        <div class="">
-            @if (Model.followedCompanies.Any())
-            {
-                <ul class="list-group">
-                    @foreach (var company in Model.followedCompanies)
-                    {
-                        <li class="list-group-item">
-                            <p><strong>Company Name:</strong> @company.CompanyName</p>
-                            <p><strong>Description:</strong> @company.Description</p>
-                            <p><strong>Address:</strong> @company.Address</p>
-                            <p><strong>Phone Number:</strong> @company.PhoneNumber</p>
-                            <p><strong>Email:</strong> @company.Email</p>
-                            <p><strong>Followed At:</strong> @company.CreatedAt.ToShortDateString()</p>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p>No followed companies available.</p>
-            }
-        </div>
+                                <p class="card-text"><strong>Description:</strong> @company.Description</p>
+                                <p class="card-text"><small class="text-muted">Created At: @company.CreatedAt.ToShortDateString()</small></p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-center">You are not following any companies yet. Start following companies to see them here!</p>
+        }
     </div>
 
 
@@ -162,8 +172,9 @@
 
 
 
+
     <!-- Product Reviews -->
-    <div class="mb-5" style="max-height:800px; overflow-y:scroll;">
+    <div class="mb-5" style="max-height:800px; overflow-y:scroll; margin-top:80px;">
         <div class="" style="border-bottom: 1px solid black;  margin-bottom:10px;">
             <h5>Product Reviews</h5>
         </div>
@@ -215,9 +226,9 @@
 
 
     <!-- Bought Products -->
-    <div class="mb-5">
+    <div class="" style="margin-top:80px;">
         <div class="border-bottom mb-3">
-            <h5>Bought Products</h5>
+            <h5>Products Bought</h5>
         </div>
         <div class="horizontal-scroll">
             @if (Model.productsBought.Any())
@@ -225,7 +236,7 @@
                 <div class="d-flex flex-row">
                     @foreach (var product in Model.productsBought)
                     {
-                        <div class="card me-3" style="min-width: 250px;">
+                        <div class="card me-3" style="width: 200px;">
                             <div id="carousel-@product.ProductId" class="carousel slide" data-bs-ride="carousel">
                                 <div class="carousel-inner">
                                     @if (product.Images != null && product.Images.Any())

@@ -24,11 +24,14 @@
             <div class="d-flex justify-content-between">
                 <p><strong>Email:</strong> @Model.companyDetails.Email</p>
 
-                <!-- Follow Button  -->
-                <form action="/User/FollowCompany" method="post">
-                    <input type="hidden" name="CompanyId" value="@Model.companyDetails.CompanyId" />
-                    <button type="submit" class="btn btn-dark">Follow</button>
-                </form>
+
+                <!-- Follow Button -->
+                <a href="/User/FollowUnfollowCompany?companyId=@Model.companyDetails.CompanyId&isFollowing=@Model.isFollowing" class="btn btn-dark">
+                    @(Model.isFollowing ? "Unfollow" : "Follow")
+                </a>
+
+
+
 
             </div>
         </div>
@@ -52,7 +55,39 @@
                             <a href="/User/ProductDetails/@product.ProductId">
                                 <img src="~/images/@product.Category/@product.Images[0]" class="card-img-top" alt="@product.Name">
                             </a>
-                            <a href="/User/LikeButton" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline"><i class="lar la-heart"></i></a>
+
+                            @if (ModelForUserPages.productsLiked.Contains(product.ProductId))
+                            {
+                                @if (ModelForUserPages.productsLiked.Contains(product.ProductId))
+                                {
+                                    <a href="/User/UnlikeButton/@product.ProductId" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline">
+                                        <i class="las la-heart" style="color:red;"></i>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href="/User/LikeButton/@product.ProductId" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline">
+                                        <i class="lar la-heart"></i>
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                @if (ModelForUserPages.productsLiked.Contains(product.ProductId))
+                                {
+                                    <a href="/User/UnlikeButton/@product.ProductId" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline">
+                                        <i class="las la-heart" style="color:red;"></i>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href="/User/LikeButton/@product.ProductId" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline">
+                                        <i class="lar la-heart"></i>
+                                    </a>
+                                }
+                            }
+
+
                         </div>
                     }
                     else
@@ -61,7 +96,20 @@
                             <a href="/User/ProductDetails/@product.ProductId" class="">
                                 <img src="~/images/placeholder-1.png" class="card-img-top" alt="Placeholder">
                             </a>
-                            <a href="/User/LikeButton" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline"><i class="lar la-heart"></i></a>
+
+                            @if (ModelForUserPages.productsLiked.Contains(product.ProductId))
+                            {
+                                <a href="/User/UnlikeButton/@product.ProductId" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline">
+                                    <i class="las la-heart" style="color:red;"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="/User/LikeButton/@product.ProductId" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline">
+                                    <i class="lar la-heart"></i>
+                                </a>
+                            }
+
                         </div>
                     }
                     <div class="card-body d-flex flex-column justify-content">

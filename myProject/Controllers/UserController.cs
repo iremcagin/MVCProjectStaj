@@ -16,6 +16,12 @@ namespace myProject.Controllers
 
         public IActionResult Index()
         {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(0);
+            }
+
             List<ProductModel> products = userDatabaseControlModel.getAllProducts();
             List<ProductModel> mostClickedProducts = userDatabaseControlModel.GetMostClickedProducts();
             List<ProductModel> newestProducts = userDatabaseControlModel.GetNewestProducts();
@@ -28,6 +34,7 @@ namespace myProject.Controllers
 
 
             ModelForUserPages.companies = userDatabaseControlModel.GetAllCompanies();
+            ModelForUserPages.productsLiked = userDatabaseControlModel.GetLikedProductIds(userId);
 
 
             return View();
@@ -67,6 +74,14 @@ namespace myProject.Controllers
             ModelForUserPages modelForUserPages = new ModelForUserPages();
             modelForUserPages = userDatabaseControlModel.ProductDetail(productId);
 
+
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(0);
+            }
+            ModelForUserPages.productsLiked = userDatabaseControlModel.GetLikedProductIds(userId);
+
             return View(modelForUserPages);
         }
 
@@ -102,6 +117,7 @@ namespace myProject.Controllers
             ModelForUserPages modelForUserPages = new ModelForUserPages();
             modelForUserPages = userDatabaseControlModel.GetBasket(userId);
             modelForUserPages.productsDeletedFromBasket = userDatabaseControlModel.GetPrevDeletedBasket(userId);
+            ModelForUserPages.productsLiked = userDatabaseControlModel.GetLikedProductIds(userId);
 
             UpdatePrice();
 
@@ -177,6 +193,7 @@ namespace myProject.Controllers
 
             ModelForUserPages modelForUserPages = new ModelForUserPages();
             modelForUserPages = userDatabaseControlModel.GetUserProfileInfo(userId);
+            ModelForUserPages.productsLiked = userDatabaseControlModel.GetLikedProductIds(userId);
 
 
             return View(modelForUserPages);
@@ -260,6 +277,14 @@ namespace myProject.Controllers
             else if (categoryyy == "all") modelForUserPages.productsByCategory = userDatabaseControlModel.getAllProducts();
             else { modelForUserPages.productsByCategory = userDatabaseControlModel.GetProductsByCategory(categoryyy); }
 
+
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+            ModelForUserPages.productsLiked = userDatabaseControlModel.GetLikedProductIds(userId);
+
             return View(modelForUserPages);
         }
 
@@ -270,7 +295,14 @@ namespace myProject.Controllers
         public IActionResult CompanyDetails(int companyId)
         {
             ModelForUserPages modelForUserPages = new ModelForUserPages();
-            modelForUserPages = userDatabaseControlModel.CompanyDetails(companyId);
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            modelForUserPages = userDatabaseControlModel.CompanyDetails(companyId, userId);
+            ModelForUserPages.productsLiked = userDatabaseControlModel.GetLikedProductIds(userId);
 
             return View(modelForUserPages);
         }
@@ -296,7 +328,68 @@ namespace myProject.Controllers
 
 
         /* -------------------------------------------------------------------------------------------------------------- */
+        /* Follow company */
+        [HttpGet]
+        public IActionResult FollowUnfollowCompany(bool isFollowing, int companyId)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
 
+            if (isFollowing)
+            {
+                // Unfollow the company
+                userDatabaseControlModel.UnfollowCompany(userId, companyId);
+            }
+            else
+            {
+                // Follow the company
+                userDatabaseControlModel.FollowCompany(userId, companyId);
+            }
+
+            return RedirectToAction("CompanyDetails", new { companyId });
+        }
+
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Like Button */
+        [HttpGet("User/LikeButton/{productId}")]
+        public IActionResult LikeButton(int productId)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+            userDatabaseControlModel.LikeButton(userId,productId);
+
+
+            // Redirect back to the referrer URL
+            var referrerUrl = Request.Headers["Referer"].ToString();
+            return Redirect(referrerUrl);
+        }
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Unlike Button */
+        [HttpGet("User/UnlikeButton/{productId}")]
+        public IActionResult UnlikeButton(int productId)
+        {
+            Console.WriteLine(productId+"aaa");
+
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+            userDatabaseControlModel.UnlikeButton(userId, productId);
+
+
+            // Redirect back to the referrer URL
+            var referrerUrl = Request.Headers["Referer"].ToString();
+            return Redirect(referrerUrl);
+        }
 
 
 

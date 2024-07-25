@@ -1249,7 +1249,8 @@ namespace myProject.Models
 
 
 
-                for (int i = 0; i < user.productReviews.Count; i++) {
+                for (int i = 0; i < user.productReviews.Count; i++)
+                {
                     // Get images
 
                     string query = @"
@@ -1387,8 +1388,6 @@ namespace myProject.Models
 
                 for (int i = 0; i < user.productsBought.Count; i++)
                 {
-                    // Get images
-
                     string query = @"
                         SELECT p.Category, pi.ImageUrl
                         FROM Products p
@@ -1399,22 +1398,24 @@ namespace myProject.Models
                     {
                         cmd.Parameters.AddWithValue("@productId", user.productsBought[i].ProductId);
 
-
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                string imageUrl = reader.GetString(1);
-                                user.productsBought[i].Images.Add(imageUrl);
+                                // Handle null values
+                                string imageUrl = reader.IsDBNull(1) ? null : reader.GetString(1);
+                                string category = reader.IsDBNull(0) ? null : reader.GetString(0);
 
-                                user.productsBought[i].categoryyy_ = reader.GetString(0);
+                                if (imageUrl != null)
+                                {
+                                    user.productsBought[i].Images.Add(imageUrl);
+                                }
+
+                                user.productsBought[i].categoryyy_ = category;
                             }
                         }
                     }
                 }
-
-
-
 
 
                 // Query to get followed company IDs and follow dates, sorted by follow date
@@ -1445,18 +1446,18 @@ namespace myProject.Models
                 // Prepare the list of Company IDs for the query
                 var companyIds = followedCompanies.Select(c => c.CompanyId).ToList();
 
-                if (companyIds.Any())
+                for (int i = 0; i < followedCompanies.Count; ++i)
                 {
                     string companyDetailsQuery = @"
-                    SELECT Id, CompanyName, Description, Address, PhoneNumber, Email, LogoUrl, BannerUrl
-                    FROM Companies
-                    WHERE Id IN (" + string.Join(",", companyIds) + ")";
+                        SELECT *
+                        FROM Companies
+                        WHERE Id = @companyId";
 
                     using (SqlCommand cmd = new SqlCommand(companyDetailsQuery, conn))
                     {
+                        cmd.Parameters.AddWithValue("@companyId", followedCompanies[i].CompanyId);
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-
                             user.followedCompanies = new List<CompanyModel>();
 
                             while (reader.Read())
@@ -1849,7 +1850,7 @@ namespace myProject.Models
 
         /* ------------------------------------------------------------------------------------------------------------- */
         /* Eğer main category seçilmiş ise tüm alt categorilerdeki ürünleri döndürmek için alt kategorileri bul. */
-        public ModelForUserPages CompanyDetails(int companyId)
+        public ModelForUserPages CompanyDetails(int companyId, int? userId)
         {
             ModelForUserPages modelForUserPages = new ModelForUserPages();
 
@@ -1928,9 +1929,6 @@ namespace myProject.Models
                     }
 
 
-
-
-
                     for (int i = 0; i < modelForUserPages.companyProducts.Count; i++)
                     {
                         // Get images and category
@@ -1959,6 +1957,23 @@ namespace myProject.Models
                             }
                         }
                     }
+
+
+                    // Check if the user is following the company
+                    string followQuery = @"
+                        SELECT COUNT(*) 
+                        FROM FollowedCompanies 
+                        WHERE UserId = @UserId AND CompanyId = @CompanyId";
+
+                    using (SqlCommand cmd = new SqlCommand(followQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@UserId", userId);
+                        cmd.Parameters.AddWithValue("@CompanyId", companyId);
+
+                        int followCount = (int)cmd.ExecuteScalar();
+                        modelForUserPages.isFollowing = followCount > 0;
+                    }
+
                 }
             }
             catch (Exception ex)
@@ -1989,7 +2004,7 @@ namespace myProject.Models
                 {
                     conn.Open();
 
-                   
+
                     try
                     {
                         for (int i = 0; i < productIds.Length; i++)
@@ -1997,7 +2012,7 @@ namespace myProject.Models
                             int productId = productIds[i];
                             int quantity = productQuantities[i];
 
-                             
+
 
                             // Update Stock and Sold values in the Products table
                             string updateQuery = @"
@@ -2021,7 +2036,7 @@ namespace myProject.Models
                     {
                         throw;
                     }
-                    
+
                 }
             }
             catch (Exception ex)
@@ -2032,6 +2047,165 @@ namespace myProject.Models
 
 
 
+
+
+        /* ------------------------------------------------------------------------------------------------------------- */
+        /* Follow Unfollow */
+
+        public void FollowCompany(int? userId, int companyId)
+        {
+            ModelForUserPages modelForUserPages = new ModelForUserPages();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                string followQuery = @"
+                INSERT INTO FollowedCompanies (UserId, CompanyId)
+                VALUES (@UserId, @CompanyId)";
+
+                using (SqlCommand cmd = new SqlCommand(followQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@CompanyId", companyId);
+                    cmd.ExecuteNonQuery();
+
+                    modelForUserPages.isFollowing = true;
+                }
+            }
+        }
+
+        public void UnfollowCompany(int? userId, int companyId)
+        {
+            ModelForUserPages modelForUserPages = new ModelForUserPages();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                string unfollowQuery = @"
+                    DELETE FROM FollowedCompanies
+                    WHERE UserId = @UserId AND CompanyId = @CompanyId";
+
+                using (SqlCommand cmd = new SqlCommand(unfollowQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@CompanyId", companyId);
+                    cmd.ExecuteNonQuery();
+
+                    modelForUserPages.isFollowing = false;
+                }
+            }
+        }
+
+
+
+
+        /* ------------------------------------------------------------------------------------------------------------- */
+        /* Like Button */
+        public void LikeButton(int? userId,int productId)
+        {
+
+            string insertQuery = @"
+                INSERT INTO ProductsLiked (UserId, ProductId, CreatedAt)
+                VALUES (@UserId, @ProductId, GETDATE())";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                using (SqlTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // Check if the user already likes this product
+                        string checkQuery = @"
+                            SELECT COUNT(*)
+                            FROM ProductsLiked
+                            WHERE UserId = @UserId AND ProductId = @ProductId";
+
+                        using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn, transaction))
+                        {
+                            checkCmd.Parameters.AddWithValue("@UserId", userId);
+                            checkCmd.Parameters.AddWithValue("@ProductId", productId);
+
+                            int count = (int)checkCmd.ExecuteScalar();
+
+                            // If the user does not already like this product, insert the like
+                            if (count == 0)
+                            {
+                                using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn, transaction))
+                                {
+                                    insertCmd.Parameters.AddWithValue("@UserId", userId);
+                                    insertCmd.Parameters.AddWithValue("@ProductId", productId);
+                                    insertCmd.ExecuteNonQuery();
+                                }
+                            }
+                        }
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+                }
+            }
+
+
+
+        /* ------------------------------------------------------------------------------------------------------------- */
+        /* Like Button */
+        public List<int> GetLikedProductIds(int? userId)
+        {
+            List<int> likedProductIds = new List<int>();
+
+            string query = @"
+                SELECT ProductId
+                FROM ProductsLiked
+                WHERE UserId = @UserId";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            likedProductIds.Add(reader.GetInt32(reader.GetOrdinal("ProductId")));
+                        }
+                    }
+                }
+            }
+            return likedProductIds;
+        }
+
+
+        public void UnlikeButton(int? userId, int productId)
+        {
+            Console.WriteLine(productId);
+
+            string query = @"
+            DELETE FROM ProductsLiked
+            WHERE ProductId = @ProductId AND UserId = @UserId";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ProductId", productId);
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
 
 
 

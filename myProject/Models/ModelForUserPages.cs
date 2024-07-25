@@ -13,9 +13,12 @@ namespace myProject.Models
         public string MainCategory { get; set; }
 
 
+        // Tüm sayfalar için
+        public static List<int> productsLiked = new List<int>();
+
+
         // User Product Details için
         public List<ProductModel>  recommendatitons = new List<ProductModel>();
-
 
 
         // User Basket için
@@ -39,13 +42,12 @@ namespace myProject.Models
         // Alt Linkler için
         public List<ProductModel> productsByCategory { get; set; } = new List<ProductModel>();
         public string subcategory {  get; set; }
-
         
+
         // Company Sayfası için
         public CompanyModel companyDetails { get; set; }
         public List<ProductModel> companyProducts { get; set; } = new List<ProductModel>();
-
-
+        public bool isFollowing;
 
 
         public ModelForUserPages() { }
