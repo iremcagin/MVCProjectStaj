@@ -46,7 +46,7 @@ namespace myProject.Models
                     cmd.Parameters.AddWithValue("@PhoneNumber", model.PhoneNumber);
                     cmd.Parameters.AddWithValue("@Address", model.Address);
                     cmd.Parameters.AddWithValue("@Role", "user");
-                    cmd.Parameters.AddWithValue("@Birthdate", model.Birthdate);
+                    cmd.Parameters.AddWithValue("@Birthdate", DateTime.Now);
                     cmd.Parameters.AddWithValue("@CreatedAt", DateTime.Now);
 
                     cmd.ExecuteNonQuery();

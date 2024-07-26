@@ -56,6 +56,57 @@ namespace myProject.Controllers
 
 
 
+        [HttpPost]
+        public IActionResult DeleteUser(int userId)
+        {
+            _adminDatabaseControlModel.DeleteUser(userId);
+            return RedirectToAction("Users");
+        }
+
+
+
+
+        /* --------------------------------------------------- Products --------------------------------------------------- */
+        [HttpGet]
+        public IActionResult Products()
+        {
+            ModelForAdminPages modelForAdminPages = new ModelForAdminPages();
+            modelForAdminPages.products = _adminDatabaseControlModel.getAllProducts();
+
+            return View(modelForAdminPages);
+        }
+
+
+        [HttpPost]
+        public IActionResult DeleteProduct(int productId)
+        {
+            _adminDatabaseControlModel.DeleteProduct(productId);
+            return RedirectToAction("Products");
+        }
+
+
+
+
+        /* --------------------------------------------------- Reviews --------------------------------------------------- */
+        [HttpGet]
+        public IActionResult Reviews()
+        {
+            ModelForAdminPages modelForAdminPages = new ModelForAdminPages();
+            modelForAdminPages.reviews = _adminDatabaseControlModel.GetAllReviews();
+
+            return View(modelForAdminPages);
+        }
+
+
+        [HttpPost]
+        public IActionResult DeleteReview(int reviewId)
+        {
+            _adminDatabaseControlModel.DeleteReview(reviewId);
+            return RedirectToAction("Reviews");
+        }
+
+
+
         /* --------------------------------------------------- Navbar --------------------------------------------------- */
         public IActionResult Signout()
         {

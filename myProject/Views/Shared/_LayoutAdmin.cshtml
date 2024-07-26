@@ -76,8 +76,8 @@
     <div class="container-fluid">
         <div class="row px-2">
             <!-- Sidebar -->
-            <nav class="col-md-2 d-md-block sidebar" style="height:100vh; overflow-y:scroll; box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.2);">
-                <div class="sidebar-sticky">
+            <nav class="col-md-2 d-md-block sidebar" style="height:100vh; overflow-y:scroll; box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.2); background-color:#fff5f6; margin-left:-10px;">
+                <div class="sidebar-sticky"e;">
                     <ul class="nav flex-column">
                         <li class="nav-item rounded mt-3 @(ViewContext.RouteData.Values["Controller"].ToString() == "Admin" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
                             <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Index">
@@ -97,10 +97,21 @@
 
                         <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Admin" && ViewContext.RouteData.Values["Action"].ToString() == "Users" ? "active" : "")">
                             <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Users">
-                                <i class="las la-user-check"></i> Users
+                                <i class="las la-users"></i> Users
                             </a>
                         </li>
 
+                        <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Admin" && ViewContext.RouteData.Values["Action"].ToString() == "Products" ? "active" : "")">
+                            <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Products">
+                                <i class="las la-box"></i> Products
+                            </a>
+                        </li>
+
+                        <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Admin" && ViewContext.RouteData.Values["Action"].ToString() == "Reviews" ? "active" : "")">
+                            <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Reviews">
+                                <i class="las la-star"></i> Reviews
+                            </a>
+                        </li>
                       
 
                         <!--li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Seller" && ViewContext.RouteData.Values["Action"].ToString() == "Comments" ? "active" : "")">

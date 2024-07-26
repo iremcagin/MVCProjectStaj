@@ -86,8 +86,8 @@ namespace myProject.Models
                         }
                     }
                 }
-              
-                
+
+
             }
             return combinedViewModelList;
         }
@@ -109,7 +109,7 @@ namespace myProject.Models
                 string companyQuery = "SELECT * FROM Companies WHERE isAccountActivated = @IsAccountActivated";
                 using (SqlCommand companyCmd = new SqlCommand(companyQuery, conn))
                 {
-                   
+
                     companyCmd.Parameters.AddWithValue("@IsAccountActivated", false);
                     using (SqlDataReader reader = companyCmd.ExecuteReader())
                     {
@@ -235,7 +235,7 @@ namespace myProject.Models
                                     Birthdate = reader.GetDateTime(reader.GetOrdinal("Birthdate")),
                                     CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
 
-                                    
+
                                 };
 
                                 users.Add(product);
@@ -253,6 +253,215 @@ namespace myProject.Models
         }
 
 
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Delete User */
+        public void DeleteUser(int userId)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    // SQL query to delete the user
+                    string deleteUserQuery = "DELETE FROM Users WHERE Id = @UserId";
+                    using (SqlCommand cmd = new SqlCommand(deleteUserQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@UserId", userId);
+                        int rowsAffected = cmd.ExecuteNonQuery();
+
+                      
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while deleting the user: " + ex.Message);
+                // Optionally rethrow or handle the exception based on your application's needs
+            }
+        }
+
+
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Return all products */
+        public List<ProductModel> getAllProducts()
+        {
+            List<ProductModel> products = new List<ProductModel>();
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string productQuery = "SELECT * FROM Products";
+                    using (SqlCommand cmd = new SqlCommand(productQuery, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                ProductModel product = new ProductModel
+                                {
+                                    ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                    CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Description = reader.GetString(reader.GetOrdinal("Description")),
+                                    Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                    Stock = reader.GetInt32(reader.GetOrdinal("Stock")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                    Category = reader.GetString(reader.GetOrdinal("Category")),
+                                    Rating = Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("Rating"))),
+                                    Favorite = reader.GetInt32(reader.GetOrdinal("Favorite")),
+                                    Clicked = reader.GetInt32(reader.GetOrdinal("Clicked")),
+                                    isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"))
+                                };
+                                products.Add(product);
+                            }
+                        }
+                    }
+                }
+
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string imageQuery = "SELECT ProductId, ImageURL FROM ProductImages";
+                    using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.HasRows) // Check if there are rows returned by the query
+                            {
+                                while (reader.Read())
+                                {
+                                    int productId = (int)reader["ProductId"];
+                                    string imageUrl = reader["ImageURL"].ToString();
+
+                                    // İlgili ürünü bul ve resim ekle
+                                    ProductModel product = products.FirstOrDefault(p => p.ProductId == productId);
+                                    if (product != null && !product.Images.Contains(imageUrl)) // Check if image already exists
+                                    {
+                                        product.Images.Add(imageUrl);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error while reading products: " + ex.Message);
+            }
+
+            return products;
+        }
+
+
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Delete Product */
+        public void DeleteProduct(int productId)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    // SQL query to delete the user
+                    string deleteUserQuery = "DELETE FROM Products WHERE ProductId = @productId";
+                    using (SqlCommand cmd = new SqlCommand(deleteUserQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@productId", productId);
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while deleting the product: " + ex.Message);
+            }
+        }
+
+
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Return all reviews */
+        public List<ProductReviewModel> GetAllReviews()
+        {
+            List<ProductReviewModel> reviews = new List<ProductReviewModel>();
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = "SELECT * FROM Reviews";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                ProductReviewModel review = new ProductReviewModel
+                                {
+                                    ReviewId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                    CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                    UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                                    Rating = reader.GetInt32(reader.GetOrdinal("Rating")),
+                                    Review = reader.GetString(reader.GetOrdinal("Review")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+                                };
+
+                                reviews.Add(review);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error while getting users: " + ex.Message);
+            }
+
+            return reviews;
+        }
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Delete Review */
+        public void DeleteReview(int reviewId)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    // SQL query to delete the user
+                    string deleteUserQuery = "DELETE FROM Reviews WHERE Id = @reviewId";
+                    using (SqlCommand cmd = new SqlCommand(deleteUserQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@reviewId", reviewId);
+                        int rowsAffected = cmd.ExecuteNonQuery();
+
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while deleting the user: " + ex.Message);
+            }
+        }
 
 
 

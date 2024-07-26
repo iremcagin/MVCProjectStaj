@@ -16,6 +16,16 @@ namespace myProject.Models
         public List<UserModel> users { get; set; } = new List<UserModel>();
 
 
+        // Products Page için
+        public List<ProductModel> products { get; set; } = new List<ProductModel>();
+
+
+
+        // Reviews Page için
+        public List<ProductReviewModel> reviews { get; set; } = new List<ProductReviewModel>();
+
+
+
 
     }
 
