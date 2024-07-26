@@ -1,0 +1,43 @@
+﻿@model myProject.Models.ModelForAdminPages
+@{
+    ViewData["Title"] = "Companies";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="" style="max-height:700px; overflow-y:auto;">
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">User ID</th>
+                <th scope="col">Age</th>
+                <th scope="col">Name</th>
+                <th scope="col">Surname</th>
+                <th scope="col">Phone Number</th>
+                <th scope="col">Email</th>
+                <th scope="col">Address</th>
+                <th scope="col">Role</th>
+                <th scope="col">Birthdate</th>
+                <th scope="col">Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.users)
+            {
+                <tr>
+                    <td>@user.UserId</td>
+                    <td>@user.Age</td>
+                    <td>@user.Name</td>
+                    <td>@user.Surname</td>
+                    <td>@user.PhoneNumber</td>
+                    <td>@user.Email</td>
+                    <td>@user.Address</td>
+                    <td>@user.Role</td>
+                    <td>@user.Birthdate.ToString("yyyy-MM-dd")</td>
+                    <td>@user.CreatedAt.ToString("yyyy-MM-dd")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+

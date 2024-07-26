@@ -14,7 +14,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Playwrite+PE:wght@100..400&family=Poppins&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Thasadith&display=swap" rel="stylesheet">
 
+
+    <link href="https://fonts.googleapis.com/css2?family=Arapey:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #fefefe;
+            font-family: 'Montserrat', sans-serif;
+            font-family: "Arapey", serif;
+        }
+    </style>
+
 </head>
+
+
+
 <body style="overflow:hidden;">
 
     <header>
@@ -34,16 +47,9 @@
                 <!--h6 style=" font-family: "Poppins", sans-serif;">Seller Management System</!--h6-->
 
                 <div class="satici-info" style="display:flex; align-items:center;">
-                    <div style="width:25px;"></div>
-                    <!-- Sol tarafta resim -->
-                    <div class="poppins text-center" style="color:#fefefe; width:45px; height:45px;">
-                        <img src="~/images/user.jpg" class="img-fluid rounded-circle" alt="image">
-                    </div>
-                    <!-- Sağ tarafta mağaza adı ve satıcı ismi -->
-                    <div class=" " style="margin-left:10px; margin-right:5px; justify-content:center;">
-                        <h6 class="poppins" style="color:#fefefe;  margin-top:3px; margin-bottom:-1px;">Mağaza Adı</h6>
-                        <h6 class="poppins" style="color:#fefefe; font-size:13px;">Satıcı İsmi</h6>
-                    </div>
+                    
+                   
+                    <h6 class="poppins" style="color:#fefefe; ">Admin</h6>
 
                     <div class="dropdown">
                         <button class="btn btn-link dropdown-toggle dropdown-outline" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:#fefefe;">
@@ -86,6 +92,12 @@
                         <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Admin" && ViewContext.RouteData.Values["Action"].ToString() == "ActivateAccounts" ? "active" : "")">
                             <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="ActivateAccounts">
                                 <i class="las la-user-check"></i> Activate Accounts
+                            </a>
+                        </li>
+
+                        <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Admin" && ViewContext.RouteData.Values["Action"].ToString() == "Users" ? "active" : "")">
+                            <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Users">
+                                <i class="las la-user-check"></i> Users
                             </a>
                         </li>
 

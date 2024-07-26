@@ -1,0 +1,505 @@
+﻿@model myProject.Models.ModelForUserPages
+@{
+    ViewData["Title"] = "Guest";
+    Layout = "~/Views/Shared/_LayoutGuest.cshtml";
+}
+
+
+
+
+<div class="container">
+    <!-- Product Details Section -->
+    <div class="card mb-4">
+        <!--div class="card-header">
+            
+        </!--div-->
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-7">
+                    @if (@Model.productDetailsModel.ProductImages != null && @Model.productDetailsModel.ProductImages.Count > 0)
+                    {
+                        <div id="productImagesCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                @for (int i = 0; i < Model.productDetailsModel.ProductImages.Count; i++)
+                                {
+                                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                                        <img src="~/images/@Model.productDetailsModel.Product.Category/@Model.productDetailsModel.ProductImages[i]" alt="Product Image" class="d-block w-100" style="max-height:600px;" />
+                                       
+                                    </div>
+                                }
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#productImagesCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#productImagesCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+
+                    }
+                    else
+                    {
+                        <img src="~/images/placeholder-1.png" alt="Placeholder Image" class="img-fluid" />
+                    }
+                </div>
+                <div class="col-md-5 d-flex flex-column justify-content-between">
+                    <div class="d-flex flex-column">
+                        <div class="d-flex justify-content-between" style="">
+
+                            <a href="/Login" class="btn btn-like position-absolute top-0 end-0 m-2 no-outline">
+                                <i class="lar la-heart"></i>
+                            </a>
+
+                              <ul class="list-group list-group-flush">
+                                <li class="list-group-item" style="font-size:15px;">
+
+                                    <div>
+
+
+                                        @if (@Model.productDetailsModel.Product.Rating >= 0 && @Model.productDetailsModel.Product.Rating <= 5)
+                                        {
+
+                                            var fullStars = (int)Math.Floor(@Model.productDetailsModel.Product.Rating);
+                                            var halfStar = (@Model.productDetailsModel.Product.Rating - fullStars) >= 0.5;
+                                            // Boş yıldızların <
+                                            var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+
+                                            for (int i = 0; i < fullStars; i++)
+                                            {
+                                                <i class="las la-star" style="color: #ffd700"></i>
+                                            }
+
+                                            if (halfStar)
+                                            {
+                                                <i class="las la-star-half-alt" style="color: #ffd700"></i>
+                                            }
+
+                                            for (int i = 0; i < emptyStars; i++)
+                                            {
+                                                <span class="las la-star" style="color: lightgrey"></span>
+                                            }
+                                        }
+
+                                    </div>
+                                    <strong><i class="la la-heart" style="color:red;"></i></strong> @Model.productDetailsModel.Product.Favorite
+                                    <strong style="margin-left:5px;"><i class="la la-eye" style="color:blue;"></i> </strong> @Model.productDetailsModel.Product.Clicked
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h2> @Model.productDetailsModel.Product.Name </h2>
+
+
+                        
+                        </div>
+                        
+                        <p style="margin-top:30px;"> @Model.productDetailsModel.Product.Description</p>
+                        
+
+                    </div>
+                    <div>
+                        <!-- Button -->
+                        <div class="d-flex align-items-center justify-content-end">
+                            <h3 class="" style="color: #bf1b3c; font-weight:600; margin-right:20px;">
+                                $@Model.productDetailsModel.Product.Price
+                            </h3>
+
+                        </div>
+
+
+
+
+
+                        <div class="mt-3">
+                            <ul class="list-group">
+                                @{
+            /*
+            *  <li class="list-group-item"><strong>Favorites:</strong> @Model.productDetailsModel.Product.Favorite</li>
+                                    *     <li class="list-group-item"><strong>Clicks:</strong> @Model.productDetailsModel.Product.Clicked</li>
+                                    *    <li class="list-group-item"><strong>Available:</strong> @Model.productDetailsModel.Product.isAvailable</li>
+                                    *  <li class="list-group-item"><strong>Created At:</strong> @Model.productDetailsModel.Product.CreatedAt.ToShortDateString()</li>
+                                    */
+                                }
+
+                                <!-- QUANTİTY  -->
+                                <li class="list-group-item">
+                                    <div class="count-control mt-2">
+                                        <strong>
+                                            Quantity:</strong>
+                                        <button type="button" class="btn btn-dark btn-sm count-btn d-flex align-items-center justify-content-center" style="margin-left:10px;" onclick="updateQuantity('decrease')">-</button>
+                                        <span id="quantityDisplay" style="margin: 0 10px;">1</span>
+                                        <button type="button" class="btn btn-dark btn-sm count-btn d-flex align-items-center justify-content-center" onclick="updateQuantity('increase')">+</button>
+                                    </div>
+                                    <input type="hidden" id="quantity" name="quantity" value="1">
+                                    <input type="hidden" id="stock" value="@Model.productDetailsModel.Product.Stock">
+                                </li>
+
+
+
+
+
+                                <li class="list-group-item"><strong>Category:</strong> @Model.productDetailsModel.Product.Category</li>
+                                <li class="list-group-item"><strong>Stock:</strong> @Model.productDetailsModel.Product.Stock</li>
+                        </div>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+    <!-- Product Reviews Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Product Reviews <i class="las la-comment-dots"></i></h5>
+        </div>
+        <div class="card-body">
+            <div style="max-height:500px; overflow:scroll;">
+            @if (Model.productDetailsModel.ProductReviews.Any())
+            {
+                int i = 0;
+
+                    foreach (var review in Model.productDetailsModel.ProductReviews)
+                    {
+                        <div class="mb-3">
+                            <h6>
+                                @Model.productDetailsModel.ReviewedUsers[i].Name @Model.productDetailsModel.ReviewedUsers[i].Surname
+                                <span style="font-size:15px; margin-left:5px;">
+                                    @for (int j = 0; j < 5; j++)
+                                    {
+                                        if (j < review.Rating)
+                                        {
+                                            <i class="las la-star text-warning"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="lar la-star text-warning"></i>
+                                        }
+                                    }
+                                </span>
+                            </h6>
+                            <p>@review.Review</p>
+                            <p style="margin-top: -15px;"><small>Reviewed on @review.CreatedAt.ToShortDateString()</small></p>
+                            @if (i < Model.productDetailsModel.ProductReviews.Count - 1)
+                            {
+                                <hr />
+                            }
+               
+                        </div>
+                        i++;
+                    }
+                }
+            else
+            {
+                <p>No reviews yet.</p>
+            }
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+    <!-- Company Details Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Company Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-around align-items-center">
+                <div class="col-md-5 position-relative" >
+                    <!-- Banner Image -->
+                    <div class="banner-container">
+                        <a href="@Url.Action("CompanyDetails", "Guest", new { id = @Model.productDetailsModel.Company.CompanyId })">
+                            <img src="~/images/_Banners/@Model.productDetailsModel.Company.BannerUrl" alt="Company Banner" class="banner-image" />
+                        </a>
+                    </div>
+
+                    <!-- Logo Image on top of Banner -->
+                    <div class="logo-container">
+                        <img src="~/images/_Logos/@Model.productDetailsModel.Company.LogoUrl" alt="Company Logo" class="logo-image" />
+                    </div>
+                </div>
+
+
+
+
+                <div class="col-md-6">
+                    <h4>@Model.productDetailsModel.Company.CompanyName</h4>
+                    <p>@Model.productDetailsModel.Company.Description</p>
+                    <ul class="list-group">
+                        <li class="list-group-item"><strong>Name:</strong> @Model.productDetailsModel.User.Name @Model.productDetailsModel.User.Surname</li>
+                        <li class="list-group-item"><strong>Address:</strong> @Model.productDetailsModel.Company.Address</li>                       
+                        @{
+                            /*
+                            * <li class="list-group-item"><strong>IBAN:</strong> @Model.productDetailsModel.Company.IBAN</li>
+                            * <li class="list-group-item"><strong>Tax ID Number:</strong> @Model.productDetailsModel.Company.TaxIDNumber</li>
+                            * <li class="list-group-item"><strong>Email:</strong> @Model.productDetailsModel.Company.Email</li>
+                            * <li class="list-group-item"><strong>Phone Number:</strong> @Model.productDetailsModel.Company.PhoneNumber</li>
+                            */
+                        }
+                     
+                        <li class="list-group-item"><strong>Created At:</strong> @Model.productDetailsModel.Company.CreatedAt.ToShortDateString()</li>
+                        <li class="list-group-item"><strong>Rating:</strong> @Model.productDetailsModel.Company.Rating</li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- Recommendations Section -->
+    <div class="container" style="margin-top:150px;">
+        <h4 style="border-bottom:1px solid black;">Recommended Products</h4>
+        <div id="recommendationsCarousel" class="carousel slide" data-bs-ride="carousel"  style="margin-top:50px;">
+            <div class="carousel-inner">
+                @for (int i = 0; i < Model.recommendatitons.Count; i += 3) // Show 3 products per slide
+                {
+                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                        <div class="d-flex">
+                            @for (int j = i; j < i + 3 && j < Model.recommendatitons.Count; j++)
+                            {
+                                var imageUrl = Model.recommendatitons[j].Images.Any()
+                                ? Url.Content($"~/images/" + @Model.recommendatitons[j].Category + "/" + Model.recommendatitons[j].Images[0])
+                                : Url.Content("~/images/placeholder-1.png");
+
+
+                                <div class="card mx-2" style="width: 12rem;">
+                                    <!-- Adjusted width here -->
+                                    <!-- Image -->
+                                    <div class="position-relative">
+                                        <a href="/Guest/ProductDetails/@Model.recommendatitons[j].ProductId">
+                                            <img src="@imageUrl" class="card-img-top" alt="">
+                                        </a>
+                                        </div>
+
+
+                                    <div class="card-body d-flex flex-column justify-content">
+                                        <div class="d-flex flex-column" style="font-size:15px;">
+                                            <h5 class="card-title"><span style="font-size:15px; font-weight:600;"> @Model.recommendatitons[j].Name </span><span style="font-size:14px; color:grey;">@Model.recommendatitons[j].Description</span></h5>
+
+                                            <div class="d-flex">
+                                                <p style="margin-right:5px;  font-size:14px; margin-top:2px;">@Model.recommendatitons[j].Rating</p>
+
+                                                @if (@Model.recommendatitons[j].Rating >= 0 && @Model.recommendatitons[j].Rating <= 5)
+                                                {
+                                                    var fullStars = (int)Math.Floor(@Model.recommendatitons[j].Rating);
+                                                    var halfStar = (@Model.recommendatitons[j].Rating - fullStars) >= 0.5;
+                                                    // Boş yıldızların sayısı
+                                                    var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+                                                    for (int k = 0; k < fullStars; k++)
+                                                    {
+                                                        <i class="las la-star" style="color: #ffd700"></i>
+                                                    }
+
+                                                    if (halfStar)
+                                                    {
+                                                        <i class="las la-star-half-alt" style="color: #ffd700"></i>
+                                                    }
+
+                                                    for (int k = 0; k < emptyStars; k++)
+                                                    {
+                                                        <span class="las la-star" style="color: lightgrey"></span>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                        <h5 class="card-text" style="font-size: 16px; font-weight:600; color:#b46c2c; margin-top:15px;">$@Model.recommendatitons[j].Price</h5>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#recommendationsCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#recommendationsCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+@section Scripts {
+    <script>
+
+
+
+</script>
+}
+
+
+
+
+
+
+<style>
+    input:focus,
+    input:clicked{
+        outline:none;
+        box-shadow:none;
+
+    }
+
+     .search-button:hover {
+        background-color: #fafafa;
+        }
+
+    .no-outline:focus,
+    .no-outline:active{
+        outline: none;
+        box-shadow: none;
+    }
+
+
+
+    .btn-like {
+        background-color: rgba(255, 255, 255, 0.8);
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+        .btn-like i {
+            color: black; /* Like icon color */
+            font-size: 13px;
+        }
+
+        .btn-like:hover {
+            background-color: rgba(255, 255, 255, 1);
+        }
+
+    .position-relative {
+        position: relative;
+    }
+
+    .position-absolute {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+    }
+
+    .position-relative {
+        position: relative;
+    }
+
+    .banner-container {
+        width: 100%;
+        height: auto; /* Or any height that fits your design */
+        overflow: hidden;
+        border-radius: 8px; /* Optional: adds rounded corners to the banner */
+    }
+
+    .banner-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .logo-container {
+        position: absolute;
+        bottom: 20px; /* Adjust according to your preference */
+        left: 20px; /* Adjust according to your preference */
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid #fff; /* Optional: add a border around the logo */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Optional: add a shadow effect */
+    }
+
+    .logo-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+
+
+    .rating {
+        display: flex;
+        direction: rtl;
+        font-size: 1.5em;
+        unicode-bidi: bidi-override;
+        text-align: center;
+        user-select: none;
+    }
+
+        .rating input {
+            display: none;
+        }
+
+        .rating label {
+            color: #ccc;
+            cursor: pointer;
+            display: block;
+            position: relative;
+            width: 1.1em;
+        }
+
+            .rating label:before {
+                content: '\2605'; /* Star symbol */
+            }
+
+        .rating input:checked ~ label {
+            color: #f5b301;
+        }
+
+        .rating label:hover,
+        .rating label:hover ~ label {
+            color: #f5b301;
+        }
+
+
+    .count-control {
+        display: flex;
+        align-items: center;
+    }
+
+    .count-input {
+        width: 20px;
+        height: 15px;
+        text-align: center;
+        border: 1px solid #000;
+        margin: 0 5px;
+    }
+
+    .count-btn {
+        width: 12px;
+        height: 12px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>

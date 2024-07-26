@@ -12,10 +12,10 @@ namespace myProject.Models
 
 
         /* ------------------------------------- COMPANIES ------------------------------------- */
-        public List<CombinedViewModel> getAllCompanies()
+        public List<ModelForAdminPages> getAllCompanies()
         {
-            List<CombinedViewModel> combinedViewModelList = new List<CombinedViewModel>();
-            CombinedViewModel combinedViewModel = new CombinedViewModel();
+            List<ModelForAdminPages> combinedViewModelList = new List<ModelForAdminPages>();
+            ModelForAdminPages combinedViewModel = new ModelForAdminPages();
 
 
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -93,10 +93,13 @@ namespace myProject.Models
         }
 
 
-        public List<CombinedViewModel> getNotAcitavedCompanies()
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Return new signed companies to activate */
+        public List<ModelForAdminPages> getNotAcitavedCompanies()
         {
-            List<CombinedViewModel> combinedViewModelList = new List<CombinedViewModel>();
-            CombinedViewModel combinedViewModel = new CombinedViewModel();
+            List<ModelForAdminPages> combinedViewModelList = new List<ModelForAdminPages>();
+            ModelForAdminPages combinedViewModel = new ModelForAdminPages();
 
 
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -177,6 +180,8 @@ namespace myProject.Models
 
 
 
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Activate account */
         public void ActivateAccount(int CompanyId)
         {
             string updateQuery = "UPDATE Companies SET isAccountActivated = @IsAccountActivated WHERE Id = @CompanyId";
@@ -194,6 +199,59 @@ namespace myProject.Models
                 }
             }
         }
+
+
+
+
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Return all users */
+        public List<UserModel> getAllUsers()
+        {
+            List<UserModel> users = new List<UserModel>();
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = "SELECT * FROM Users";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                UserModel product = new UserModel
+                                {
+                                    UserId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Age = reader.GetInt32(reader.GetOrdinal("Age")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Surname = reader.GetString(reader.GetOrdinal("Surname")),
+                                    PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
+                                    PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
+                                    Email = reader.GetString(reader.GetOrdinal("Email")),
+                                    Address = reader.GetString(reader.GetOrdinal("Address")),
+                                    Role = reader.GetString(reader.GetOrdinal("Role")),
+                                    Birthdate = reader.GetDateTime(reader.GetOrdinal("Birthdate")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+
+                                    
+                                };
+
+                                users.Add(product);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error while getting users: " + ex.Message);
+            }
+
+            return users;
+        }
+
 
 
 

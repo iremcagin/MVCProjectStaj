@@ -40,6 +40,7 @@
         {
             @foreach (var product in Model.mostClickedProducts)
             {
+                int i = 0;
                 <div class="carousel-item @(product == Model.mostClickedProducts.First() ? "active" : "")">
                     <div class="container-fluid">
                         <div class="row p-3 col-md-12">
@@ -103,10 +104,10 @@
 
                                 <!-- Company -->
                                 <div class="text-dark d-flex align-items-center p-2" style="border-top: 1px solid black;">
-                                    <img src="~/images/company_logo.png" class="img-fluid rounded" style="max-width: 50px; max-height: 50px;" alt="Logo">
+                                    <img src="~/images/_Logos/@Model.mostClickedProductsCompanyInfo[i].LogoUrl" class="img-fluid rounded" style="max-width: 50px; max-height: 50px; " alt="Logo">
                                     <div class="ms-3">
-                                        <h6 style="font-size: 14px;">Company Name</h6>
-                                        <h6 style="font-size: 14px;"><i class="las la-map-marker"></i></h6>
+                                        <h6 style="font-size: 14px;">@Model.mostClickedProductsCompanyInfo[i].CompanyName</h6>
+                                        <h6 style="font-size: 14px;"><i class="las la-map-marker"></i>@Model.mostClickedProductsCompanyInfo[i].Address</h6>
                                     </div>
                                     <!-- Views, Likes -->
                                     <div class="ms-auto">
@@ -118,6 +119,7 @@
                         </div>
                     </div>
                 </div>
+                i++;
             }
         }
     </div>
@@ -149,7 +151,7 @@
 
 
 <!-- Companies  -->
-<div class="container" style="margin-top:300px;">
+<div class="container" style="margin-top:200px;">
     <div class="row">
         @if (ModelForUserPages.companies.Count > 0)
         {
@@ -314,14 +316,14 @@
                                 <p class="my-0 font-weight-normal" style="font-size:17px;"><strong>@product.Name</strong></p>
                                 <p class="card-text" style="font-size:17px;">
                                     <strong>
-                                    $@product.Price
-                                </strong>
+                                        $@product.Price
+                                    </strong>
 
-                    </p>
+                                </p>
                             </div>
                             <div class="card-body">
                                 <div id="carouselExampleIndicators@i" class="carousel slide" data-ride="carousel">
-                                   
+
                                     <div class="carousel-inner">
                                         @for (int j = 0; j < product.Images.Count; j++)
                                         {
@@ -361,7 +363,7 @@
                                             <i class="las la-star-half-alt" style="color: #ffd700"></i>
                                         }
 
-                                        for (int k = 0; i < emptyStars; k++)
+                                        for (int k = 0; k < emptyStars; k++)
                                         {
                                             <span class="las la-star" style="color: lightgrey"></span>
                                         }
@@ -376,9 +378,9 @@
 
 
 
-    </div>
-    <div>
-    </div>
+        </div>
+        <div>
+        </div>
 
 </div>
 

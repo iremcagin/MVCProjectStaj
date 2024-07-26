@@ -19,7 +19,7 @@ namespace myProject.Controllers
 
         /* ------------------------------------- LOGIN ------------------------------------- */
         [HttpPost]
-        public async Task<IActionResult> Login(CombinedViewModel model)
+        public async Task<IActionResult> Login(ModelForAdminPages model)
         {
             UserModel loggedUser = new UserModel();
             
@@ -74,7 +74,7 @@ namespace myProject.Controllers
 
         /* ------------------------------------- USER SIGN UP ------------------------------------- */
         [HttpPost]
-        public async Task<IActionResult> UserSignUp(CombinedViewModel model)
+        public async Task<IActionResult> UserSignUp(ModelForAdminPages model)
         {
 
             UserModel userModel = model.User;
@@ -99,7 +99,7 @@ namespace myProject.Controllers
        
 
         [HttpPost]
-        public async Task<IActionResult> CompanySignUp(CombinedViewModel model)
+        public async Task<IActionResult> CompanySignUp(ModelForAdminPages model)
         {
                   string _logosPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/_Logos");
                   string _bannersPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/_Banners");

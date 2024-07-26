@@ -124,7 +124,7 @@ namespace myProject.Models
 
 
         /* ------------------------------------- COMPANY SIGN UP ------------------------------------- */
-        public void CompanySignUp(CombinedViewModel model)
+        public void CompanySignUp(ModelForAdminPages model)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {

@@ -18,7 +18,7 @@ namespace myProject.Controllers
         [HttpGet]
         public IActionResult Companies()
         {
-            List<CombinedViewModel> combinedViewModelList = _adminDatabaseControlModel.getAllCompanies();
+            List<ModelForAdminPages> combinedViewModelList = _adminDatabaseControlModel.getAllCompanies();
 
            return View(combinedViewModelList);
         }
@@ -27,7 +27,7 @@ namespace myProject.Controllers
         /* --------------------------------------------------- Activate Accounts Page --------------------------------------------------- */
         public IActionResult ActivateAccounts()
         {
-            List<CombinedViewModel> combinedViewModelList = _adminDatabaseControlModel.getNotAcitavedCompanies();
+            List<ModelForAdminPages> combinedViewModelList = _adminDatabaseControlModel.getNotAcitavedCompanies();
 
             return View(combinedViewModelList);
         }
@@ -43,6 +43,19 @@ namespace myProject.Controllers
             return RedirectToAction("ActivateAccounts");
         }
 
+
+        /* --------------------------------------------------- Users Page --------------------------------------------------- */
+        [HttpGet]
+        public IActionResult Users()
+        {
+            ModelForAdminPages modelForAdminPages = new ModelForAdminPages();
+            modelForAdminPages.users = _adminDatabaseControlModel.getAllUsers();
+
+            return View(modelForAdminPages);
+        }
+
+
+
         /* --------------------------------------------------- Navbar --------------------------------------------------- */
         public IActionResult Signout()
         {
@@ -50,6 +63,8 @@ namespace myProject.Controllers
             return RedirectToAction("Index","Guest");
           
         }
+
+
 
 
 

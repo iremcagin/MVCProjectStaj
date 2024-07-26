@@ -38,8 +38,24 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/iremc/Desktop/Staj/_UyumsoftBelgeler/myProject/myProject/Views/Admin/Users.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVXNlcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/iremc/Desktop/Staj/_UyumsoftBelgeler/myProject/myProject/Views/Guest/CompanyDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3Vlc3RcQ29tcGFueURldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/iremc/Desktop/Staj/_UyumsoftBelgeler/myProject/myProject/Views/Guest/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3Vlc3RcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/iremc/Desktop/Staj/_UyumsoftBelgeler/myProject/myProject/Views/Guest/ProductDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3Vlc3RcUHJvZHVjdERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/iremc/Desktop/Staj/_UyumsoftBelgeler/myProject/myProject/Views/Guest/ProductsByCategory.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3Vlc3RcUHJvZHVjdHNCeUNhdGVnb3J5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/iremc/Desktop/Staj/_UyumsoftBelgeler/myProject/myProject/Views/Home/Index.cshtml]

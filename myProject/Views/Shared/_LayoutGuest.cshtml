@@ -46,6 +46,9 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" href="/Guest">Home</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Guest" asp-action="ProductsByCategory" asp-route-categoryyy="all">All Products</a>
+                        </li>
                         @{
                             ModelForUserPages categoriesModel = new ModelForUserPages();
                             var furnitureCategories = categoriesModel.GetAllFurnitureCategories();
@@ -62,7 +65,7 @@
                                         @foreach (var category in furnitureCategories)
                                         {
                                             <li>
-                                                <a class="text-dark" asp-area="" asp-controller="Guest" asp-action="@category.CategoryName">
+                                            <a class="text-dark" asp-area="" asp-controller="Guest" asp-action="ProductsByCategory" asp-route-categoryyy="Furniture">
                                                 <i class="las la-caret-right" style="margin-right:3px; color: #969696;"></i>
                                                 <span style="color: #969696;">
                                                     @category.CategoryName
@@ -79,12 +82,12 @@
                                         Decoration
                                     </a>
                                     <ul class="list-unstyled small-list">
-                                        @foreach (var category in decorationCategories)
+                                    @foreach (var categoryyy in decorationCategories)
                                         {
                                             <li>
-                                                <a class="text-dark" asp-area="" asp-controller="Guest" asp-action="@category.CategoryName">
+                                            <a class="text-dark" asp-area="" asp-action="ProductsByCategory" asp-route-categoryyy="@categoryyy.CategoryName">
                                                 <i class="las la-caret-right" style="margin-right:3px; color: #969696;"></i>
-                                                <span style="color: #969696;">@category.CategoryName</span>
+                                                <span style="color: #969696;">@categoryyy.CategoryName</span>
                                                 </a>
                                             </li>
                                         }
@@ -104,8 +107,8 @@
                         </form>
                     </div>
 
-                    <ul class="navbar-nav col-md-2">
-                        <li class="nav-item">
+                    <ul class="navbar-nav col-md-3">
+                        <li class="nav-item d-flex">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Index" style="font-size:20px;">
                                 <i class="la la-user"></i> Login
                             </a>
