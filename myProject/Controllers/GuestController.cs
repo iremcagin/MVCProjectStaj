@@ -6,32 +6,25 @@ namespace myProject.Controllers
 {
     public class GuestController : Controller
     {
-        /*
-        private readonly CategoriesModel _categoriesRepository;
-
-        public GuestController()
-        {
-            _categoriesRepository = new CategoriesModel();
-        } */
+       
 
         private readonly _UserDatabaseControlModel userDatabaseControlModel = new _UserDatabaseControlModel();
 
 
         public IActionResult Index()
         {
-            List<ProductModel> products = userDatabaseControlModel.getAllProducts();
-            List<ProductModel> mostClickedProducts = userDatabaseControlModel.GetMostClickedProducts();
-            List<ProductModel> newestProducts = userDatabaseControlModel.GetNewestProducts();
+
+            ModelForUserPages modelForUserPages = new ModelForUserPages();
+            modelForUserPages = userDatabaseControlModel.HomePageProducts();
+
+            ModelForUserPages.companies = userDatabaseControlModel.GetAllCompanies();
 
 
 
-            // ViewBag kullanarak view'a veri gönderme
-            ViewBag.Products = products;
-            ViewBag.MostClickedProducts = mostClickedProducts;
-            ViewBag.NewestProducts = newestProducts;
 
-            return View();
+            return View(modelForUserPages);
         }
+
 
 
     }

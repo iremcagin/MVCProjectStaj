@@ -35,7 +35,7 @@ namespace myProject.Models
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    string productQuery = "SELECT * FROM Products";
+                    string productQuery = "SELECT * FROM Products WHERE isAvailable = 'true'";
                     using (SqlCommand cmd = new SqlCommand(productQuery, conn))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -44,18 +44,18 @@ namespace myProject.Models
                             {
                                 ProductModel product = new ProductModel
                                 {
-                                    ProductId = (int)reader["ProductId"],
-                                    CompanyId = (int)reader["CompanyId"],
-                                    Name = reader["Name"].ToString(),
-                                    Description = reader["Description"].ToString(),
-                                    Price = (decimal)reader["Price"],
-                                    Stock = (int)reader["Stock"],
-                                    CreatedAt = (DateTime)reader["CreatedAt"],
-                                    Category = reader["Category"].ToString(),
-                                    Rating = Convert.ToSingle(reader["Rating"]),  // Float tipi için Convert.ToSingle
-                                    Favorite = (int)reader["Favorite"],
-                                    isAvailable = reader["isAvailable"].ToString(),
-                                    Images = new List<string>()
+                                    ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                    CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Description = reader.GetString(reader.GetOrdinal("Description")),
+                                    Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                    Stock = reader.GetInt32(reader.GetOrdinal("Stock")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                    Category = reader.GetString(reader.GetOrdinal("Category")),
+                                    Rating = Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("Rating"))),
+                                    Favorite = reader.GetInt32(reader.GetOrdinal("Favorite")),
+                                    Clicked = reader.GetInt32(reader.GetOrdinal("Clicked")),
+                                    isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"))
                                 };
                                 products.Add(product);
                             }
@@ -103,9 +103,9 @@ namespace myProject.Models
 
         /* -------------------------------------------------------------------------------------------------------------- */
         /* Return top most 5 viewed product. */
-        public List<ProductModel> GetMostClickedProducts(int limit = 5)
+        public ModelForUserPages HomePageProducts(int limit = 5)
         {
-            List<ProductModel> products = new List<ProductModel>();
+            ModelForUserPages modelForUserPages = new ModelForUserPages();
 
             try
             {
@@ -113,11 +113,12 @@ namespace myProject.Models
                 {
                     conn.Open();
 
-
+                    
                     string query = @"
                         SELECT TOP (@Limit) *
                         FROM Products 
-                        ORDER BY Clicked DESC";
+                        WHERE isAvailable = 'true'
+                        ORDER BY Clicked DESC ";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
@@ -128,29 +129,27 @@ namespace myProject.Models
                             {
                                 ProductModel product = new ProductModel
                                 {
-                                    ProductId = (int)reader["ProductId"],
-                                    CompanyId = (int)reader["CompanyId"],
-                                    Name = reader["Name"].ToString(),
-                                    Description = reader["Description"].ToString(),
-                                    Price = (decimal)reader["Price"],
-                                    Stock = (int)reader["Stock"],
-                                    CreatedAt = (DateTime)reader["CreatedAt"],
-                                    Category = reader["Category"].ToString(),
-                                    Rating = Convert.ToSingle(reader["Rating"]),  // Float tipi için Convert.ToSingle kullanın
-                                    Favorite = (int)reader["Favorite"],
-                                    isAvailable = reader["isAvailable"].ToString(),
-                                    Images = new List<string>()
+                                    ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                    CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Description = reader.GetString(reader.GetOrdinal("Description")),
+                                    Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                    Stock = reader.GetInt32(reader.GetOrdinal("Stock")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                    Category = reader.GetString(reader.GetOrdinal("Category")),
+                                    Rating = Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("Rating"))),
+                                    Favorite = reader.GetInt32(reader.GetOrdinal("Favorite")),
+                                    Clicked = reader.GetInt32(reader.GetOrdinal("Clicked")),
+                                    isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"))
                                 };
-                                products.Add(product);
+                                modelForUserPages.mostClickedProducts.Add(product);
                             }
                         }
                     }
-                }
+                
 
-                /* Read Images */
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
+                // Read Images 
+                
                     string imageQuery = "SELECT ProductId, ImageURL FROM ProductImages";
                     using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
                     {
@@ -164,7 +163,7 @@ namespace myProject.Models
                                     string imageUrl = reader["ImageURL"].ToString();
 
                                     // İlgili ürünü bul ve resim ekle
-                                    ProductModel product = products.FirstOrDefault(p => p.ProductId == productId);
+                                    ProductModel product = modelForUserPages.mostClickedProducts.FirstOrDefault(p => p.ProductId == productId);
                                     if (product != null && !product.Images.Contains(imageUrl)) // Check if image already exists
                                     {
                                         product.Images.Add(imageUrl);
@@ -173,158 +172,86 @@ namespace myProject.Models
                             }
                         }
                     }
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error while reading products: " + ex.Message);
-            }
-
-            return products;
-
-        }
 
 
-
-
-        /* -------------------------------------------------------------------------------------------------------------- */
-        /* Return latest 4 product. */
-        public List<ProductModel> GetNewestProducts(int limit = 4)
-        {
-            List<ProductModel> products = new List<ProductModel>();
-
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-
-
-                    string query = @"
-                        SELECT TOP (@Limit) *
-                        FROM Products 
-                        ORDER BY CreatedAt DESC";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@Limit", limit);
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                ProductModel product = new ProductModel
-                                {
-                                    ProductId = (int)reader["ProductId"],
-                                    CompanyId = (int)reader["CompanyId"],
-                                    Name = reader["Name"].ToString(),
-                                    Description = reader["Description"].ToString(),
-                                    Price = (decimal)reader["Price"],
-                                    Stock = (int)reader["Stock"],
-                                    CreatedAt = (DateTime)reader["CreatedAt"],
-                                    Category = reader["Category"].ToString(),
-                                    Rating = Convert.ToSingle(reader["Rating"]),  // Float tipi için Convert.ToSingle kullanın
-                                    Favorite = (int)reader["Favorite"],
-                                    isAvailable = reader["isAvailable"].ToString(),
-                                    Images = new List<string>()
-                                };
-                                products.Add(product);
-                            }
-                        }
-                    }
-                }
-
-                // İkinci bağlantıyı kullanarak resimleri okuyun
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    string imageQuery = "SELECT ProductId, ImageURL FROM ProductImages";
-                    using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
-                    {
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            if (reader.HasRows) // Check if there are rows returned by the query
-                            {
-                                while (reader.Read())
-                                {
-                                    int productId = (int)reader["ProductId"];
-                                    string imageUrl = reader["ImageURL"].ToString();
-
-                                    // İlgili ürünü bul ve resim ekle
-                                    ProductModel product = products.FirstOrDefault(p => p.ProductId == productId);
-                                    if (product != null && !product.Images.Contains(imageUrl)) // Check if image already exists
-                                    {
-                                        product.Images.Add(imageUrl);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error while reading products: " + ex.Message);
-            }
-
-            return products;
-
-        }
-
-
-
-
-        /* -------------------------------------------------------------------------------------------------------------- */
-        /* Return comments randomly. */
-        public List<ProductModel> GetRandomComments(int limit = 4)
-        {
-            List<ProductModel> products = new List<ProductModel>();
-
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-
-
-                    string query = @"
+                    for(int i=0; i< modelForUserPages.mostClickedProducts.Count; ++i) { 
+                        // Then, retrieve company details based on CompanyId
+                        string companyQuery = @"
                         SELECT *
-                        FROM Products ";
+                        FROM Companies
+                        WHERE Id = @companyId";
+
+                        using (SqlCommand cmd = new SqlCommand(companyQuery, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@companyId", modelForUserPages.mostClickedProducts[i].CompanyId);
+
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    modelForUserPages.mostClickedProductsCompanyInfo.Add(new CompanyModel
+                                    {
+                                        CompanyId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                        UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                                        CompanyName = reader.GetString(reader.GetOrdinal("CompanyName")),
+                                        Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description")),
+                                        Address = reader.GetString(reader.GetOrdinal("Address")),
+                                        PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
+                                        Email = reader.GetString(reader.GetOrdinal("Email")),
+                                        isAccountActivated = reader.GetBoolean(reader.GetOrdinal("isAccountActivated")),
+                                        LogoUrl = reader.IsDBNull(reader.GetOrdinal("LogoUrl")) ? null : reader.GetString(reader.GetOrdinal("LogoUrl")),
+                                        BannerUrl = reader.IsDBNull(reader.GetOrdinal("BannerUrl")) ? null : reader.GetString(reader.GetOrdinal("BannerUrl")),
+                                        TaxIDNumber = reader.GetString(reader.GetOrdinal("TaxIDNumber")),
+                                        IBAN = reader.GetString(reader.GetOrdinal("IBAN")),
+                                        isHighlighed = reader.IsDBNull(reader.GetOrdinal("IsHighlighted")) ? null : reader.GetString(reader.GetOrdinal("IsHighlighted")),
+                                        CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                        Rating = reader.GetInt32(reader.GetOrdinal("Rating"))
+
+                                    });
+                                }
+                            }
+                        }
+                    }
+
+
+
+                    query = @"
+                        SELECT TOP (@Limit) *
+                        FROM Products 
+                        WHERE isAvailable = 'true'      
+                        ORDER BY CreatedAt DESC ";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@Limit", limit);
+                        cmd.Parameters.AddWithValue("@Limit", 4);
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
                                 ProductModel product = new ProductModel
                                 {
-                                    ProductId = (int)reader["ProductId"],
-                                    CompanyId = (int)reader["CompanyId"],
-                                    Name = reader["Name"].ToString(),
-                                    Description = reader["Description"].ToString(),
-                                    Price = (decimal)reader["Price"],
-                                    Stock = (int)reader["Stock"],
-                                    CreatedAt = (DateTime)reader["CreatedAt"],
-                                    Category = reader["Category"].ToString(),
-                                    Rating = Convert.ToSingle(reader["Rating"]),  // Float tipi için Convert.ToSingle kullanın
-                                    Favorite = (int)reader["Favorite"],
-                                    isAvailable = reader["isAvailable"].ToString(),
+                                    ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                    CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Description = reader.GetString(reader.GetOrdinal("Description")),
+                                    Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                    Stock = reader.GetInt32(reader.GetOrdinal("Stock")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                    Category = reader.GetString(reader.GetOrdinal("Category")),
+                                    Rating = Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("Rating"))),
+                                    Favorite = reader.GetInt32(reader.GetOrdinal("Favorite")),
+                                    Clicked = reader.GetInt32(reader.GetOrdinal("Clicked")),
+                                    isAvailable = reader.GetString(reader.GetOrdinal("isAvailable")),
                                     Images = new List<string>()
                                 };
-                                products.Add(product);
+                                modelForUserPages.newestProducts.Add(product);
                             }
                         }
                     }
-                }
 
-                // İkinci bağlantıyı kullanarak resimleri okuyun
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    string imageQuery = "SELECT ProductId, ImageURL FROM ProductImages";
+
+                    
+                    imageQuery = "SELECT ProductId, ImageURL FROM ProductImages";
                     using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -337,7 +264,7 @@ namespace myProject.Models
                                     string imageUrl = reader["ImageURL"].ToString();
 
                                     // İlgili ürünü bul ve resim ekle
-                                    ProductModel product = products.FirstOrDefault(p => p.ProductId == productId);
+                                    ProductModel product = modelForUserPages.newestProducts.FirstOrDefault(p => p.ProductId == productId);
                                     if (product != null && !product.Images.Contains(imageUrl)) // Check if image already exists
                                     {
                                         product.Images.Add(imageUrl);
@@ -346,6 +273,102 @@ namespace myProject.Models
                             }
                         }
                     }
+
+
+
+                    // GetRandomComments
+                   List<ProductReviewModel> productReviews = new List<ProductReviewModel>();
+
+                   query = "SELECT Id, ProductId, CompanyId, UserId, Rating, Review, CreatedAt FROM Reviews\r\n";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                productReviews.Add(new ProductReviewModel
+                                {
+                                    ReviewId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                    CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                    UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                                    Rating = reader.GetInt32(reader.GetOrdinal("Rating")),
+                                    Review = reader.GetString(reader.GetOrdinal("Review")),
+                                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                });
+
+                            }
+                            
+                        }
+                    }
+
+
+                    // Select 4 random reviews from the productReviews list
+                    Random rnd = new Random();
+                    modelForUserPages.randomlySelectedReviewModel = productReviews.OrderBy(x => rnd.Next()).Take(4).ToList();
+
+
+                    for(int i=0; i<modelForUserPages.randomlySelectedReviewModel.Count; i++)
+                    {
+                        query = @"
+                        SELECT *
+                        FROM Products WHERE isAvailable = 'true' AND ProductId = @ProductId";
+
+
+                        using (SqlCommand cmd = new SqlCommand(query, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@ProductId", modelForUserPages.randomlySelectedReviewModel[i].ProductId);
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    ProductModel product = new ProductModel
+                                    {
+                                        ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                        CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                        Name = reader.GetString(reader.GetOrdinal("Name")),
+                                        Description = reader.GetString(reader.GetOrdinal("Description")),
+                                        Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                        Stock = reader.GetInt32(reader.GetOrdinal("Stock")),
+                                        CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                        Category = reader.GetString(reader.GetOrdinal("Category")),
+                                        Rating = Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("Rating"))),
+                                        Favorite = reader.GetInt32(reader.GetOrdinal("Favorite")),
+                                        Clicked = reader.GetInt32(reader.GetOrdinal("Clicked")),
+                                        isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"))
+                                    };
+                                    modelForUserPages.randomlySelectedProductModel.Add(product);
+                                }
+                            }
+                        }
+                    }
+
+
+
+                    for (int i = 0; i < modelForUserPages.randomlySelectedReviewModel.Count; i++)
+                    {
+                        query = "SELECT ProductId, ImageURL FROM ProductImages WHERE ProductId = @ProductId";
+                        using (SqlCommand cmd = new SqlCommand(query, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@ProductId", modelForUserPages.randomlySelectedReviewModel[i].ProductId);
+
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                if (reader.HasRows) // Check if there are rows returned by the query
+                                {
+                                    while (reader.Read())
+                                    {
+                                        int productId = (int)reader["ProductId"];
+                                        string imageUrl = reader["ImageURL"].ToString();
+
+                                        modelForUserPages.randomlySelectedProductModel[i].Images.Add(imageUrl);
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
                 }
             }
             catch (Exception ex)
@@ -353,10 +376,9 @@ namespace myProject.Models
                 Console.WriteLine("Error while reading products: " + ex.Message);
             }
 
-            return products;
+            return modelForUserPages;
 
         }
-
 
 
 
@@ -388,7 +410,7 @@ namespace myProject.Models
 
                     query = @"
                         SELECT *
-                        FROM Products where ProductId = @productId";
+                        FROM Products where ProductId = @productId and isAvailable = 'true'";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
@@ -606,7 +628,8 @@ namespace myProject.Models
                         SELECT *
                         FROM Products
                         WHERE Category = @category
-                        AND ProductId != @excludedProductId";
+                        AND ProductId != @excludedProductId
+                        AND  isAvailable = 'true'";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
@@ -808,7 +831,7 @@ namespace myProject.Models
                     string queryProducts = @"
                     SELECT *
                     FROM Products
-                    WHERE ProductId = @ProductId";
+                    WHERE ProductId = @ProductId AND isAvailable = 'true'";
 
 
                     using (SqlCommand cmd = new SqlCommand(queryProducts, conn))
@@ -958,7 +981,7 @@ namespace myProject.Models
                     string queryProducts = @"
                     SELECT *
                     FROM Products
-                    WHERE ProductId = @ProductId";
+                    WHERE ProductId = @ProductId AND isAvailable = 'true'";
 
 
                     using (SqlCommand cmd = new SqlCommand(queryProducts, conn))
@@ -1066,7 +1089,7 @@ namespace myProject.Models
                 queryProductIds = @"
                     SELECT CompanyId
                     FROM Products
-                    WHERE ProductId = @productId";
+                    WHERE ProductId = @productId AND isAvailable = 'true'";
 
                 using (SqlCommand cmd = new SqlCommand(queryProductIds, conn))
                 {
@@ -1352,7 +1375,7 @@ namespace myProject.Models
                     string productDetailsQuery = @"
                     SELECT *
                     FROM Products
-                    WHERE ProductId IN (" + string.Join(",", productIds) + ")";
+                    WHERE ProductId IN (" + string.Join(",", productIds) + ") AND isAvailable = 'true'";
 
                     using (SqlCommand cmd = new SqlCommand(productDetailsQuery, conn))
                     {
@@ -1392,7 +1415,7 @@ namespace myProject.Models
                         SELECT p.Category, pi.ImageUrl
                         FROM Products p
                         LEFT JOIN ProductImages pi ON p.ProductId = pi.ProductId
-                        WHERE p.ProductId = @productId";
+                        WHERE p.ProductId = @productId AND p.isAvailable = 'true'";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
@@ -1737,7 +1760,7 @@ namespace myProject.Models
                     conn.Open();
 
                     // Ürünleri kategoriye göre filtreleyen sorgu
-                    string productQuery = "SELECT * FROM Products WHERE Category = @Category";
+                    string productQuery = "SELECT * FROM Products WHERE Category = @Category AND isAvailable = 'true'";
                     using (SqlCommand cmd = new SqlCommand(productQuery, conn))
                     {
                         cmd.Parameters.AddWithValue("@Category", category);
@@ -1899,7 +1922,7 @@ namespace myProject.Models
                     }
 
 
-                    string productQuery = "SELECT * FROM Products WHERE CompanyId = @CompanyId";
+                    string productQuery = "SELECT * FROM Products WHERE CompanyId = @CompanyId AND isAvailable = 'true'";
                     using (SqlCommand cmd = new SqlCommand(productQuery, conn))
                     {
                         cmd.Parameters.AddWithValue("@CompanyId", companyId);
@@ -1936,7 +1959,7 @@ namespace myProject.Models
                         SELECT p.Category, pi.ImageUrl
                         FROM Products p
                         LEFT JOIN ProductImages pi ON p.ProductId = pi.ProductId
-                        WHERE p.ProductId = @productId";
+                        WHERE p.ProductId = @productId AND p.isAvailable = 'true'";
 
                         using (SqlCommand cmd = new SqlCommand(query, conn))
                         {
@@ -2101,12 +2124,16 @@ namespace myProject.Models
 
         /* ------------------------------------------------------------------------------------------------------------- */
         /* Like Button */
-        public void LikeButton(int? userId,int productId)
+        public void LikeButton(int? userId, int productId)
         {
-
             string insertQuery = @"
-                INSERT INTO ProductsLiked (UserId, ProductId, CreatedAt)
-                VALUES (@UserId, @ProductId, GETDATE())";
+        INSERT INTO ProductsLiked (UserId, ProductId, CreatedAt)
+        VALUES (@UserId, @ProductId, GETDATE())";
+
+            string updateFavoriteQuery = @"
+        UPDATE Products
+        SET Favorite = Favorite + 1
+        WHERE ProductId = @ProductId";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -2118,9 +2145,9 @@ namespace myProject.Models
                     {
                         // Check if the user already likes this product
                         string checkQuery = @"
-                            SELECT COUNT(*)
-                            FROM ProductsLiked
-                            WHERE UserId = @UserId AND ProductId = @ProductId";
+                    SELECT COUNT(*)
+                    FROM ProductsLiked
+                    WHERE UserId = @UserId AND ProductId = @ProductId";
 
                         using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn, transaction))
                         {
@@ -2138,6 +2165,13 @@ namespace myProject.Models
                                     insertCmd.Parameters.AddWithValue("@ProductId", productId);
                                     insertCmd.ExecuteNonQuery();
                                 }
+
+                                // Update the Favorite count in the Products table
+                                using (SqlCommand updateCmd = new SqlCommand(updateFavoriteQuery, conn, transaction))
+                                {
+                                    updateCmd.Parameters.AddWithValue("@ProductId", productId);
+                                    updateCmd.ExecuteNonQuery();
+                                }
                             }
                         }
                         transaction.Commit();
@@ -2148,8 +2182,9 @@ namespace myProject.Models
                         throw;
                     }
                 }
-                }
             }
+        }
+
 
 
 
@@ -2185,27 +2220,69 @@ namespace myProject.Models
         }
 
 
+        /* -------------------------------------------------------------------------------------------------------------- */
+        /* Dislike */
         public void UnlikeButton(int? userId, int productId)
         {
-            Console.WriteLine(productId);
-
-            string query = @"
+            string deleteQuery = @"
             DELETE FROM ProductsLiked
             WHERE ProductId = @ProductId AND UserId = @UserId";
+
+            string updateFavoriteQuery = @"
+            UPDATE Products
+            SET Favorite = Favorite - 1
+            WHERE ProductId = @ProductId";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlTransaction transaction = conn.BeginTransaction())
                 {
-                    cmd.Parameters.AddWithValue("@ProductId", productId);
-                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    try
+                    {
+                        // Check if the user has liked this product
+                        string checkQuery = @"
+                        SELECT COUNT(*)
+                        FROM ProductsLiked
+                        WHERE UserId = @UserId AND ProductId = @ProductId";
 
-                    cmd.ExecuteNonQuery();
+                        using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn, transaction))
+                        {
+                            checkCmd.Parameters.AddWithValue("@UserId", userId);
+                            checkCmd.Parameters.AddWithValue("@ProductId", productId);
+
+                            int count = (int)checkCmd.ExecuteScalar();
+
+                            // If the user has liked this product, delete the like
+                            if (count > 0)
+                            {
+                                using (SqlCommand deleteCmd = new SqlCommand(deleteQuery, conn, transaction))
+                                {
+                                    deleteCmd.Parameters.AddWithValue("@ProductId", productId);
+                                    deleteCmd.Parameters.AddWithValue("@UserId", userId);
+                                    deleteCmd.ExecuteNonQuery();
+                                }
+
+                                // Update the Favorite count in the Products table
+                                using (SqlCommand updateCmd = new SqlCommand(updateFavoriteQuery, conn, transaction))
+                                {
+                                    updateCmd.Parameters.AddWithValue("@ProductId", productId);
+                                    updateCmd.ExecuteNonQuery();
+                                }
+                            }
+                        }
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
                 }
             }
         }
+
 
 
 
@@ -2227,7 +2304,7 @@ namespace myProject.Models
 
                     for (int i = 0; i < productIds.Count; ++i)
                     {
-                        string productQuery = "SELECT * FROM Products Where ProductId = @ProductId";
+                        string productQuery = "SELECT * FROM Products Where ProductId = @ProductId AND isAvailable = 'true'";
                         using (SqlCommand cmd = new SqlCommand(productQuery, conn))
                         {
                             cmd.Parameters.AddWithValue("@ProductId", productIds[i]);

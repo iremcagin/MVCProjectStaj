@@ -17,6 +17,16 @@ namespace myProject.Models
         public static List<int> productsLiked = new List<int>();
 
 
+        // Ana sayfa
+        public List<ProductModel> mostClickedProducts = new List<ProductModel>();
+        public List<CompanyModel> mostClickedProductsCompanyInfo = new List<CompanyModel>();
+
+        public List<ProductModel> newestProducts = new List<ProductModel>();
+
+        public List<ProductReviewModel> randomlySelectedReviewModel = new List<ProductReviewModel>();
+        public List<ProductModel> randomlySelectedProductModel = new List<ProductModel>();
+
+
         // User Product Details için
         public List<ProductModel>  recommendatitons = new List<ProductModel>();
 

@@ -22,22 +22,16 @@ namespace myProject.Controllers
                 return Json(0);
             }
 
-            List<ProductModel> products = userDatabaseControlModel.getAllProducts();
-            List<ProductModel> mostClickedProducts = userDatabaseControlModel.GetMostClickedProducts();
-            List<ProductModel> newestProducts = userDatabaseControlModel.GetNewestProducts();
 
-
-            // ViewBag kullanarak view'a veri gönderme
-            ViewBag.Products = products;
-            ViewBag.MostClickedProducts = mostClickedProducts;
-            ViewBag.NewestProducts = newestProducts;
+            ModelForUserPages modelForUserPages = new ModelForUserPages();
+            modelForUserPages = userDatabaseControlModel.HomePageProducts();
 
 
             ModelForUserPages.companies = userDatabaseControlModel.GetAllCompanies();
             ModelForUserPages.productsLiked = userDatabaseControlModel.GetLikedProductIds(userId);
 
 
-            return View();
+            return View(modelForUserPages);
         }
 
 

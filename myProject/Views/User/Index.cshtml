@@ -2,9 +2,6 @@
 @{
     ViewData["Title"] = "User";
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
-    var allProducts = ViewBag.Products as List<ProductModel>;
-    var mostClickedProducts = ViewBag.MostClickedProducts as List<ProductModel>;
-    var newestProducts = ViewBag.NewestProducts as List<ProductModel>;
 }
 
 
@@ -35,17 +32,17 @@
 
 
 <!-- Most Viewed -->
-<h3 class="mb-4" style="border-bottom: 1px solid black; font-size: 20px;">Top 5 Most Viewed Products</h3>
+<h3 class="mb-4 col-md-12" style="border-bottom: 1px solid black; font-size: 20px;">Top 5 Most Viewed Products</h3>
 
 <div id="mostViewedCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
-        @if (mostClickedProducts != null && mostClickedProducts.Any())
+        @if (Model.mostClickedProducts != null && Model.mostClickedProducts.Any())
         {
-            @foreach (var product in mostClickedProducts)
+            @foreach (var product in Model.mostClickedProducts)
             {
-                <div class="carousel-item @(product == mostClickedProducts.First() ? "active" : "")">
+                <div class="carousel-item @(product == Model.mostClickedProducts.First() ? "active" : "")">
                     <div class="container-fluid">
-                        <div class="row p-3">
+                        <div class="row p-3 col-md-12">
                             <!-- Image -->
                             <div class="col-md-8 order-md-1">
                                 @if (product.Images.Count > 0)
@@ -109,7 +106,7 @@
                                     <img src="~/images/company_logo.png" class="img-fluid rounded" style="max-width: 50px; max-height: 50px;" alt="Logo">
                                     <div class="ms-3">
                                         <h6 style="font-size: 14px;">Company Name</h6>
-                                        <h6 style="font-size: 14px;"><i class="las la-map-marker"></i> Location</h6>
+                                        <h6 style="font-size: 14px;"><i class="las la-map-marker"></i></h6>
                                     </div>
                                     <!-- Views, Likes -->
                                     <div class="ms-auto">
@@ -137,7 +134,7 @@
 
     <!-- Indicators -->
     <ol class="carousel-indicators">
-        @for (int i = 0; i < mostClickedProducts.Count; i++)
+        @for (int i = 0; i < Model.mostClickedProducts.Count; i++)
         {
             <li data-bs-target="#mostViewedCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"></li>
         }
@@ -146,18 +143,56 @@
 
 
 
+
+
+
+
+
+<!-- Companies  -->
+<div class="container" style="margin-top:300px;">
+    <div class="row">
+        @if (ModelForUserPages.companies.Count > 0)
+        {
+            @foreach (var company in ModelForUserPages.companies)
+            {
+                @if (company.isHighlighed == "true")
+                {
+                    <div class="col-md-3 mb-4">
+                        <div class="card h-100 position-relative">
+                            <a href="@Url.Action("CompanyDetails", "User", new { id = company.CompanyId })">
+                                <img class="card-img-top" src="@Url.Content(string.IsNullOrEmpty(company.BannerUrl) ? "~/images/placeholder-1.png" : "~/images/_Banners/" + company.BannerUrl)" alt="Banner">
+                                <img class="logo-img position-absolute" src="@Url.Content(string.IsNullOrEmpty(company.LogoUrl) ? "~/images/placeholder-1.png" : "~/images/_Logos/" + company.LogoUrl)" alt="Logo">
+                            </a>
+                            <div class="card-body" style="text-align:center;">
+                                <h5 class="card-title">@company.CompanyName</h5>
+                                <p class="card-text  review-text">@company.Description</p>
+                                <!--p class="card-text"><small class="text-muted">Rating: @company.Rating</small></!--p-->
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        }
+    </div>
+</div>
+
+
+
+
+
+
 <!-- Sliding Divs -->
-<div class="side-panel-container" style="margin-top: 200px; height:400px;">
+<div class="side-panel-container" style="margin-top: 200px; height:1000px;">
     <!-- Left Panel -->
     <div class="side-panel left-panel d-flex flex-column">
         <h5 style="border-bottom:1px solid black">Latest Products</h5>
 
-        <div class="row p-2 mt-2">
-            @if (ViewBag.NewestProducts != null && ViewBag.NewestProducts.Count > 0)
+        <div class="row p-2 mt-2 col-md-12">
+            @if (Model.newestProducts != null && Model.newestProducts.Count > 0)
             {
-                foreach (var product in ViewBag.NewestProducts)
+                foreach (var product in Model.newestProducts)
                 {
-                    <div class="col-6 col-md-3">
+                    <div class="col-6">
                         <div class="card" style="max-width: 180px; min-height: 300px;">
                             @if (product.Images.Count > 0)
                             {
@@ -260,10 +295,87 @@
 
 
 
+
+
     <!-- Right Panel -->
-    <div class="side-panel right-panel d-flex flex-column p-2">
+    <div class="side-panel right-panel d-flex flex-column p-2 col-md-8">
         <h5 style="border-bottom:1px solid black"> Product Reviews</h5>
+
         <!-- Product Reviews Content -->
+        <div class="container-fluid ">
+            <div class="row">
+                @for (int i = 0; i < Model.randomlySelectedReviewModel.Count; i++)
+                {
+                    var review = Model.randomlySelectedReviewModel[i];
+                    var product = Model.randomlySelectedProductModel[i];
+                    <div class="col-md-3">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header d-flex justify-content-between">
+                                <p class="my-0 font-weight-normal" style="font-size:17px;"><strong>@product.Name</strong></p>
+                                <p class="card-text" style="font-size:17px;">
+                                    <strong>
+                                    $@product.Price
+                                </strong>
+
+                    </p>
+                            </div>
+                            <div class="card-body">
+                                <div id="carouselExampleIndicators@i" class="carousel slide" data-ride="carousel">
+                                   
+                                    <div class="carousel-inner">
+                                        @for (int j = 0; j < product.Images.Count; j++)
+                                        {
+                                            <div class="carousel-item @(j == 0 ? "active" : "")">
+                                                <a href="/User/ProductDetails/@product.ProductId" class="">
+                                                    <img class="d-block w-100" src="~/images/@product.Category/@product.Images[j]" alt="Product Image @j">
+                                                </a>
+                                            </div>
+                                        }
+                                    </div>
+                                    <a class="carousel-control-prev" href="#carouselExampleIndicators@i" role="button" data-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                    <a class="carousel-control-next" href="#carouselExampleIndicators@i" role="button" data-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </div>
+                                <p class="card-text review-text">@product.Description</p>
+                                <p class="card-text">
+                                    <strong>Rating:</strong> @if (@product.Rating >= 0 && @product.Rating <= 5)
+                                    {
+
+                                        var fullStars = (int)Math.Floor(@product.Rating);
+                                        var halfStar = (@product.Rating - fullStars) >= 0.5;
+                                        // Boş yıldızların sayısı
+                                        var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+                                        for (int k = 0; k < fullStars; k++)
+                                        {
+                                            <i class="las la-star" style="color: #ffd700"></i>
+                                        }
+
+                                        if (halfStar)
+                                        {
+                                            <i class="las la-star-half-alt" style="color: #ffd700"></i>
+                                        }
+
+                                        for (int k = 0; i < emptyStars; k++)
+                                        {
+                                            <span class="las la-star" style="color: lightgrey"></span>
+                                        }
+                                    }
+                                </p>
+                                <p class="card-text review-text"><strong>Review:</strong> @review.Review</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+
+
     </div>
     <div>
     </div>
@@ -277,31 +389,6 @@
 
 
 
-<!-- Companies  -->
-<div class="container" style="margin-top:200px;">
-    <div class="row">
-        @if(ModelForUserPages.companies.Count > 0){
-            @foreach (var company in ModelForUserPages.companies)
-            {
-                @if(company.isHighlighed == "true"){
-                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                        <div class="card h-100 position-relative">
-                            <a href="@Url.Action("CompanyDetails", "User", new { id = company.CompanyId })">
-                                <img class="card-img-top" src="@Url.Content(string.IsNullOrEmpty(company.BannerUrl) ? "~/images/placeholder-1.png" : "~/images/_Banners/" + company.BannerUrl)" alt="Banner">
-                                <img class="logo-img position-absolute" src="@Url.Content(string.IsNullOrEmpty(company.LogoUrl) ? "~/images/placeholder-1.png" : "~/images/_Logos/" + company.LogoUrl)" alt="Logo">
-                            </a>
-                            <div class="card-body" style="text-align:center;">
-                                <h5 class="card-title">@company.CompanyName</h5>
-                                <p class="card-text">@company.Description</p>
-                                <!--p class="card-text"><small class="text-muted">Rating: @company.Rating</small></!--p-->
-                            </div>
-                        </div>
-                    </div>
-                }
-            }
-        }
-     </div>
-</div>
 
 
 
@@ -311,19 +398,6 @@
 
 
 
-
-
-
-
-
-
-<!-- Search Button -->
-<div class="container mb-2 col-md-6" style="margin-top:200px;">
-    <form class="d-flex ">
-        <input class="form-control me-2 no-outline" type="search" placeholder="Search for Product..." aria-label="Search">
-        <button class="btn btn-outline-primary" type="submit"><i class="las la-search"></i></button>
-    </form>
-</div>
 
 
 <style>
@@ -340,6 +414,15 @@
         text-overflow: ellipsis;
         white-space: normal; /* Satırların kaydırılmasına izin verir */
     }
+
+        .review-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 5; /* Number of lines before truncation */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
 
 </style>
 
