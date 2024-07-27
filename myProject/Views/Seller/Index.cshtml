@@ -1,9 +1,267 @@
-﻿@{
-    ViewData["Title"] = "Dashboard";
+﻿@model myProject.Models.ModelForSellerPages
+
+@{
+    ViewData["Title"] = "Seller";
     Layout = "~/Views/Shared/_LayoutSeller.cshtml";
 }
 
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
 
-<div class="text-center">
-    <p>fvghbjnmklşöç</p>
+
+<div class="container" style="overflow-y:scroll; max-height:650px; overflow-x:hidden;">
+    <div class="row mb-4 justify-content-between">
+        <!-- Statistics Overview -->
+        <div class="row col-md-8">
+            <div class="d-flex flex-column">
+                <div class="d-flex justify-content-around">
+                    <div class=" mb-3 col-md-4">
+                        <div class="card border-primary shadow-sm">
+                            <div class="card-body text-center text-primary">
+                                <i class="la la-star fa-2x"></i> <!-- Icon for Companies -->
+                                <h5 class="card-title mt-2">Average Rating</h5>
+                                <p class="card-text display-5">@Model.AverageRating</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class=" mb-3 col-md-4">
+                        <div class="card border-success shadow-sm">
+                            <div class="card-body text-center text-success">
+                                <i class="la la-box fa-2x"></i> <!-- Icon for Products -->
+                                <h5 class="card-title mt-2">Total Products</h5>
+                                <p class="card-text display-5">@Model.TotalProducts</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-around">
+                    <div class=" mb-3 col-md-4">
+                        <div class="card border-warning shadow-sm">
+                            <div class="card-body text-center text-warning">
+                                <i class="la la-comments fa-2x"></i> <!-- Icon for Reviews -->
+                                <h5 class="card-title mt-2">Total Reviews</h5>
+                                <p class="card-text display-5">@Model.TotalReviews</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3 col-md-4">
+                        <div class="card border-danger shadow-sm">
+                            <div class="card-body text-center text-danger">
+                                <i class="la la-users fa-2x"></i> <!-- Icon for Users -->
+                                <h5 class="card-title mt-2">Total Users</h5>
+                                <p class="card-text display-5">@Model.TotalUsers</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Sales by Category</h5>
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <!-- User Registration Trends -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Daily Sales</h5>
+                    <canvas id="dailySalesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Daily Revenue</h5>
+                    <canvas id="dailyRevenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5" style="margin-top:80px;">
+        <!-- Top Products -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-light rounded">
+                <!-- Image -->
+                <img src="@(Model.mostReviewedProduct.Images.Count > 0 ? Url.Content("~/images/" + Model.mostReviewedProduct.Category + "/" + Model.mostReviewedProduct.Images[0]) : Url.Content("~/images/placeholder-1.png"))" class="card-img-top img-fluid" alt="Most Reviewed Product">
+
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-center">Most Reviewed Product</h5>
+                    <p class="card-text text-center flex-grow-1">@Model.mostReviewedProduct.Name</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-light rounded">
+                <!-- Image -->
+                <img src="@(Model.mostLikedProduct.Images.Count > 0 ? Url.Content("~/images/" + Model.mostLikedProduct.Category + "/" + Model.mostLikedProduct.Images[0]) : Url.Content("~/images/placeholder-1.png"))" class="card-img-top img-fluid" alt="Most Liked Product">
+
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-center">Most Liked Product</h5>
+                    <p class="card-text text-center flex-grow-1">@Model.mostLikedProduct.Name</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-light rounded">
+                <!-- Image -->
+                <img src="@(Model.mostPurchasedProduct.Images.Count > 0 ? Url.Content("~/images/" + Model.mostPurchasedProduct.Category + "/" + Model.mostPurchasedProduct.Images[0]) : Url.Content("~/images/placeholder-1.png"))" class="card-img-top img-fluid" alt="Most Purchased Product">
+
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-center">Most Purchased Product</h5>
+                    <p class="card-text text-center flex-grow-1">@Model.mostPurchasedProduct.Name</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-light rounded">
+                <!-- Image -->
+                <img src="@(Model.mostClickedProduct.Images.Count > 0 ? Url.Content("~/images/" + Model.mostClickedProduct.Category + "/" + Model.mostClickedProduct.Images[0]) : Url.Content("~/images/placeholder-1.png"))" class="card-img-top img-fluid" alt="Most Clicked Product">
+
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-center">Most Clicked Product</h5>
+                    <p class="card-text text-center flex-grow-1">@Model.mostClickedProduct.Name</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
+
+
+
+
+
+
+<style>
+    .card {
+        height: 100%;
+    }
+
+    .card-img-top {
+        object-fit: cover; /* Ensures image covers the area without distortion */
+        height: 150px; /* Set a fixed height for uniformity */
+    }
+
+    #pieChart {
+        width: 100%;
+        height: 200px;
+    }
+
+</style>
+
+
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const dailySales = @Html.Raw(Json.Serialize(Model.DailySales));
+        const dailyRevenues = @Html.Raw(Json.Serialize(Model.DailyRevenues));
+
+        console.log("Daily Sales:", dailySales);
+        console.log("Daily Revenues:", dailyRevenues);
+
+
+        // Line Chart for Daily Sales
+        const ctxSales = document.getElementById('dailySalesChart').getContext('2d');
+        const salesChart = new Chart(ctxSales, {
+            type: 'line',
+            data: {
+                labels: dailySales.map(s => `${s.day}/${s.month}`),
+                datasets: [{
+                    label: 'Daily Sales',
+                    data: dailySales.map(s => s.salesCount),
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Line Chart for Daily Revenue
+        const ctxRevenue = document.getElementById('dailyRevenueChart').getContext('2d');
+        const revenueChart = new Chart(ctxRevenue, {
+            type: 'line',
+            data: {
+                labels: dailyRevenues.map(dr => `${dr.day}/${dr.month}`),
+                datasets: [{
+                    label: 'Daily Revenue',
+                    data: dailyRevenues.map(dr => dr.dailyRevenueAmount),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+
+
+        var ctx = document.getElementById('pieChart').getContext('2d');
+        var salesByCategory = @Html.Raw(Json.Serialize(Model.salesByCategory));
+
+        console.log("salesByCategory:", salesByCategory);
+
+
+        var labels = salesByCategory.map(item => item.category);
+        var data = salesByCategory.map(item => item.totalSales);
+
+
+        var pieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Sales by Category',
+                    data: data,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw + ' sales';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+
+    });
+</script>
+
+

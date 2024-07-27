@@ -1,20 +1,17 @@
-﻿using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using myProject.Models;
-using System.Reflection;
-using static System.Net.Mime.MediaTypeNames;
 using System.IO;
-using System.Web;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
 namespace myProject.Controllers
 {
-    public class SellerController : Microsoft.AspNetCore.Mvc.Controller
+    public class SellerController : Controller
     {
         private readonly _SellerDatabaseControlModel databaseControlModel;
-
-
 
         /* --------------------------------------------------- Constructor --------------------------------------------------- */
         public SellerController()
@@ -22,41 +19,78 @@ namespace myProject.Controllers
             databaseControlModel = new _SellerDatabaseControlModel();
         }
 
-
-
         /* --------------------------------------------------- Dashboard Page --------------------------------------------------- */
         public IActionResult Index()
         {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
 
-            return View();
+            var companyInfo = databaseControlModel.GetCompanyInfo(userId);
+            if (companyInfo == null)
+            {
+                ViewBag.companyInfo = null;
+            }
+            else
+            {
+                ViewBag.companyInfo = companyInfo;
+            }
+
+            ModelForSellerPages modelForSellerPages = databaseControlModel.Dashboard(userId);
+
+            return View(modelForSellerPages);
         }
+
 
         /* --------------------------------------------------- Products Page --------------------------------------------------- */
         public IActionResult Products(List<ProductModel> products_ = null, int page = 1, int pageSize = 7)
         {
             ModelForSellerPages modelForSellerPages = new ModelForSellerPages();
-            
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(0);
+            }
+
             if (products_ == null)
             {
-                // Veri tabanından tüm ürünleri çek
-                modelForSellerPages.products = databaseControlModel.getAllProducts();
+                modelForSellerPages.products = databaseControlModel.getAllProducts(userId);
             }
             else
             {
                 modelForSellerPages.products = products_;
             }
 
+
+            var companyInfo = databaseControlModel.GetCompanyInfo(userId);
+            if (companyInfo == null)
+            {
+                ViewBag.companyInfo = null;
+            }
+            else
+            {
+                ViewBag.companyInfo = companyInfo;
+            }
+
+
+
             modelForSellerPages.categories = databaseControlModel.getAllCategories();
 
-            
-            // Sayfalama işlemleri
-            var pagedProducts = modelForSellerPages.products.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-            ViewBag.TotalPages = (int)Math.Ceiling((double)modelForSellerPages.products.Count / pageSize);
+            int totalProducts = modelForSellerPages.products?.Count ?? 0;
+            var pagedProducts = new List<ProductModel>();
+
+            if (totalProducts > 0)
+            {
+                pagedProducts = modelForSellerPages.products.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            }
+
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
             ViewBag.CurrentPage = page;
 
-            return View(modelForSellerPages);  
+            return View(modelForSellerPages);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> AddNewProduct(List<IFormFile> images, ProductModel model)
@@ -64,8 +98,24 @@ namespace myProject.Controllers
             try
             {
                 string availability = model.isAvailable;
-                if (availability == "available") model.isAvailable = "true";
-                else model.isAvailable = "false";   
+                model.isAvailable = availability == "available" ? "true" : "false";
+
+                int? userId = HttpContext.Session.GetInt32("UserId");
+                if (userId == null)
+                {
+                    return Json(0);
+                }
+
+
+                var companyInfo = databaseControlModel.GetCompanyInfo(userId);
+                if (companyInfo == null)
+                {
+                    ViewBag.companyInfo = null;
+                }
+                else
+                {
+                    ViewBag.companyInfo = companyInfo;
+                }
 
 
                 foreach (var image in images)
@@ -87,7 +137,7 @@ namespace myProject.Controllers
                         model.Images.Add(fileName);
                     }
                 }
-                databaseControlModel.saveProductToDatabase(model);
+                databaseControlModel.saveProductToDatabase(model, userId);
                 return RedirectToAction("Products");
             }
             catch (Exception ex)
@@ -97,15 +147,112 @@ namespace myProject.Controllers
             }
         }
 
-
-
         /* --------------------------------------------------- Navbar --------------------------------------------------- */
-        public IActionResult Signout()
+        public JsonResult Signout()
         {
             HttpContext.Session.Remove("UserId");
-            return RedirectToAction("Index", "Guest");
+            return Json(new { success = true, message = "Signed out successfully" });
         }
 
+        /* --------------------------------------------------- Orders Page --------------------------------------------------- */
+        public IActionResult Orders(int page = 1, int pageSize = 7)
+        {
+            ModelForSellerPages modelForSellerPages = new ModelForSellerPages();
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(0);
+            }
+            modelForSellerPages.orders = databaseControlModel.GetAllOrders(userId);
 
+            int totalProducts = modelForSellerPages.orders?.Count ?? 0;
+            var pagedProducts = new List<ProductModel>();
+            if (totalProducts > 0)
+            {
+                pagedProducts = modelForSellerPages.orders.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            }
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
+            ViewBag.CurrentPage = page;
+
+            var companyInfo = databaseControlModel.GetCompanyInfo(userId);
+            if (companyInfo == null)
+            {
+                ViewBag.companyInfo = null;
+            }
+            else
+            {
+                ViewBag.companyInfo = companyInfo;
+            }
+
+            return View(modelForSellerPages);
+        }
+
+        /* --------------------------------------------------- Customers Page --------------------------------------------------- */
+        public IActionResult Customers(int page = 1, int pageSize = 10)
+        {
+            ModelForSellerPages modelForSellerPages = new ModelForSellerPages();
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(0);
+            }
+            modelForSellerPages.customers = databaseControlModel.GetAllCustomers(userId);
+
+            int totalProducts = modelForSellerPages.customers?.Count ?? 0;
+            var pagedProducts = new List<UserModel>();
+            if (totalProducts > 0)
+            {
+                pagedProducts = modelForSellerPages.customers.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            }
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
+            ViewBag.CurrentPage = page;
+
+
+            var companyInfo = databaseControlModel.GetCompanyInfo(userId);
+            if (companyInfo == null)
+            {
+                ViewBag.companyInfo = null;
+            }
+            else
+            {
+                ViewBag.companyInfo = companyInfo;
+            }
+
+            return View(modelForSellerPages);
+        }
+
+        /* --------------------------------------------------- Followers Page --------------------------------------------------- */
+        public IActionResult Followers(int page = 1, int pageSize = 10)
+        {
+            ModelForSellerPages modelForSellerPages = new ModelForSellerPages();
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(0);
+            }
+            modelForSellerPages.followers = databaseControlModel.GetAllFollowers(userId);
+
+            int totalProducts = modelForSellerPages.followers?.Count ?? 0;
+            var pagedProducts = new List<UserModel>();
+            if (totalProducts > 0)
+            {
+                pagedProducts = modelForSellerPages.followers.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            }
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
+            ViewBag.CurrentPage = page;
+
+
+            var companyInfo = databaseControlModel.GetCompanyInfo(userId);
+            if (companyInfo == null)
+            {
+                ViewBag.companyInfo = null;
+            }
+            else
+            {
+                ViewBag.companyInfo = companyInfo;
+            }
+
+            return View(modelForSellerPages);
+        }
     }
 }

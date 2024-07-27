@@ -1,0 +1,77 @@
+﻿@model myProject.Models.ModelForSellerPages
+
+@{
+    ViewData["Title"] = "Seller";
+    Layout = "~/Views/Shared/_LayoutSeller.cshtml";
+
+    int totalPages = ViewBag.TotalPages;
+    int currentPage = ViewBag.CurrentPage;
+}
+
+
+
+
+
+<div class="" style="max-height:600px; overflow-y:auto;">
+    <table class="table table-bordered p-2">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">User ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Surname</th>
+                <th scope="col">Phone Number</th>
+                <th scope="col">Email</th>
+                <th scope="col">Address</th>
+                <th scope="col">Role</th>
+                <th scope="col">Birthdate</th>
+                <th scope="col">Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.followers)
+            {
+                <tr>
+                    <td>@user.UserId</td>
+                    <td>@user.Name</td>
+                    <td>@user.Surname</td>
+                    <td>@user.PhoneNumber</td>
+                    <td>@user.Email</td>
+                    <td>@user.Address</td>
+                    <td>@user.Role</td>
+                    <td>@user.Birthdate.ToString("yyyy-MM-dd")</td>
+                    <td>@user.CreatedAt.ToString("yyyy-MM-dd")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between align-items-center">
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm">
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Followers", "Seller", new { page = i })">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+<style>
+
+    table th {
+        font-size: 14px;
+        text-align: center;
+    }
+
+    table td {
+        text-align: center;
+        font-size: 13px;
+    }
+
+</style>

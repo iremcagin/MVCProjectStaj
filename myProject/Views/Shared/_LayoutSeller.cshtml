@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -35,22 +36,38 @@
                     <div style="width:25px;"></div>
                     <!-- Sol tarafta resim --> 
                     <div class="poppins text-center" style="color:#fefefe; width:45px; height:45px;">
-                        <img src="~/images/user.jpg" class="img-fluid rounded-circle" alt="image">
+                        @if (ViewBag.companyInfo != null)
+                        {
+                            <img src="~/images/_Logos/@ViewBag.companyInfo.Company.LogoUrl" class="img-fluid rounded-circle" alt="image">
+                        }
+                        else
+                        {
+                            <img src="~/images/placeholder-1.png" class="img-fluid rounded-circle" alt="image">
+                        }
                     </div>
                     <!-- Sağ tarafta mağaza adı ve satıcı ismi -->
                     <div class=" " style="margin-left:10px; margin-right:5px; justify-content:center;">
-                        <h6 class="poppins" style="color:#fefefe;  margin-top:3px; margin-bottom:-1px;">Mağaza Adı</h6>
-                        <h6 class="poppins" style="color:#fefefe; font-size:13px;">Satıcı İsmi</h6>
+                        @if (ViewBag.companyInfo != null)
+                        {
+                            <h6 class="poppins" style="color:#fefefe;  margin-top:3px; margin-bottom:-1px;">@ViewBag.companyInfo.Company.CompanyName</h6>
+                            <h6 class="poppins" style="color:#fefefe; font-size:11px;">@ViewBag.companyInfo.User.Name</h6>
+                        }
+                        else
+                        {
+                            <h6 style="color:#fefefe; font-size:11px;">Company Info Not Available</h6>
+                        }
+                       
+                        
                     </div>
                    
                     <div class="dropdown">
                         <button class="btn btn-link dropdown-toggle dropdown-outline" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:#fefefe;">
                         </button>
                         <div class="dropdown-menu dropdown-menu-left" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" asp-area="" asp-controller="Seller" asp-action="Profile">
+                            <a class="dropdown-item disabled-link" asp-area="" asp-controller="Seller" asp-action="Profile">
                                 <i class="las la-user-circle"></i> Profile
                             </a>
-                            <a class="dropdown-item" asp-area="" asp-controller="Seller" asp-action="Messages">
+                            <a class="dropdown-item disabled-link" asp-area="" asp-controller="Seller" asp-action="Messages">
                                 <i class="las la-envelope"></i> Messages
                             </a>
                             <a class="dropdown-item" asp-area="" asp-controller="Seller" asp-action="Signout">
@@ -76,11 +93,6 @@
                                 <i class="las la-tachometer-alt"></i> Dashboard
                             </a>
                         </li>
-                        <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Seller" && ViewContext.RouteData.Values["Action"].ToString() == "Customers" ? "active" : "")">
-                            <a class="nav-link" asp-area="" asp-controller="Seller" asp-action="Customers">
-                                <i class="las la-users"></i> Customers  <!-- beğeniler, takipçiler, ürün sepette olanlar, comments  -->
-                            </a>
-                        </li>
                         <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Seller" && ViewContext.RouteData.Values["Action"].ToString() == "Products" ? "active" : "")">
                             <a class="nav-link" asp-area="" asp-controller="Seller" asp-action="Products">
                                 <i class="las la-shopping-bag"></i> Products
@@ -92,13 +104,16 @@
                             </a>
                         </li>
                        
-                        
-                       
-                        <!--li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Seller" && ViewContext.RouteData.Values["Action"].ToString() == "Comments" ? "active" : "")">
-                            <a class="nav-link" asp-area="" asp-controller="Seller" asp-action="Comments">
-                                <i class="las la-comments"></i> Comments
+                        <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Seller" && ViewContext.RouteData.Values["Action"].ToString() == "Customers" ? "active" : "")">
+                            <a class="nav-link" asp-area="" asp-controller="Seller" asp-action="Customers">
+                                <i class="las la-users"></i> Customers  <!-- beğeniler, takipçiler, ürün sepette olanlar, comments  -->
                             </a>
-                        </!--li-->
+                        </li>
+                        <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Seller" && ViewContext.RouteData.Values["Action"].ToString() == "Followers" ? "active" : "")">
+                            <a class="nav-link" asp-area="" asp-controller="Seller" asp-action="Followers">
+                                <i class="las la-user-plus"></i></i> Followers
+                            </a>
+                        </li>
                         
                        
                        
@@ -177,7 +192,12 @@
             right: 0;
         }
 
-
+        .disabled-link {
+            pointer-events: none; /* Bağlantıyı tıklanamaz yapar */
+            color: #6c757d; /* Renk değişikliği: tıklanamaz bağlantı için gri renk */
+            cursor: default; /* İmleci değiştirme: el yerine normal imleç */
+            text-decoration: none; /* Alt çizgi kaldırma */
+        }
     </style>
 
 
