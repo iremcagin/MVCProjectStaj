@@ -10,7 +10,11 @@ namespace myProject.Controllers
         /* --------------------------------------------------- Dashboard Page --------------------------------------------------- */
         public IActionResult Index()
         {
-            return View();
+            ModelForAdminPages modelForAdminPages = new ModelForAdminPages();
+            modelForAdminPages = _adminDatabaseControlModel.Dashboard();
+
+
+            return View(modelForAdminPages);
         }
 
 

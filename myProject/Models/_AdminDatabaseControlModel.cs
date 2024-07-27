@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Data.SqlClient;
 
 namespace myProject.Models
 {
@@ -11,8 +12,479 @@ namespace myProject.Models
 
 
 
-        /* ------------------------------------- COMPANIES ------------------------------------- */
-        public List<ModelForAdminPages> getAllCompanies()
+
+
+
+        /* ------------------------------------- DASHBOARD ------------------------------------- */
+        public ModelForAdminPages Dashboard()
+        {
+            ModelForAdminPages modelForAdminPages = new ModelForAdminPages();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+
+                // Toplam Company sayısı
+                string query = "SELECT COUNT(*) FROM Companies";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    modelForAdminPages.TotalCompanies = (int)cmd.ExecuteScalar();
+                }
+
+
+                // Toplam Products sayısı
+                query = "SELECT COUNT(*) FROM Products";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    modelForAdminPages.TotalProducts = (int)cmd.ExecuteScalar();
+                }
+
+
+                // Toplam Reviews sayısı
+                query = "SELECT COUNT(*) FROM Reviews";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    modelForAdminPages.TotalReviews = (int)cmd.ExecuteScalar();
+                }
+
+
+
+                // Toplam Users sayısı
+                query = "SELECT COUNT(*) FROM Users";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    modelForAdminPages.TotalUsers = (int)cmd.ExecuteScalar();
+                }
+
+
+
+                // En çok yorum alan ürün
+                query = @"
+            SELECT TOP 1 p.ProductId, p.CompanyId, p.Name, p.Description, p.Price, p.Stock, p.CreatedAt, p.Category, p.Rating, p.Favorite, p.Clicked, p.isAvailable, COUNT(r.Id) AS ReviewCount
+            FROM Products p
+            JOIN Reviews r ON p.ProductId = r.ProductId
+            GROUP BY p.ProductId, p.CompanyId, p.Name, p.Description, p.Price, p.Stock, p.CreatedAt, p.Category, p.Rating, p.Favorite, p.Clicked, p.isAvailable
+            ORDER BY ReviewCount DESC";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            modelForAdminPages.mostReviewedProduct = new ProductModel
+                            {
+                                ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Description = reader.GetString(reader.GetOrdinal("Description")),
+                                Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                Stock = reader.GetInt32(reader.GetOrdinal("Stock")),
+                                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                Category = reader.GetString(reader.GetOrdinal("Category")),
+                                Rating = Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("Rating"))),
+                                Favorite = reader.GetInt32(reader.GetOrdinal("Favorite")),
+                                Clicked = reader.GetInt32(reader.GetOrdinal("Clicked")),
+                                isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"))
+                            };
+                        }
+                    }
+                }
+
+
+                string imageQuery = "SELECT ImageURL FROM ProductImages WHERE ProductId = @ProductId";
+                using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ProductId", modelForAdminPages.mostReviewedProduct.ProductId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (modelForAdminPages.mostReviewedProduct.Images == null)
+                        {
+                            modelForAdminPages.mostReviewedProduct.Images = new List<string>();
+                        }
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                string imageUrl = reader["ImageURL"].ToString();
+                                if (!string.IsNullOrWhiteSpace(imageUrl))
+                                {
+                                    modelForAdminPages.mostReviewedProduct.Images.Add(imageUrl);
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+
+
+                // En çok beğenilen ürün
+                query = @"
+            SELECT TOP 1 ProductId, CompanyId, Name, Description, Price, Stock, CreatedAt, Category, Rating, Favorite, Clicked, isAvailable
+            FROM Products
+            ORDER BY Favorite DESC";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            modelForAdminPages.mostLikedProduct = new ProductModel
+                            {
+                                ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Description = reader.GetString(reader.GetOrdinal("Description")),
+                                Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                Stock = reader.GetInt32(reader.GetOrdinal("Stock")),
+                                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                Category = reader.GetString(reader.GetOrdinal("Category")),
+                                Rating = Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("Rating"))),
+                                Favorite = reader.GetInt32(reader.GetOrdinal("Favorite")),
+                                Clicked = reader.GetInt32(reader.GetOrdinal("Clicked")),
+                                isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"))
+                            };
+                        }
+                    }
+                }
+
+
+
+
+                imageQuery = "SELECT ImageURL FROM ProductImages WHERE ProductId = @ProductId";
+                using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ProductId", modelForAdminPages.mostLikedProduct.ProductId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (modelForAdminPages.mostLikedProduct.Images == null)
+                        {
+                            modelForAdminPages.mostLikedProduct.Images = new List<string>();
+                        }
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                string imageUrl = reader["ImageURL"].ToString();
+                                if (!string.IsNullOrWhiteSpace(imageUrl))
+                                {
+                                    modelForAdminPages.mostLikedProduct.Images.Add(imageUrl);
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+
+                // En çok takip edilen company
+                query = @"
+            SELECT TOP 1 c.Id, c.UserId, c.CompanyName, c.Description, c.Address, c.PhoneNumber, c.Email, c.isAccountActivated, c.LogoUrl, c.BannerUrl, c.TaxIDNumber, c.IBAN, c.IsHighlighted, c.CreatedAt, c.Rating, COUNT(f.Id) AS FollowerCount
+            FROM Companies c
+            JOIN FollowedCompanies f ON c.Id = f.CompanyId
+            GROUP BY c.Id, c.UserId, c.CompanyName, c.Description, c.Address, c.PhoneNumber, c.Email, c.isAccountActivated, c.LogoUrl, c.BannerUrl, c.TaxIDNumber, c.IBAN, c.IsHighlighted, c.CreatedAt, c.Rating
+            ORDER BY FollowerCount DESC";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            modelForAdminPages.mostFollowedCompany = new CompanyModel
+                            {
+                                CompanyId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
+                                CompanyName = reader.GetString(reader.GetOrdinal("CompanyName")),
+                                Description = reader.GetString(reader.GetOrdinal("Description")),
+                                Address = reader.GetString(reader.GetOrdinal("Address")),
+                                PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
+                                Email = reader.GetString(reader.GetOrdinal("Email")),
+                                isAccountActivated = reader.GetBoolean(reader.GetOrdinal("isAccountActivated")),
+                                LogoUrl = reader.GetString(reader.GetOrdinal("LogoUrl")),
+                                BannerUrl = reader.GetString(reader.GetOrdinal("BannerUrl")),
+                                TaxIDNumber = reader.GetString(reader.GetOrdinal("TaxIDNumber")),
+                                IBAN = reader.GetString(reader.GetOrdinal("IBAN")),
+                                isHighlighed = reader.GetString(reader.GetOrdinal("IsHighlighted")),
+                                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                Rating = reader.GetInt32(reader.GetOrdinal("Rating")),
+                            };
+                        }
+                    }
+                }
+
+
+
+                // En çok satın alınan ürün
+                query = @"
+            SELECT TOP 1 p.ProductId, p.CompanyId, p.Name, p.Description, p.Price, p.Stock, p.CreatedAt, p.Category, p.Rating, p.Favorite, p.Clicked, p.isAvailable, COUNT(pb.ProductId) AS PurchaseCount
+            FROM Products p
+            JOIN ProductsBought pb ON p.ProductId = pb.ProductId
+            GROUP BY p.ProductId, p.CompanyId, p.Name, p.Description, p.Price, p.Stock, p.CreatedAt, p.Category, p.Rating, p.Favorite, p.Clicked, p.isAvailable
+            ORDER BY PurchaseCount DESC";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            modelForAdminPages.mostPurchasedProduct = new ProductModel
+                            {
+                                ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Description = reader.GetString(reader.GetOrdinal("Description")),
+                                Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                Stock = reader.GetInt32(reader.GetOrdinal("Stock")),
+                                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                Category = reader.GetString(reader.GetOrdinal("Category")),
+                                Rating = Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("Rating"))),
+                                Favorite = reader.GetInt32(reader.GetOrdinal("Favorite")),
+                                Clicked = reader.GetInt32(reader.GetOrdinal("Clicked")),
+                                isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"))
+                            };
+                        }
+                    }
+                }
+
+
+
+                imageQuery = "SELECT ImageURL FROM ProductImages WHERE ProductId = @ProductId";
+                using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ProductId", modelForAdminPages.mostPurchasedProduct.ProductId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (modelForAdminPages.mostPurchasedProduct.Images == null)
+                        {
+                            modelForAdminPages.mostPurchasedProduct.Images = new List<string>();
+                        }
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                string imageUrl = reader["ImageURL"].ToString();
+                                if (!string.IsNullOrWhiteSpace(imageUrl))
+                                {
+                                    modelForAdminPages.mostPurchasedProduct.Images.Add(imageUrl);
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+
+
+                // User Registration Trends
+
+                query = @"
+                    SELECT 
+                        DAY(CreatedAt) AS Day, 
+                        MONTH(CreatedAt) AS Month, 
+                        YEAR(CreatedAt) AS Year, 
+                        COUNT(*) AS RegistrationCount
+                    FROM 
+                        Users
+                    GROUP BY 
+                        DAY(CreatedAt), 
+                        MONTH(CreatedAt), 
+                        YEAR(CreatedAt)
+                    ORDER BY 
+                        Year, 
+                        Month, 
+                        Day";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        modelForAdminPages.UserRegistrationTrends = new List<UserRegistrationTrend>();
+                        while (reader.Read())
+                        {
+                            modelForAdminPages.UserRegistrationTrends.Add(new UserRegistrationTrend
+                            {
+                                Day = reader.GetInt32(reader.GetOrdinal("Day")),
+                                Month = reader.GetInt32(reader.GetOrdinal("Month")),
+                                Year = reader.GetInt32(reader.GetOrdinal("Year")),
+                                RegistrationCount = reader.GetInt32(reader.GetOrdinal("RegistrationCount"))
+                            });
+                        }
+                    }
+                }
+
+
+
+                // en çok ürünü olan şirket
+                query = @"
+                    WITH CompanyProductCounts AS (
+                        SELECT
+                            c.Id,
+                            c.CompanyName,
+                            c.Description,
+                            c.Address,
+                            c.PhoneNumber,
+                            c.Email,
+                            c.isAccountActivated,
+                            c.LogoUrl,
+                            c.BannerUrl,
+                            c.TaxIDNumber,
+                            c.IBAN,
+                            c.IsHighlighted,
+                            c.CreatedAt,
+                            c.Rating,
+                            COUNT(p.ProductId) AS ProductCount
+                        FROM
+                            Companies c
+                        LEFT JOIN
+                            Products p ON c.Id = p.CompanyId
+                        GROUP BY
+                            c.Id, c.CompanyName, c.Description, c.Address, c.PhoneNumber, c.Email, c.isAccountActivated,
+                            c.LogoUrl, c.BannerUrl, c.TaxIDNumber, c.IBAN, c.IsHighlighted, c.CreatedAt, c.Rating
+                    )
+                    SELECT TOP 1
+                        Id,
+                        CompanyName,
+                        Description,
+                        Address,
+                        PhoneNumber,
+                        Email,
+                        isAccountActivated,
+                        LogoUrl,
+                        BannerUrl,
+                        TaxIDNumber,
+                        IBAN,
+                        IsHighlighted,
+                        CreatedAt,
+                        Rating,
+                        ProductCount
+                    FROM
+                        CompanyProductCounts
+                    ORDER BY
+                        ProductCount DESC";
+
+
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            modelForAdminPages.CompanyWithMostProducts = new CompanyModel
+                            {
+                                CompanyId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                CompanyName = reader.GetString(reader.GetOrdinal("CompanyName")),
+                                Description = reader.GetString(reader.GetOrdinal("Description")),
+                                Address = reader.GetString(reader.GetOrdinal("Address")),
+                                PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber")),
+                                Email = reader.GetString(reader.GetOrdinal("Email")),
+                                isAccountActivated = reader.GetBoolean(reader.GetOrdinal("isAccountActivated")),
+                                LogoUrl = reader.GetString(reader.GetOrdinal("LogoUrl")),
+                                BannerUrl = reader.GetString(reader.GetOrdinal("BannerUrl")),
+                                TaxIDNumber = reader.GetString(reader.GetOrdinal("TaxIDNumber")),
+                                IBAN = reader.GetString(reader.GetOrdinal("IBAN")),
+                                isHighlighed = reader.GetString(reader.GetOrdinal("IsHighlighted")),
+                                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                                Rating = reader.GetInt32(reader.GetOrdinal("Rating")),
+                            };
+
+                            // En çok ürüne sahip şirketin ürün sayısını ayarlama
+                            modelForAdminPages.CompanyWithMostProductsTotalProducts = reader.GetInt32(reader.GetOrdinal("ProductCount"));
+                        }
+                    }
+                }
+
+
+
+
+                query = @"
+                SELECT 
+                    DAY(pb.CreatedAt) AS Day,
+                    MONTH(pb.CreatedAt) AS Month,
+                    YEAR(pb.CreatedAt) AS Year,
+                    SUM(p.Price) AS DailyRevenue
+                FROM 
+                    ProductsBought pb
+                INNER JOIN 
+                    Products p ON pb.ProductId = p.ProductId
+                GROUP BY 
+                    DAY(pb.CreatedAt),
+                    MONTH(pb.CreatedAt),
+                    YEAR(pb.CreatedAt)
+                ORDER BY 
+                    YEAR(pb.CreatedAt) DESC, 
+                    MONTH(pb.CreatedAt) DESC, 
+                    DAY(pb.CreatedAt) DESC";
+
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        modelForAdminPages.DailyRevenues = new List<DailyRevenue>();
+                        while (reader.Read())
+                        {
+                            modelForAdminPages.DailyRevenues.Add(new DailyRevenue
+                            {
+                                Day = reader.GetInt32(reader.GetOrdinal("Day")),
+                                Month = reader.GetInt32(reader.GetOrdinal("Month")),
+                                Year = reader.GetInt32(reader.GetOrdinal("Year")),
+                                DailyRevenueAmount = reader.GetDecimal(reader.GetOrdinal("DailyRevenue"))
+                            });
+                        }
+                    }
+                }
+
+
+
+
+                
+                query = @"
+                    SELECT 
+                        p.Category AS Category,
+                        COUNT(pb.ProductId) AS TotalSales
+                    FROM 
+                        ProductsBought pb
+                    INNER JOIN 
+                        Products p ON pb.ProductId = p.ProductId
+                    GROUP BY 
+                        p.Category
+                    ORDER BY 
+                        TotalSales DESC";
+                    
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                modelForAdminPages.salesByCategory.Add(new SalesByCategory
+                                {
+                                    Category = reader.GetString(reader.GetOrdinal("Category")),
+                                    TotalSales = reader.GetInt32(reader.GetOrdinal("TotalSales"))
+                                });
+                            }
+                        }
+                    }
+
+
+
+
+
+
+            }
+            return modelForAdminPages;
+        }
+
+
+
+            /* ------------------------------------- COMPANIES ------------------------------------- */
+            public List<ModelForAdminPages> getAllCompanies()
         {
             List<ModelForAdminPages> combinedViewModelList = new List<ModelForAdminPages>();
             ModelForAdminPages combinedViewModel = new ModelForAdminPages();
