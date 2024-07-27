@@ -34,31 +34,30 @@ namespace myProject.Controllers
         /* --------------------------------------------------- Products Page --------------------------------------------------- */
         public IActionResult Products(List<ProductModel> products_ = null, int page = 1, int pageSize = 7)
         {
-            List<ProductModel> allProducts;
+            ModelForSellerPages modelForSellerPages = new ModelForSellerPages();
             
             if (products_ == null)
             {
                 // Veri tabanından tüm ürünleri çek
-                allProducts = databaseControlModel.getAllProducts();
+                modelForSellerPages.products = databaseControlModel.getAllProducts();
             }
             else
             {
-                // Arama sonucu ile gelen ürünleri kullan
-                allProducts = products_;
+                modelForSellerPages.products = products_;
             }
+
+            modelForSellerPages.categories = databaseControlModel.getAllCategories();
 
             
             // Sayfalama işlemleri
-            var pagedProducts = allProducts.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-            ViewBag.TotalPages = (int)Math.Ceiling((double)allProducts.Count / pageSize);
+            var pagedProducts = modelForSellerPages.products.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            ViewBag.TotalPages = (int)Math.Ceiling((double)modelForSellerPages.products.Count / pageSize);
             ViewBag.CurrentPage = page;
-            ViewBag.AllProducts = allProducts;
 
-            return View(pagedProducts);  
+            return View(modelForSellerPages);  
         }
 
 
-        [Microsoft.AspNetCore.Mvc.HttpPost]
         [HttpPost]
         public async Task<IActionResult> AddNewProduct(List<IFormFile> images, ProductModel model)
         {

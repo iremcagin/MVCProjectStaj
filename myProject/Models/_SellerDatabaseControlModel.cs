@@ -152,6 +152,40 @@ namespace myProject.Models
                             }
                         }
                     }
+
+
+                    for (int i = 0; i < products.Count; i++)
+                    {
+                        string query = @"
+                        SELECT Id, ProductId, CompanyId, UserId, Rating, Review, CreatedAt 
+                        FROM Reviews WHERE ProductId = @ProductId
+                        ORDER BY CreatedAt DESC";
+
+
+                        using (SqlCommand cmd = new SqlCommand(query, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@ProductId", products[i].ProductId);
+
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                // Okunan her satırı işleyin
+                                while (reader.Read())
+                                {
+                                    products[i].reviews.Add(new ProductReviewModel
+                                    {
+                                        ReviewId = (int)reader["Id"],
+                                        ProductId = (int)reader["ProductId"],
+                                        CompanyId = (int)reader["CompanyId"],
+                                        UserId = (int)reader["UserId"],
+                                        Rating = (int)reader["Rating"],
+                                        Review = reader["Review"].ToString(),
+                                        CreatedAt = (DateTime)reader["CreatedAt"]
+                                    });
+                                }
+                            }
+                        }
+                    }
+
                 }
 
             }
@@ -163,6 +197,45 @@ namespace myProject.Models
             return products;
         }
 
+
+
+
+
+        public List<string> getAllCategories()
+        {
+            List<string> categories = new List<string>();
+
+            try
+            {
+                // İlk bağlantıyı açarak ürünleri okuyun
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    // Categorileri döndür
+                    string query = "SELECT CategoryName FROM Categories";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                categories.Add(
+                                    reader["CategoryName"].ToString()
+                                );
+                            }
+                        }
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error while reading categories: " + ex.Message);
+            }
+
+            return categories;
+        }
 
 
 

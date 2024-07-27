@@ -27,6 +27,10 @@ namespace myProject.Models
         public string categoryyy_ { get; set; }
 
 
+        // Seller Products için
+        public List<ProductReviewModel> reviews { get; set; } = new List<ProductReviewModel>();
+
+
 
 
     }

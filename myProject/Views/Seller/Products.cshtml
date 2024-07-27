@@ -1,9 +1,8 @@
-﻿@model List<myProject.Models.ProductModel>
+﻿@model myProject.Models.ModelForSellerPages
 
 @{
-    ViewData["Title"] = "Products";
+    ViewData["Title"] = "Seller";
     Layout = "~/Views/Shared/_LayoutSeller.cshtml";
-    var allProducts = ViewBag.AllProducts as List<ProductModel>;
     int totalPages = ViewBag.TotalPages;
     int currentPage = ViewBag.CurrentPage;
 
@@ -49,6 +48,8 @@
 
 
 <div class="container-fluid">
+
+    @{/*
     <div class="row">
        
         <div class="col-11" style="margin-top:-10px;">
@@ -121,11 +122,11 @@
         </div>
     </div>
 
-
+    */}
 
 
     <!-- Tablo -->
-    <table class="table table-striped mt-4">
+    <table class="table table-striped table-bordered">
         <thead>
             <tr>
                 <th>Images</th>
@@ -142,27 +143,27 @@
             </tr>
         </thead>
         <tbody id="productTableBody">
-            @if (Model != null && Model.Any())
+            @if (Model.products != null && Model.products.Any())
             {
                 <!-- Tablo içeriği burada dinamik olarak oluşturulacak -->
-                @foreach (var product in Model)
+                @foreach (var product in Model.products)
                 {
                     <tr class="product-row">
                         <td>
                             <!-- Sadece ilk resmi gösteren Carousel bileşeni -->
                             <div id="carousel-@product.ProductId" class="carousel slide" data-ride="carousel">
                                 <div class="carousel-inner">
-                                    <div class="carousel-item active">
+                                    <div class="carousel-item active  d-flex justify-content-center">
                                         @if (product.Images.Count > 0)
                                         {
                                             <a href="#" data-toggle="modal" data-target="#imageModal">
-                                                <img src="@Url.Content("~/images/" + product.Images[0])" alt="@product.Name" class="d-block w-100 card-img" style="width: 90px; height: 45px;" />
+                                                <img src="@Url.Content("~/images/"+product.Category+"/" + product.Images[0])" alt="@product.Name" class="d-block  card-img" style="width: auto; height: 45px;" />
                                             </a>
                                         }
                                         else
                                         {
                                             <img src="~/images/placeholder-1.png"
-                                                 alt="@product.Name" class="d-block card-img" style="width: 70px; height: 45px; margin-left:45px;" />
+                                                 alt="@product.Name" class="d-block card-img" style="width: auto; height: 45px;" />
                                         }
                                     </div>
                                 </div>
@@ -185,7 +186,7 @@
                                                 @foreach (var image in product.Images)
                                                 {
                                                     <div class="carousel-item @(image == product.Images[0] ? "active" : "")">
-                                                        <img src="@Url.Content("~/images/" + image)" alt="@product.Name" class="d-block w-100 img-fluid img-thumbnail" style="object-fit: contain; max-height: 450px;" />
+                                                        <img src="@Url.Content("~/images/"+product.Category+"/" + image)" alt="@product.Name" class="d-block w-100 img-fluid img-thumbnail" style="object-fit: contain; max-height: 450px;" />
                                                     </div>
                                                 }
                                             </div>
@@ -219,7 +220,7 @@
                                         <h6 class="modal-title" id="descriptionModalLabel">Description</h6>
                                     </div>
                                     <div class="modal-body">
-                                        <p id="modalDescription"  style="font-size:15px;"></p>
+                                        <p id="modalDescription"  style="font-size:14px;"></p>
                                     </div>
 
                                 </div>
@@ -241,17 +242,17 @@
 
                                 for (int i = 0; i < fullStars; i++)
                                 {
-                                    <span class="star full-star">&#9733;</span>
+                                    <i class="las la-star" style="color: #ffd700"></i>
                                 }
 
                                 if (halfStar)
                                 {
-                                    <span class="star half-star">&#9733;</span>
+                                    <i class="las la-star-half-alt" style="color: #ffd700"></i>
                                 }
 
                                 for (int i = 0; i < emptyStars; i++)
                                 {
-                                    <span class="star">&#9734;</span>
+                                    <span class="las la-star" style="color: lightgrey"></span>
                                 }
                             }
 
@@ -261,21 +262,15 @@
                         <td>
                             <span class="favorite ">
                                 <span class="favorite-count">@product.Favorite</span>
-                                @if (@product.Favorite>0)
-                                {
-                                    <span class="favorite-heart">&#9829;</span> 
-                                }
-                                else
-                                {
-                                    <span class="not-favorite-heart">&#9825;</span> 
-                                }
+                                
+                                <i class="las la-heart" style="color: #e74c3c;"></i>
                             
                             </span>
                         </td>
 
 
                         <td>
-                            @product.Reviews.Count
+                            @product.reviews.Count
                             <button type="button" class="btn btn-sm" style="font-size:15px; margin-top:-2px; margin-left:-7px;" data-toggle="modal" data-target="#reviewModal-@product.ProductId">
                                 <i class="las la-comment-dots"></i>
                             </button>
@@ -291,17 +286,34 @@
                                             </button>
                                         </div>
                                         <div class="modal-body">
-                                            @foreach (var review in product.Reviews)
+                                            @if (@product.reviews.Any())
                                             {
-                                                <div class="mb-2" style="border-bottom:1px solid black">
-                                                    <span>@review.Review</span>
-                                                </div>
+                                                for (int i = 0; i < product.reviews.Count; i++)
+                                                {
+                                                    var review = product.reviews[i];
+                                                    <div class="mb-2 review-item">
+                                                        <span>@review.Review</span>
+                                                        <p class="review-date">@review.CreatedAt.ToString("MMMM d, yyyy")</p>
+
+                                                    </div>
+                                                    @if (i < product.reviews.Count - 1)
+                                                    {
+                                                        <hr class="review-separator" />
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <p>No reviews available.</p>
                                             }
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
                         </td>
+
+
                         <td>
                             @if (product.isAvailable == "true")
                             {
@@ -376,12 +388,10 @@
                         <div class="form-group">
                             <label for="productCategory" style="font-size:14px;">Category:</label>
                             <select class="form-control no-outline" style="font-size:13px;" id="productCategory" name="Category" required>
-                                <option value="">Select a category</option>
-                                <option value="table">Table</option>
-                                <option value="chair">Chair</option>
-                                <option value="bed">Bed</option>
-                                <option value="sofa">Sofa</option>
-                                <option value="wardrobe">Wardrobe</option>
+                                @foreach (var category in Model.categories)
+                                {
+                                    <option value="@category">@category</option>
+                                }
                             </select>
                         </div>
                         <div class="d-flex align-items-center justify-content-between">
@@ -479,47 +489,19 @@
         font-size: 13px;
     }
 
-    .star {
-        font-size: 13px;
-        margin-right:-2px;
+    .review-item {
+        text-align: left; /* Textleri sola hizalar */
     }
 
-    .full-star {
-        //color: #ffd700; 
+    .review-separator {
+        border-top: 1px solid #ddd; /* Gri renkli çizgi */
+        margin: 10px 0; /* Çizgi ile yorumlar arasında boşluk */
     }
 
-    .half-star {
-        color: #d3d3d3; 
-        position: relative;
-    }
-
-    .half-star::before {
-        content: '\2605'; 
-        color: #000; 
-        position: absolute;
-        left: 0;
-        width: 55%; 
-        overflow: hidden;
-    }
-
-    .empty-star {
-        color: #d3d3d3;
-    }
-
-    .empty-star::before {
-        content: '\2605'; 
-        color: #000;
-        position: absolute;
-        overflow: hidden;
-    }
-
-    .favorite-heart {
-        color: #ff0000; 
-    }
-
-    .not-favorite-heart {
-        color: #d3d3d3;
-       
+    .review-date {
+        font-size: 13px; 
+        color: #b0bec5;
+        margin-top: 5px; 
     }
 </style>
 

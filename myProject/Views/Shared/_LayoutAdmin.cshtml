@@ -55,10 +55,10 @@
                         <button class="btn btn-link dropdown-toggle dropdown-outline" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:#fefefe;">
                         </button>
                         <div class="dropdown-menu dropdown-menu-left" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" asp-area="" asp-controller="Admin" asp-action="Profile">
+                            <a class="dropdown-item disabled-link" asp-area="" asp-controller="Admin" asp-action="Profile">
                                 <i class="las la-user-circle"></i> Profile
                             </a>
-                            <a class="dropdown-item" asp-area="" asp-controller="Admin" asp-action="Messages">
+                            <a class="dropdown-item disabled-link" asp-area="" asp-controller="Admin" asp-action="Messages">
                                 <i class="las la-envelope"></i> Messages
                             </a>
                             <a class="dropdown-item" asp-area="" asp-controller="Admin" asp-action="Signout">
@@ -142,6 +142,13 @@
     </footer>
 
     <style>
+        .disabled-link {
+            pointer-events: none; /* Bağlantıyı tıklanamaz yapar */
+            color: #6c757d; /* Renk değişikliği: tıklanamaz bağlantı için gri renk */
+            cursor: default; /* İmleci değiştirme: el yerine normal imleç */
+            text-decoration: none; /* Alt çizgi kaldırma */
+        }
+
         .navbar {
             background-image: linear-gradient(to right, #ffc3a0, #FFAFBD);
             background: linear-gradient(to right, #ffb3ba, #ffdfba);
