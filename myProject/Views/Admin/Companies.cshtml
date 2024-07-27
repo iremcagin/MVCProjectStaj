@@ -1,4 +1,4 @@
-﻿@model List<myProject.Models.ModelForAdminPages>
+﻿@model myProject.Models.ModelForAdminPages
 @{
     ViewData["Title"] = "Companies";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
@@ -40,58 +40,67 @@
             </tr>
         </thead>
         <tbody style="font-size:15px; font-weight:400;">
-            @foreach (var item in Model)
+            @foreach (var item in Model.activateCompanies)
             {
+                int i = 0;
                 <tr data-bs-toggle="modal" data-bs-target="#companyDetailModal"
-                    data-company-id="@item.Company.CompanyId"
-                    data-company-name="@item.Company.CompanyName"
-                    data-company-description="@item.Company.Description"
-                    data-company-address="@item.Company.Address"
-                    data-company-phone="@item.Company.PhoneNumber"
-                    data-company-email="@item.Company.Email"
-                    data-company-taxidnumber="@item.Company.TaxIDNumber"
-                    data-company-iban="@item.Company.IBAN"
-                    data-company-createdat="@item.Company.CreatedAt.ToString("yyyy-MM-dd")"
-                    data-company-rating="@item.Company.Rating"
-                    data-company-highlighed="@item.Company.isHighlighed"
-                    data-company-accountactivated="@item.Company.isAccountActivated"
-
-                    data-user-name="@item.User?.Name"
-                    data-user-surname="@item.User?.Surname"
-                    data-user-email="@item.User?.Email"
-                    data-user-phone="@item.User?.PhoneNumber"
-                    data-company-logo="@item.Company.LogoUrl"
-                    data-company-banner="@item.Company.BannerUrl"
-                    data-company-products="@item.Company.ProductsList.Count"
-
+                    data-company-id="@item.CompanyId"
+                    data-company-name="@item.CompanyName"
+                    data-company-description="@item.Description"
+                    data-company-address="@item.Address"
+                    data-company-phone="@item.PhoneNumber"
+                    data-company-email="@item.Email"
+                    data-company-taxidnumber="@item.TaxIDNumber"
+                    data-company-iban="@item.IBAN"
+                    data-company-createdat="@item.CreatedAt.ToString("yyyy-MM-dd")"
+                    data-company-rating="@item.Rating"
+                    data-company-highlighed="@item.isHighlighed"
+                    data-company-accountactivated="@item.isAccountActivated"
+                    data-user-name="@Model.activateCompaniesUsers[i].Name"
+                    data-user-surname="@Model.activateCompaniesUsers[i].Surname"
+                    data-user-email="@Model.activateCompaniesUsers[i].Email"
+                    data-user-phone="@Model.activateCompaniesUsers[i].PhoneNumber"
+                    data-company-logo="@item.LogoUrl"
+                    data-company-banner="@item.BannerUrl"
+                    data-company-products="@item.ProductsList.Count"
                     style="cursor:pointer;">
                     @{
-                    /*
-                    <td>@item.User.UserId</td>
-                    <td>@item.User.Name</td>
-                    <td>@item.User.Surname</td>
-                    <td>@item.User.PhoneNumber</td>
-                    <td>@item.User.Email</td>
-                    <td>@item.User.Address</td>
-                    <td>@item.User.Role</td>
-                    <td>@item.User.Birthdate</td>
-                    <td>@item.User.CreatedAt</td>
-                    <td>@item.Company.LogoUrl</td>
-                    <td>@item.Company.BannerUrl</td>*/
+                        /*
+                        <td>@item.User.UserId</td>
+                        <td>@item.User.Name</td>
+                        <td>@item.User.Surname</td>
+                        <td>@item.User.PhoneNumber</td>
+                        <td>@item.User.Email</td>
+                        <td>@item.User.Address</td>
+                        <td>@item.User.Role</td>
+                        <td>@item.User.Birthdate</td>
+                        <td>@item.User.CreatedAt</td>
+                        <td>@item.Company.LogoUrl</td>
+                        <td>@item.Company.BannerUrl</td>*/
                     }
-                    <td>@item.Company.CompanyId</td>
-                    <td>@item.Company.CompanyName</td>
-                    <td style="white-space: nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 30px;">@item.Company.Description</td>
-                    <td>@item.Company.Address</td>
-                    <td>@item.Company.PhoneNumber</td>
-                    <td>@item.Company.Email</td>
-                    <td>@item.Company.isAccountActivated</td>
-                    <td>@item.Company.TaxIDNumber</td>
-                    <td>@item.Company.IBAN</td>
-                    <td>@item.Company.isHighlighed</td>
-                    <td>@item.Company.CreatedAt</td>
-                    <td>@item.Company.Rating</td>
+                    <td class="open-modal">@item.CompanyId</td>
+                    <td class="open-modal">@item.CompanyName</td>
+                    <td class="open-modal"  style="white-space: nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 30px;">@item.Description</td>
+                    <td class="open-modal">@item.Address</td>
+                    <td class="open-modal">@item.PhoneNumber</td>
+                    <td class="open-modal">@item.Email</td>
+                    <td class="open-modal">@item.isAccountActivated</td>
+                    <td class="open-modal">@item.TaxIDNumber</td>
+                    <td class="open-modal" style="white-space: nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 30px;">@item.IBAN</td>
+                    <td class="open-modal">@item.isHighlighed</td>
+                    <td class="open-modal">@item.CreatedAt</td>
+                    <td class="open-modal">@item.Rating</td>
+                    <td>
+                        <!-- Activation Button with Form -->
+                        <form id="activateForm-@item.CompanyId" asp-controller="Admin" asp-action="ActivateAccountSubmit" method="post">
+                            <input type="hidden" name="companyId" value="@item.CompanyId" />
+                            <button type="button" class="btn btn-outline-success btn-sm activate-btn  no-outline" data-company-id="@item.CompanyId">
+                                Activate
+                            </button>
+                        </form>
+                    </td>
                 </tr>
+                i++;
             }
         </tbody>
 

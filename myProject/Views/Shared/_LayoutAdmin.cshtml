@@ -91,7 +91,7 @@
                         </li>
                         <li class="nav-item rounded @(ViewContext.RouteData.Values["Controller"].ToString() == "Admin" && ViewContext.RouteData.Values["Action"].ToString() == "ActivateAccounts" ? "active" : "")">
                             <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="ActivateAccounts">
-                                <i class="las la-user-check"></i> Activate Accounts
+                                <i class="las la-user-check"></i> Activate Accounts(@ViewBag.notActivated)
                             </a>
                         </li>
 

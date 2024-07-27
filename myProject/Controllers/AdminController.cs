@@ -16,6 +16,7 @@ namespace myProject.Controllers
             ModelForAdminPages modelForAdminPages = new ModelForAdminPages();
             modelForAdminPages = _adminDatabaseControlModel.Dashboard();
 
+            ViewBag.notActivated = _adminDatabaseControlModel.NotActivated();
 
             return View(modelForAdminPages);
         }
@@ -25,17 +26,17 @@ namespace myProject.Controllers
         [HttpGet]
         public IActionResult Companies()
         {
-            List<ModelForAdminPages> combinedViewModelList = _adminDatabaseControlModel.getAllCompanies();
-
-           return View(combinedViewModelList);
+            ModelForAdminPages combinedViewModelList = _adminDatabaseControlModel.getAllCompanies();
+            ViewBag.notActivated = _adminDatabaseControlModel.NotActivated();
+            return View(combinedViewModelList);
         }
 
 
         /* --------------------------------------------------- Activate Accounts Page --------------------------------------------------- */
         public IActionResult ActivateAccounts()
         {
-            List<ModelForAdminPages> combinedViewModelList = _adminDatabaseControlModel.getNotAcitavedCompanies();
-
+            ModelForAdminPages combinedViewModelList = _adminDatabaseControlModel.getNotAcitavedCompanies();
+            ViewBag.notActivated = _adminDatabaseControlModel.NotActivated();
             return View(combinedViewModelList);
         }
 
@@ -57,7 +58,7 @@ namespace myProject.Controllers
         {
             ModelForAdminPages modelForAdminPages = new ModelForAdminPages();
             modelForAdminPages.users = _adminDatabaseControlModel.getAllUsers();
-
+            ViewBag.notActivated = _adminDatabaseControlModel.NotActivated();
             return View(modelForAdminPages);
         }
 
@@ -79,7 +80,7 @@ namespace myProject.Controllers
         {
             ModelForAdminPages modelForAdminPages = new ModelForAdminPages();
             modelForAdminPages.products = _adminDatabaseControlModel.getAllProducts();
-
+            ViewBag.notActivated = _adminDatabaseControlModel.NotActivated();
             return View(modelForAdminPages);
         }
 
@@ -100,7 +101,7 @@ namespace myProject.Controllers
         {
             ModelForAdminPages modelForAdminPages = new ModelForAdminPages();
             modelForAdminPages.reviews = _adminDatabaseControlModel.GetAllReviews();
-
+            ViewBag.notActivated = _adminDatabaseControlModel.NotActivated();
             return View(modelForAdminPages);
         }
 

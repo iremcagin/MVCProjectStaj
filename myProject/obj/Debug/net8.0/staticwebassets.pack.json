@@ -25,8 +25,60 @@
       "PackagePath": "staticwebassets\\images\\Sofa\\koltuk1_2.webp"
     },
     {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Banners\\Barcello Studio_banner.jpg",
+      "PackagePath": "staticwebassets\\images\\_Banners\\Barcello Studio_banner.jpg"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Banners\\Creative Furniture_banner.jpg",
+      "PackagePath": "staticwebassets\\images\\_Banners\\Creative Furniture_banner.jpg"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Banners\\Fradel Interiors_banner.jpg",
+      "PackagePath": "staticwebassets\\images\\_Banners\\Fradel Interiors_banner.jpg"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Banners\\Furniture Store_banner.jpg",
+      "PackagePath": "staticwebassets\\images\\_Banners\\Furniture Store_banner.jpg"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Banners\\Home Decor_banner.jpg",
+      "PackagePath": "staticwebassets\\images\\_Banners\\Home Decor_banner.jpg"
+    },
+    {
       "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Banners\\Home Interior_banner.jpg",
       "PackagePath": "staticwebassets\\images\\_Banners\\Home Interior_banner.jpg"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Banners\\Isabel Claude_banner.jpg",
+      "PackagePath": "staticwebassets\\images\\_Banners\\Isabel Claude_banner.jpg"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Banners\\Palid Design_banner.webp",
+      "PackagePath": "staticwebassets\\images\\_Banners\\Palid Design_banner.webp"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Banners\\Salford _banner.jpg",
+      "PackagePath": "staticwebassets\\images\\_Banners\\Salford _banner.jpg"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Logos\\Barcello Studio_logo.webp",
+      "PackagePath": "staticwebassets\\images\\_Logos\\Barcello Studio_logo.webp"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Logos\\Creative Furniture_logo.jpg",
+      "PackagePath": "staticwebassets\\images\\_Logos\\Creative Furniture_logo.jpg"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Logos\\Fradel Interiors_logo.jpg",
+      "PackagePath": "staticwebassets\\images\\_Logos\\Fradel Interiors_logo.jpg"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Logos\\Furniture Store_logo.jpg",
+      "PackagePath": "staticwebassets\\images\\_Logos\\Furniture Store_logo.jpg"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Logos\\Home Decor_logo.jpg",
+      "PackagePath": "staticwebassets\\images\\_Logos\\Home Decor_logo.jpg"
     },
     {
       "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Logos\\Home Interior_logo.png",
@@ -35,6 +87,18 @@
     {
       "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Logos\\Home Interior_logo.webp",
       "PackagePath": "staticwebassets\\images\\_Logos\\Home Interior_logo.webp"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Logos\\Isabel Claude_logo.jpg",
+      "PackagePath": "staticwebassets\\images\\_Logos\\Isabel Claude_logo.jpg"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Logos\\Palid Design_logo.jpg",
+      "PackagePath": "staticwebassets\\images\\_Logos\\Palid Design_logo.jpg"
+    },
+    {
+      "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\_Logos\\Salford _logo.jpg",
+      "PackagePath": "staticwebassets\\images\\_Logos\\Salford _logo.jpg"
     },
     {
       "Id": "C:\\Users\\iremc\\Desktop\\Staj\\_UyumsoftBelgeler\\myProject\\myProject\\wwwroot\\images\\loginBG.jpg",

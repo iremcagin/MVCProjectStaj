@@ -13,6 +13,7 @@ namespace myProject.Models
 
 
         // Dashboard için
+        public int notActivated { get; set; }
         public int TotalCompanies { get; set; }
         public int TotalProducts { get; set; }
         public int TotalReviews { get; set; }
@@ -33,10 +34,6 @@ namespace myProject.Models
 
 
 
-
-
-
-
         // Users Page için
         public List<UserModel> users { get; set; } = new List<UserModel>();
 
@@ -50,7 +47,9 @@ namespace myProject.Models
         public List<ProductReviewModel> reviews { get; set; } = new List<ProductReviewModel>();
 
 
-
+        //  Not acitaved accounts için
+        public List<CompanyModel> activateCompanies { get; set; }= new List<CompanyModel> { };
+        public List<UserModel> activateCompaniesUsers { get; set; } = new List<UserModel>();
 
     }
 

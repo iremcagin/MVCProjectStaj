@@ -13,6 +13,25 @@ namespace myProject.Models
 
 
 
+        public int NotActivated()
+        {
+            int count = 0;
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                // Toplam aktif olmayan şirket sayısı
+                string query = "SELECT COUNT(*) FROM Companies WHERE isAccountActivated = 0";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    count = (int)cmd.ExecuteScalar();
+                }
+            }
+            return count;
+        }
+
+
 
 
         /* ------------------------------------- DASHBOARD ------------------------------------- */
@@ -26,11 +45,19 @@ namespace myProject.Models
 
 
                 // Toplam Company sayısı
-                string query = "SELECT COUNT(*) FROM Companies";
+                string query = "SELECT COUNT(*) FROM Companies WHERE isAccountActivated = 1";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     modelForAdminPages.TotalCompanies = (int)cmd.ExecuteScalar();
                 }
+
+                // Toplam aktif olmayan şirket sayısı
+                query = "SELECT COUNT(*) FROM Companies WHERE isAccountActivated = 0";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    modelForAdminPages.notActivated = (int)cmd.ExecuteScalar();
+                }
+
 
 
                 // Toplam Products sayısı
@@ -484,94 +511,89 @@ namespace myProject.Models
 
 
             /* ------------------------------------- COMPANIES ------------------------------------- */
-            public List<ModelForAdminPages> getAllCompanies()
-        {
-            List<ModelForAdminPages> combinedViewModelList = new List<ModelForAdminPages>();
-            ModelForAdminPages combinedViewModel = new ModelForAdminPages();
-
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            public ModelForAdminPages getAllCompanies()
             {
-                conn.Open();
+                ModelForAdminPages modelForAdminPages = new ModelForAdminPages();
 
 
-                // Company tablosundan verileri almak için sorgu
-                string companyQuery = "SELECT * FROM Companies";
-                using (SqlCommand companyCmd = new SqlCommand(companyQuery, conn))
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    using (SqlDataReader reader = companyCmd.ExecuteReader())
+                    conn.Open();
+
+                    string companyQuery = "SELECT * FROM Companies WHERE isAccountActivated = @IsAccountActivated";
+                    using (SqlCommand companyCmd = new SqlCommand(companyQuery, conn))
                     {
 
-                        while (reader.Read())
+                        companyCmd.Parameters.AddWithValue("@IsAccountActivated", true);
+                        using (SqlDataReader reader = companyCmd.ExecuteReader())
                         {
-                            CompanyModel company = new CompanyModel
-                            {
-                                CompanyId = reader.GetInt32(0),
-                                UserId = reader.GetInt32(1),
-                                CompanyName = reader.GetString(2),
-                                Description = reader.GetString(3),
-                                Address = reader.GetString(4),
-                                PhoneNumber = reader.GetString(5),
-                                Email = reader.GetString(6),
-                                isAccountActivated = reader.GetBoolean(7),
-                                LogoUrl = reader.GetString(8),
-                                BannerUrl = reader.GetString(9),
-                                TaxIDNumber = reader.GetString(10),
-                                IBAN = reader.GetString(11),
-                                isHighlighed = reader.GetString(12),
-                                CreatedAt = reader.GetDateTime(13),
-                                Rating = reader.GetInt32(14)
-                            };
-                            combinedViewModel.Company = company;
-                            combinedViewModelList.Add(combinedViewModel);
 
-                        }
-                    }
-                }
-
-                for (int i = 0; i < combinedViewModelList.Count; i++) {
-                    // User tablosundan verileri almak için sorgu
-                    string userQuery = "SELECT * FROM Users WHERE Id = @userId";
-                    using (SqlCommand userCmd = new SqlCommand(userQuery, conn))
-                    {
-                        userCmd.Parameters.AddWithValue("@userId", combinedViewModelList[i].Company.UserId);
-                        using (SqlDataReader reader = userCmd.ExecuteReader())
-                        {
                             while (reader.Read())
                             {
-                                UserModel user = new UserModel
+                                CompanyModel company = new CompanyModel
                                 {
-                                    UserId = reader.GetInt32(0),
-                                    Age = reader.GetInt32(1),
-                                    Name = reader.GetString(2),
-                                    Surname = reader.GetString(3),
-                                    PhoneNumber = reader.GetString(4),
-                                    PasswordHash = reader.GetString(5),
+                                    CompanyId = reader.GetInt32(0),
+                                    UserId = reader.GetInt32(1),
+                                    CompanyName = reader.GetString(2),
+                                    Description = reader.GetString(3),
+                                    Address = reader.GetString(4),
+                                    PhoneNumber = reader.GetString(5),
                                     Email = reader.GetString(6),
-                                    Address = reader.GetString(7),
-                                    Role = reader.GetString(8),
-                                    Birthdate = reader.GetDateTime(9),
-                                    CreatedAt = reader.GetDateTime(10)
+                                    isAccountActivated = reader.GetBoolean(7),
+                                    LogoUrl = reader.GetString(8),
+                                    BannerUrl = reader.GetString(9),
+                                    TaxIDNumber = reader.GetString(10),
+                                    IBAN = reader.GetString(11),
+                                    isHighlighed = reader.GetString(12),
+                                    CreatedAt = reader.GetDateTime(13),
+                                    Rating = reader.GetInt32(14)
                                 };
-                                combinedViewModelList[i].User = user;
+                                modelForAdminPages.activateCompanies.Add(company);
+                            }
+                        }
+                    }
+
+                    for (int i = 0; i < modelForAdminPages.activateCompanies.Count; i++)
+                    {
+                        // User tablosundan verileri almak için sorgu
+                        string userQuery = "SELECT * FROM Users WHERE Id = @userId";
+                        using (SqlCommand userCmd = new SqlCommand(userQuery, conn))
+                        {
+                            userCmd.Parameters.AddWithValue("@userId", modelForAdminPages.activateCompanies[i].UserId);
+                            using (SqlDataReader reader = userCmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    UserModel user = new UserModel
+                                    {
+                                        UserId = reader.GetInt32(0),
+                                        Age = reader.GetInt32(1),
+                                        Name = reader.GetString(2),
+                                        Surname = reader.GetString(3),
+                                        PhoneNumber = reader.GetString(4),
+                                        PasswordHash = reader.GetString(5),
+                                        Email = reader.GetString(6),
+                                        Address = reader.GetString(7),
+                                        Role = reader.GetString(8),
+                                        Birthdate = reader.GetDateTime(9),
+                                        CreatedAt = reader.GetDateTime(10)
+                                    };
+                                    modelForAdminPages.activateCompaniesUsers.Add(user);
+                                }
                             }
                         }
                     }
                 }
-
-
-            }
-            return combinedViewModelList;
+            return modelForAdminPages;
         }
 
 
 
         /* -------------------------------------------------------------------------------------------------------------- */
         /* Return new signed companies to activate */
-        public List<ModelForAdminPages> getNotAcitavedCompanies()
+        public ModelForAdminPages getNotAcitavedCompanies()
         {
-            List<ModelForAdminPages> combinedViewModelList = new List<ModelForAdminPages>();
-            ModelForAdminPages combinedViewModel = new ModelForAdminPages();
+            ModelForAdminPages modelForAdminPages = new ModelForAdminPages();
 
 
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -606,20 +628,18 @@ namespace myProject.Models
                                 CreatedAt = reader.GetDateTime(13),
                                 Rating = reader.GetInt32(14)
                             };
-                            combinedViewModel.Company = company;
-                            combinedViewModelList.Add(combinedViewModel);
-
+                            modelForAdminPages.activateCompanies.Add(company);
                         }
                     }
                 }
 
-                for (int i = 0; i < combinedViewModelList.Count; i++)
+                for (int i = 0; i < modelForAdminPages.activateCompanies.Count; i++)
                 {
                     // User tablosundan verileri almak için sorgu
                     string userQuery = "SELECT * FROM Users WHERE Id = @userId";
                     using (SqlCommand userCmd = new SqlCommand(userQuery, conn))
                     {
-                        userCmd.Parameters.AddWithValue("@userId", combinedViewModelList[i].Company.UserId);
+                        userCmd.Parameters.AddWithValue("@userId", modelForAdminPages.activateCompanies[i].UserId);
                         using (SqlDataReader reader = userCmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -638,15 +658,13 @@ namespace myProject.Models
                                     Birthdate = reader.GetDateTime(9),
                                     CreatedAt = reader.GetDateTime(10)
                                 };
-                                combinedViewModelList[i].User = user;
+                                modelForAdminPages.activateCompaniesUsers.Add(user);
                             }
                         }
                     }
                 }
-
-
             }
-            return combinedViewModelList;
+            return modelForAdminPages;
         }
 
 
