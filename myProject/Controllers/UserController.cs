@@ -5,10 +5,13 @@ using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Data.SqlClient;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
+
 
 
 namespace myProject.Controllers
 {
+    [Authorize(Policy = "UserPolicy")]
     public class UserController : Controller
     {
         private readonly _UserDatabaseControlModel userDatabaseControlModel = new _UserDatabaseControlModel();

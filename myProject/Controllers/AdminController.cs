@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using myProject.Models;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace myProject.Controllers
 {
+    [Authorize(Policy = "AdminPolicy")]
     public class AdminController : Controller
     {
         _AdminDatabaseControlModel _adminDatabaseControlModel = new _AdminDatabaseControlModel();

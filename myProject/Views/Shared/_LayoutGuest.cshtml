@@ -55,44 +55,44 @@
                             var decorationCategories = categoriesModel.GetAllDecorationCategories();
 
 
-                            
-                                <!-- Furniture Section -->
-                                <div class="nav-item dropdown">
-                                    <a class="nav-link text-dark" href="#" role="button">
-                                        Furniture
-                                    </a>
-                                    <ul class="list-unstyled small-list">
-                                        @foreach (var category in furnitureCategories)
-                                        {
-                                            <li>
-                                            <a class="text-dark" asp-area="" asp-controller="Guest" asp-action="ProductsByCategory" asp-route-categoryyy="Furniture">
+
+                            <!-- Furniture Section -->
+                            <div class="nav-item dropdown">
+                                <a class="nav-link text-dark" asp-controller="Guest" asp-action="ProductsByCategory" asp-route-categoryyy="Furniture">
+                                    Furniture
+                                </a>
+                                <ul class="list-unstyled small-list p-2">
+                                    @foreach (var categoryyy in furnitureCategories)
+                                    {
+                                        <li>
+                                            <a class="nav-link text-dark" asp-controller="Guest" asp-action="ProductsByCategory" asp-route-categoryyy="@categoryyy.CategoryName" style="margin-top:-15px;">
                                                 <i class="las la-caret-right" style="margin-right:3px; color: #969696;"></i>
                                                 <span style="color: #969696;">
-                                                    @category.CategoryName
+                                                    @categoryyy.CategoryName
                                                 </span>
-                                                </a>
-                                            </li>
-                                        }
-                                    </ul>
-                                </div>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
 
-                                <!-- Decoration Section -->
-                                <div class="nav-item dropdown">
-                                    <a class="nav-link text-dark" href="#" role="button">
-                                        Decoration
-                                    </a>
-                                    <ul class="list-unstyled small-list">
+                            <!-- Decoration Section -->
+                            <div class="nav-item dropdown">
+                                <a class="nav-link text-dark" asp-controller="Guest" asp-action="ProductsByCategory" asp-route-categoryyy="Decoration">
+                                    Decoration
+                                </a>
+                                <ul class="list-unstyled small-list p-2">
                                     @foreach (var categoryyy in decorationCategories)
-                                        {
-                                            <li>
-                                            <a class="text-dark" asp-area="" asp-action="ProductsByCategory" asp-route-categoryyy="@categoryyy.CategoryName">
+                                    {
+                                        <li>
+                                            <a class="nav-link text-dark" asp-controller="Guest" asp-action="ProductsByCategory" asp-route-categoryyy="@categoryyy.CategoryName" style="margin-top:-15px;">
                                                 <i class="las la-caret-right" style="margin-right:3px; color: #969696;"></i>
                                                 <span style="color: #969696;">@categoryyy.CategoryName</span>
-                                                </a>
-                                            </li>
-                                        }
-                                    </ul>
-                                </div>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
                         }
                     </ul>
                 </div>

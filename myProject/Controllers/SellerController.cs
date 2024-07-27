@@ -6,9 +6,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace myProject.Controllers
 {
+    [Authorize(Policy = "SellerPolicy")]
     public class SellerController : Controller
     {
         private readonly _SellerDatabaseControlModel databaseControlModel;
@@ -148,10 +151,10 @@ namespace myProject.Controllers
         }
 
         /* --------------------------------------------------- Navbar --------------------------------------------------- */
-        public JsonResult Signout()
+        public IActionResult Signout()
         {
             HttpContext.Session.Remove("UserId");
-            return Json(new { success = true, message = "Signed out successfully" });
+            return RedirectToAction("Index", "Guest");
         }
 
         /* --------------------------------------------------- Orders Page --------------------------------------------------- */
@@ -254,5 +257,10 @@ namespace myProject.Controllers
 
             return View(modelForSellerPages);
         }
+
+
+
+
+
     }
 }

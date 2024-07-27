@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -10,6 +12,36 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true; // Make the session cookie HTTP-only
     options.Cookie.IsEssential = true; // Make the session cookie essential for the application
 });
+
+
+
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Login";
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("SellerPolicy", policy => policy.RequireRole("Seller"));
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("UserPolicy", policy => policy.RequireRole("User"));
+});
+
+
+
 
 
 var app = builder.Build();
@@ -31,7 +63,12 @@ app.UseRouting();
 app.UseSession();
 
 
+// Kimlik Doðrulama ve Yetkilendirme Middleware'lerini Kullanma
+app.UseAuthentication();
 app.UseAuthorization();
+
+
+
 
 app.MapControllerRoute(
     name: "default",

@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using myProject.Models;
 using System.Reflection;
+using System.Security.Claims;
 
 namespace myProject.Controllers
 {
@@ -41,12 +44,36 @@ namespace myProject.Controllers
 
                     if (role == "admin")
                     {
+                        // Policy
+                        var claims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Role, "Admin")
+                        };
+
+                        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+
+
                         return RedirectToAction("Index", "Admin");
                     }
                     else if(role == "seller")
                     {
                         /* Hesap onaylanmış mı diye kontrol et */
-                        if(_loginDatabaseControlModel.CheckIfAccountActivated(loggedUser.UserId)) return RedirectToAction("Index", "Seller");
+                        if (_loginDatabaseControlModel.CheckIfAccountActivated(loggedUser.UserId)) {
+
+                            // Policy
+                            var claims = new List<Claim>
+                            {
+                                new Claim(ClaimTypes.Role, "Seller")
+                            };
+
+                            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+
+                            return RedirectToAction("Index", "Seller"); 
+                        }
                         else
                         {
                             TempData["ErrorMessage"] = "Account has not been activated yet.";
@@ -55,6 +82,16 @@ namespace myProject.Controllers
                     }
                     else if(role == "user")
                     {
+                        // Policy
+                        var claims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Role, "User")
+                        };
+
+                        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+
                         return RedirectToAction("Index", "User");
                     }
                 }
