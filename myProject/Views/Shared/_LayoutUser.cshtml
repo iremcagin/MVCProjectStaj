@@ -81,11 +81,11 @@
                                 <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-categoryyy="Furniture">
                                     Furniture
                                 </a>
-                                <ul class="list-unstyled small-list">
+                                <ul class="list-unstyled small-list p-2">
                                     @foreach (var categoryyy in furnitureCategories)
                                     {
-                                        <li>
-                                            <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-categoryyy="@categoryyy.CategoryName">
+                                        <li >
+                                            <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-categoryyy="@categoryyy.CategoryName" style="margin-top:-15px;">
                                                 <i class="las la-caret-right" style="margin-right:3px; color: #969696;"></i>
                                                 <span style="color: #969696;">
                                                     @categoryyy.CategoryName
@@ -101,11 +101,11 @@
                                 <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-categoryyy="Decoration">
                                     Decoration
                                 </a>
-                                <ul class="list-unstyled small-list">
+                                <ul class="list-unstyled small-list p-2">
                                     @foreach (var categoryyy in decorationCategories)
                                     {
                                         <li>
-                                            <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-categoryyy="@categoryyy.CategoryName">
+                                            <a class="nav-link text-dark" asp-controller="User" asp-action="ProductsByCategory" asp-route-categoryyy="@categoryyy.CategoryName" style="margin-top:-15px;">
                                                 <i class="las la-caret-right" style="margin-right:3px; color: #969696;"></i>
                                                 <span style="color: #969696;">@categoryyy.CategoryName</span>
                                             </a>
@@ -120,12 +120,13 @@
                 <!-- Right-aligned items -->
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
                     <!-- Search Button -->
+                    @{/*
                     <div class="container col-md-8">
                         <form class="d-flex ">
                             <input class="form-control me-2 no-outline" type="search" placeholder="Search for Product..." aria-label="Search">
                             <button class="btn btn-outline-primary search-button" style="border: 1px solid black" type="submit"><i class="las la-search" style="color:black;"></i></button>
                         </form>
-                    </div>
+                    </div> */}
 
                     <ul class="navbar-nav col-md-2 align-items-center">
                         <li class="nav-item">
@@ -229,7 +230,6 @@
         }
 
         .small-list {
-            margin-top: -5px;
             display: block;
             max-height: 0;
             opacity: 0;
