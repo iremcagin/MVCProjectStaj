@@ -155,24 +155,27 @@
     <div class="row">
         @if (ModelForUserPages.companies.Count > 0)
         {
+            int i = 0;
+
             @foreach (var company in ModelForUserPages.companies)
-            {
-                @if (company.isHighlighed == "true")
+        {
+                if (i < 16)
                 {
                     <div class="col-md-3 mb-4">
                         <div class="card h-100 position-relative">
-                            <a href="@Url.Action("CompanyDetails", "User", new { id = company.CompanyId })">
-                                <img class="card-img-top" src="@Url.Content(string.IsNullOrEmpty(company.BannerUrl) ? "~/images/placeholder-1.png" : "~/images/_Banners/" + company.BannerUrl)" alt="Banner">
-                                <img class="logo-img position-absolute" src="@Url.Content(string.IsNullOrEmpty(company.LogoUrl) ? "~/images/placeholder-1.png" : "~/images/_Logos/" + company.LogoUrl)" alt="Logo">
-                            </a>
-                            <div class="card-body" style="text-align:center;">
-                                <h5 class="card-title">@company.CompanyName</h5>
-                                <p class="card-text  review-text">@company.Description</p>
-                                <!--p class="card-text"><small class="text-muted">Rating: @company.Rating</small></!--p-->
-                            </div>
+                        <a href="@Url.Action("CompanyDetails", "User", new { id = company.CompanyId })">
+                            <img class="card-img-top" src="@Url.Content(string.IsNullOrEmpty(company.BannerUrl) ? "~/images/placeholder-1.png" : "~/images/_Banners/" + company.BannerUrl)" alt="Banner">
+                            <img class="logo-img position-absolute" src="@Url.Content(string.IsNullOrEmpty(company.LogoUrl) ? "~/images/placeholder-1.png" : "~/images/_Logos/" + company.LogoUrl)" alt="Logo">
+                        </a>
+                        <div class="card-body" style="text-align:center;">
+                            <h5 class="card-title">@company.CompanyName</h5>
+                            <p class="card-text  review-text">@company.Description</p>
+                            <!--p class="card-text"><small class="text-muted">Rating: @company.Rating</small></!--p-->
                         </div>
                     </div>
+                </div>
                 }
+                i++;
             }
         }
     </div>
@@ -186,15 +189,15 @@
 <!-- Sliding Divs -->
 <div class="side-panel-container" style="margin-top: 200px; height:1000px;">
     <!-- Left Panel -->
-    <div class="side-panel left-panel d-flex flex-column">
+    <div class="side-panel left-panel d-flex flex-column col-md-8">
         <h5 style="border-bottom:1px solid black">Latest Products</h5>
 
-        <div class="row p-2 mt-2 col-md-12">
+        <div class="row p-2 mt-2 ">
             @if (Model.newestProducts != null && Model.newestProducts.Count > 0)
             {
                 foreach (var product in Model.newestProducts)
                 {
-                    <div class="col-6">
+                    <div class="col-md-3">
                         <div class="card" style="max-width: 180px; min-height: 300px;">
                             @if (product.Images.Count > 0)
                             {

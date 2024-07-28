@@ -42,6 +42,7 @@ namespace myProject.Controllers
             ModelForUserPages.productsLiked = userDatabaseControlModel.GetLikedProductIds(userId);
 
 
+
             return View(modelForUserPages);
         }
 

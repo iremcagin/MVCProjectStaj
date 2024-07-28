@@ -1713,7 +1713,7 @@ namespace myProject.Models
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            if (reader.Read())
+                            while (reader.Read())
                             {
                                 companies.Add(new CompanyModel
                                 {
