@@ -8,7 +8,16 @@ namespace myProject.Controllers
     [Authorize(Policy = "AdminPolicy")]
     public class AdminController : Controller
     {
-        _AdminDatabaseControlModel _adminDatabaseControlModel = new _AdminDatabaseControlModel();
+        _AdminDatabaseControlModel _adminDatabaseControlModel;
+
+
+        public AdminController(_AdminDatabaseControlModel adminDatabaseControlModel)
+        {
+            _adminDatabaseControlModel = adminDatabaseControlModel;
+        }
+
+
+
 
         /* --------------------------------------------------- Dashboard Page --------------------------------------------------- */
         public IActionResult Index()

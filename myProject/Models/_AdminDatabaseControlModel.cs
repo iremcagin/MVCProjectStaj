@@ -6,24 +6,34 @@ namespace myProject.Models
     public class _AdminDatabaseControlModel
     {
 
-        private string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\iremc\OneDrive\Documents\myProjectDatabase.mdf;Integrated Security=True;Connect Timeout=30";
-
-        public _AdminDatabaseControlModel() { }
 
 
+        private string _connectionString;
+
+        public void Dispose(string _connectionString)
+        {
+            SqlConnection connection = new SqlConnection(_connectionString);
+            connection.Dispose();
+        }
+
+        public _AdminDatabaseControlModel(string connectionString)
+        {
+            _connectionString = connectionString;
+
+        }
 
 
         public int NotActivated()
         {
             int count = 0;
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 // Toplam aktif olmayan şirket sayısı
                 string query = "SELECT COUNT(*) FROM Companies WHERE isAccountActivated = 0";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     count = (int)cmd.ExecuteScalar();
                 }
@@ -39,21 +49,21 @@ namespace myProject.Models
         {
             ModelForAdminPages modelForAdminPages = new ModelForAdminPages();
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
 
                 // Toplam Company sayısı
                 string query = "SELECT COUNT(*) FROM Companies WHERE isAccountActivated = 1";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     modelForAdminPages.TotalCompanies = (int)cmd.ExecuteScalar();
                 }
 
                 // Toplam aktif olmayan şirket sayısı
                 query = "SELECT COUNT(*) FROM Companies WHERE isAccountActivated = 0";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     modelForAdminPages.notActivated = (int)cmd.ExecuteScalar();
                 }
@@ -62,7 +72,7 @@ namespace myProject.Models
 
                 // Toplam Products sayısı
                 query = "SELECT COUNT(*) FROM Products";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     modelForAdminPages.TotalProducts = (int)cmd.ExecuteScalar();
                 }
@@ -70,7 +80,7 @@ namespace myProject.Models
 
                 // Toplam Reviews sayısı
                 query = "SELECT COUNT(*) FROM Reviews";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     modelForAdminPages.TotalReviews = (int)cmd.ExecuteScalar();
                 }
@@ -79,7 +89,7 @@ namespace myProject.Models
 
                 // Toplam Users sayısı
                 query = "SELECT COUNT(*) FROM Users";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     modelForAdminPages.TotalUsers = (int)cmd.ExecuteScalar();
                 }
@@ -93,7 +103,7 @@ namespace myProject.Models
             JOIN Reviews r ON p.ProductId = r.ProductId
             GROUP BY p.ProductId, p.CompanyId, p.Name, p.Description, p.Price, p.Stock, p.CreatedAt, p.Category, p.Rating, p.Favorite, p.Clicked, p.isAvailable
             ORDER BY ReviewCount DESC";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -120,7 +130,7 @@ namespace myProject.Models
 
 
                 string imageQuery = "SELECT ImageURL FROM ProductImages WHERE ProductId = @ProductId";
-                using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                using (SqlCommand cmd = new SqlCommand(imageQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@ProductId", modelForAdminPages.mostReviewedProduct.ProductId);
 
@@ -152,7 +162,7 @@ namespace myProject.Models
             SELECT TOP 1 ProductId, CompanyId, Name, Description, Price, Stock, CreatedAt, Category, Rating, Favorite, Clicked, isAvailable
             FROM Products
             ORDER BY Favorite DESC";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -181,7 +191,7 @@ namespace myProject.Models
 
 
                 imageQuery = "SELECT ImageURL FROM ProductImages WHERE ProductId = @ProductId";
-                using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                using (SqlCommand cmd = new SqlCommand(imageQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@ProductId", modelForAdminPages.mostLikedProduct.ProductId);
 
@@ -214,7 +224,7 @@ namespace myProject.Models
             JOIN FollowedCompanies f ON c.Id = f.CompanyId
             GROUP BY c.Id, c.UserId, c.CompanyName, c.Description, c.Address, c.PhoneNumber, c.Email, c.isAccountActivated, c.LogoUrl, c.BannerUrl, c.TaxIDNumber, c.IBAN, c.IsHighlighted, c.CreatedAt, c.Rating
             ORDER BY FollowerCount DESC";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -251,7 +261,7 @@ namespace myProject.Models
             JOIN ProductsBought pb ON p.ProductId = pb.ProductId
             GROUP BY p.ProductId, p.CompanyId, p.Name, p.Description, p.Price, p.Stock, p.CreatedAt, p.Category, p.Rating, p.Favorite, p.Clicked, p.isAvailable
             ORDER BY PurchaseCount DESC";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -279,7 +289,7 @@ namespace myProject.Models
 
 
                 imageQuery = "SELECT ImageURL FROM ProductImages WHERE ProductId = @ProductId";
-                using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                using (SqlCommand cmd = new SqlCommand(imageQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@ProductId", modelForAdminPages.mostPurchasedProduct.ProductId);
 
@@ -325,7 +335,7 @@ namespace myProject.Models
                         Month, 
                         Day";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -395,7 +405,7 @@ namespace myProject.Models
 
 
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -448,7 +458,7 @@ namespace myProject.Models
                     DAY(pb.CreatedAt) DESC";
 
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -484,7 +494,7 @@ namespace myProject.Models
                         TotalSales DESC";
                     
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -516,12 +526,12 @@ namespace myProject.Models
                 ModelForAdminPages modelForAdminPages = new ModelForAdminPages();
 
 
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
 
                     string companyQuery = "SELECT * FROM Companies WHERE isAccountActivated = @IsAccountActivated";
-                    using (SqlCommand companyCmd = new SqlCommand(companyQuery, conn))
+                    using (SqlCommand companyCmd = new SqlCommand(companyQuery, connection))
                     {
 
                         companyCmd.Parameters.AddWithValue("@IsAccountActivated", true);
@@ -557,7 +567,7 @@ namespace myProject.Models
                     {
                         // User tablosundan verileri almak için sorgu
                         string userQuery = "SELECT * FROM Users WHERE Id = @userId";
-                        using (SqlCommand userCmd = new SqlCommand(userQuery, conn))
+                        using (SqlCommand userCmd = new SqlCommand(userQuery, connection))
                         {
                             userCmd.Parameters.AddWithValue("@userId", modelForAdminPages.activateCompanies[i].UserId);
                             using (SqlDataReader reader = userCmd.ExecuteReader())
@@ -596,12 +606,12 @@ namespace myProject.Models
             ModelForAdminPages modelForAdminPages = new ModelForAdminPages();
 
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 string companyQuery = "SELECT * FROM Companies WHERE isAccountActivated = @IsAccountActivated";
-                using (SqlCommand companyCmd = new SqlCommand(companyQuery, conn))
+                using (SqlCommand companyCmd = new SqlCommand(companyQuery, connection))
                 {
 
                     companyCmd.Parameters.AddWithValue("@IsAccountActivated", false);
@@ -637,7 +647,7 @@ namespace myProject.Models
                 {
                     // User tablosundan verileri almak için sorgu
                     string userQuery = "SELECT * FROM Users WHERE Id = @userId";
-                    using (SqlCommand userCmd = new SqlCommand(userQuery, conn))
+                    using (SqlCommand userCmd = new SqlCommand(userQuery, connection))
                     {
                         userCmd.Parameters.AddWithValue("@userId", modelForAdminPages.activateCompanies[i].UserId);
                         using (SqlDataReader reader = userCmd.ExecuteReader())
@@ -676,14 +686,14 @@ namespace myProject.Models
         {
             string updateQuery = "UPDATE Companies SET isAccountActivated = @IsAccountActivated WHERE Id = @CompanyId";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
+                using (SqlCommand cmd = new SqlCommand(updateQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@IsAccountActivated", true);
                     cmd.Parameters.AddWithValue("@CompanyId", CompanyId);
 
-                    conn.Open();
+                    connection.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
 
                 }
@@ -701,11 +711,11 @@ namespace myProject.Models
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
                     string query = "SELECT * FROM Users";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -751,13 +761,13 @@ namespace myProject.Models
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
 
                     // SQL query to delete the user
                     string deleteUserQuery = "DELETE FROM Users WHERE Id = @UserId";
-                    using (SqlCommand cmd = new SqlCommand(deleteUserQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(deleteUserQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@UserId", userId);
                         int rowsAffected = cmd.ExecuteNonQuery();
@@ -784,11 +794,11 @@ namespace myProject.Models
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
                     string productQuery = "SELECT * FROM Products";
-                    using (SqlCommand cmd = new SqlCommand(productQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(productQuery, connection))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -816,11 +826,11 @@ namespace myProject.Models
                 }
 
 
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
                     string imageQuery = "SELECT ProductId, ImageURL FROM ProductImages";
-                    using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(imageQuery, connection))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -861,13 +871,13 @@ namespace myProject.Models
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
 
                     // SQL query to delete the user
                     string deleteUserQuery = "DELETE FROM Products WHERE ProductId = @productId";
-                    using (SqlCommand cmd = new SqlCommand(deleteUserQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(deleteUserQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@productId", productId);
                         int rowsAffected = cmd.ExecuteNonQuery();
@@ -891,11 +901,11 @@ namespace myProject.Models
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
                     string query = "SELECT * FROM Reviews";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -932,13 +942,13 @@ namespace myProject.Models
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
 
                     // SQL query to delete the user
                     string deleteUserQuery = "DELETE FROM Reviews WHERE Id = @reviewId";
-                    using (SqlCommand cmd = new SqlCommand(deleteUserQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(deleteUserQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@reviewId", reviewId);
                         int rowsAffected = cmd.ExecuteNonQuery();

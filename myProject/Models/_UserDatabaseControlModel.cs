@@ -13,13 +13,17 @@ namespace myProject.Models
 {
     public class _UserDatabaseControlModel
     {
+        private string _connectionString;
 
-        private string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\iremc\OneDrive\Documents\myProjectDatabase.mdf;Integrated Security=True;Connect Timeout=30";
-
-
-        public _UserDatabaseControlModel()
+        public void Dispose(string _connectionString)
         {
+            SqlConnection connection = new SqlConnection(_connectionString);
+            connection.Dispose();
+        }
 
+        public _UserDatabaseControlModel(string connectionString)
+        {
+            _connectionString = connectionString;
 
         }
 
@@ -32,11 +36,11 @@ namespace myProject.Models
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
                     string productQuery = "SELECT * FROM Products WHERE isAvailable = 'true'";
-                    using (SqlCommand cmd = new SqlCommand(productQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(productQuery, connection))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -64,11 +68,11 @@ namespace myProject.Models
                 }
 
 
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
                     string imageQuery = "SELECT ProductId, ImageURL FROM ProductImages";
-                    using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(imageQuery, connection))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -109,9 +113,9 @@ namespace myProject.Models
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
 
                     
                     string query = @"
@@ -120,7 +124,7 @@ namespace myProject.Models
                         WHERE isAvailable = 'true'
                         ORDER BY Clicked DESC ";
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
                         cmd.Parameters.AddWithValue("@Limit", limit);
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -151,7 +155,7 @@ namespace myProject.Models
                 // Read Images 
                 
                     string imageQuery = "SELECT ProductId, ImageURL FROM ProductImages";
-                    using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(imageQuery, connection))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -181,7 +185,7 @@ namespace myProject.Models
                         FROM Companies
                         WHERE Id = @companyId";
 
-                        using (SqlCommand cmd = new SqlCommand(companyQuery, conn))
+                        using (SqlCommand cmd = new SqlCommand(companyQuery, connection))
                         {
                             cmd.Parameters.AddWithValue("@companyId", modelForUserPages.mostClickedProducts[i].CompanyId);
 
@@ -221,7 +225,7 @@ namespace myProject.Models
                         WHERE isAvailable = 'true'      
                         ORDER BY CreatedAt DESC ";
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
                         cmd.Parameters.AddWithValue("@Limit", 4);
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -252,7 +256,7 @@ namespace myProject.Models
 
                     
                     imageQuery = "SELECT ProductId, ImageURL FROM ProductImages";
-                    using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(imageQuery, connection))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -280,7 +284,7 @@ namespace myProject.Models
                    List<ProductReviewModel> productReviews = new List<ProductReviewModel>();
 
                    query = "SELECT Id, ProductId, CompanyId, UserId, Rating, Review, CreatedAt FROM Reviews\r\n";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -315,7 +319,7 @@ namespace myProject.Models
                         FROM Products WHERE isAvailable = 'true' AND ProductId = @ProductId";
 
 
-                        using (SqlCommand cmd = new SqlCommand(query, conn))
+                        using (SqlCommand cmd = new SqlCommand(query, connection))
                         {
                             cmd.Parameters.AddWithValue("@ProductId", modelForUserPages.randomlySelectedReviewModel[i].ProductId);
                             using (SqlDataReader reader = cmd.ExecuteReader())
@@ -348,7 +352,7 @@ namespace myProject.Models
                     for (int i = 0; i < modelForUserPages.randomlySelectedReviewModel.Count; i++)
                     {
                         query = "SELECT ProductId, ImageURL FROM ProductImages WHERE ProductId = @ProductId";
-                        using (SqlCommand cmd = new SqlCommand(query, conn))
+                        using (SqlCommand cmd = new SqlCommand(query, connection))
                         {
                             cmd.Parameters.AddWithValue("@ProductId", modelForUserPages.randomlySelectedReviewModel[i].ProductId);
 
@@ -393,14 +397,14 @@ namespace myProject.Models
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
 
                     // Update clicked value of product 
                     string query = "UPDATE Products SET Clicked = Clicked + 1 WHERE ProductId = @ProductId";
 
-                    using (var command = new SqlCommand(query, conn))
+                    using (var command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@ProductId", productId);
                         command.ExecuteNonQuery();
@@ -412,7 +416,7 @@ namespace myProject.Models
                         SELECT *
                         FROM Products where ProductId = @productId and isAvailable = 'true'";
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
                         cmd.Parameters.AddWithValue("@productId", productId);
 
@@ -447,7 +451,7 @@ namespace myProject.Models
                     FROM Companies
                     WHERE Id = @companyId";
 
-                    using (SqlCommand cmd = new SqlCommand(companyQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(companyQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@companyId", productDetailsModel.Product.CompanyId);
 
@@ -485,7 +489,7 @@ namespace myProject.Models
                     FROM Users
                     WHERE Id = @userId";
 
-                    using (SqlCommand cmd = new SqlCommand(userQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(userQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@userId", productDetailsModel.Company.UserId);
 
@@ -519,7 +523,7 @@ namespace myProject.Models
                     WHERE ProductId = @productId";
 
 
-                    using (SqlCommand cmd = new SqlCommand(reviewsQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(reviewsQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@productId", productId);
 
@@ -560,7 +564,7 @@ namespace myProject.Models
                         FROM Users 
                         WHERE Id = @userId";
 
-                        using (SqlCommand cmd = new SqlCommand(reviewsUsersQuery, conn))
+                        using (SqlCommand cmd = new SqlCommand(reviewsUsersQuery, connection))
                         {
                             cmd.Parameters.AddWithValue("@userId", productDetailsModel.ProductReviews[i].UserId);
 
@@ -602,7 +606,7 @@ namespace myProject.Models
                     FROM ProductImages
                     WHERE ProductId = @productId";
 
-                    using (SqlCommand cmd = new SqlCommand(imagesQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(imagesQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@productId", productId);
 
@@ -631,7 +635,7 @@ namespace myProject.Models
                         AND ProductId != @excludedProductId
                         AND  isAvailable = 'true'";
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
                         cmd.Parameters.AddWithValue("@category", productDetailsModel.Product.Category);
                         cmd.Parameters.AddWithValue("@excludedProductId", productDetailsModel.Product.ProductId);
@@ -670,7 +674,7 @@ namespace myProject.Models
                             FROM ProductImages
                             WHERE ProductId = @productId";
 
-                        using (SqlCommand cmd = new SqlCommand(imagesQuery, conn))
+                        using (SqlCommand cmd = new SqlCommand(imagesQuery, connection))
                         {
                             cmd.Parameters.AddWithValue("@productId", modelForUserPages.recommendatitons[i].ProductId);
 
@@ -711,9 +715,9 @@ namespace myProject.Models
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    await conn.OpenAsync();
+                    await connection.OpenAsync();
                     var queryCheck = "SELECT Count FROM ProductsInBasket WHERE UserId = @UserId AND ProductId = @ProductId AND CompanyId = @CompanyId";
                     var queryUpdate = "UPDATE ProductsInBasket SET Count = Count + @Quantity WHERE UserId = @UserId AND ProductId = @ProductId AND CompanyId = @CompanyId";
                     var queryInsert = "INSERT INTO ProductsInBasket (UserId, ProductId, CompanyId, Count) VALUES (@UserId, @ProductId, @CompanyId, @Quantity)";
@@ -721,7 +725,7 @@ namespace myProject.Models
                     try
                     {
                         // Check if the product already exists in the basket
-                        using (SqlCommand command = new SqlCommand(queryCheck, conn))
+                        using (SqlCommand command = new SqlCommand(queryCheck, connection))
                         {
                             command.Parameters.AddWithValue("@UserId", userId);
                             command.Parameters.AddWithValue("@ProductId", productId);
@@ -732,7 +736,7 @@ namespace myProject.Models
                             if (result != null && result != DBNull.Value) // Product exists
                             {
                                 // Update the Count value
-                                using (SqlCommand updateCommand = new SqlCommand(queryUpdate, conn))
+                                using (SqlCommand updateCommand = new SqlCommand(queryUpdate, connection))
                                 {
                                     updateCommand.Parameters.AddWithValue("@Quantity", quantity);
                                     updateCommand.Parameters.AddWithValue("@UserId", userId);
@@ -744,7 +748,7 @@ namespace myProject.Models
                             else // Product does not exist
                             {
                                 // Insert a new record
-                                using (SqlCommand insertCommand = new SqlCommand(queryInsert, conn))
+                                using (SqlCommand insertCommand = new SqlCommand(queryInsert, connection))
                                 {
                                     insertCommand.Parameters.AddWithValue("@Quantity", quantity);
                                     insertCommand.Parameters.AddWithValue("@UserId", userId);
@@ -772,15 +776,15 @@ namespace myProject.Models
         /* Return number of basket products for navbar cart icon. */
         public int GetBasketCount(int? userId)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query = "SELECT SUM(Count) FROM ProductsInBasket WHERE UserId = @UserId";
 
-                using (var command = new SqlCommand(query, conn))
+                using (var command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@UserId", userId);
 
-                    conn.Open();
+                    connection.Open();
                     object result = command.ExecuteScalar();
                     return result != DBNull.Value ? Convert.ToInt32(result) : 0;
                 }
@@ -796,16 +800,16 @@ namespace myProject.Models
             ProductsInBasket basketProducts = new ProductsInBasket();
 
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 string queryProductIds = @"
                 SELECT *
                 FROM ProductsInBasket
                 WHERE UserId = @UserId";
 
-                using (SqlCommand cmd = new SqlCommand(queryProductIds, conn))
+                using (SqlCommand cmd = new SqlCommand(queryProductIds, connection))
                 {
                     cmd.Parameters.AddWithValue("@UserId", userId);
 
@@ -834,7 +838,7 @@ namespace myProject.Models
                     WHERE ProductId = @ProductId AND isAvailable = 'true'";
 
 
-                    using (SqlCommand cmd = new SqlCommand(queryProducts, conn))
+                    using (SqlCommand cmd = new SqlCommand(queryProducts, connection))
                     {
                         cmd.Parameters.AddWithValue("@ProductId", basketProducts.Products[i].ProductId);
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -872,7 +876,7 @@ namespace myProject.Models
                     FROM ProductImages
                     WHERE ProductId = @productId";
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
                         cmd.Parameters.AddWithValue("@productId", basketProducts.Products[i].ProductId);
 
@@ -902,7 +906,7 @@ namespace myProject.Models
                 FROM CreditCards
                 WHERE UserId = @userId";
 
-                using (SqlCommand cmd = new SqlCommand(creditCardQuery, conn))
+                using (SqlCommand cmd = new SqlCommand(creditCardQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@userId", userId);
 
@@ -943,9 +947,9 @@ namespace myProject.Models
             ProductsInBasket basketProducts = new ProductsInBasket();
 
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 string query = @"
                 SELECT TOP 10 *
@@ -953,7 +957,7 @@ namespace myProject.Models
                 WHERE UserId = @UserId
                 ORDER BY DeletedAt DESC";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@UserId", userId);
 
@@ -984,7 +988,7 @@ namespace myProject.Models
                     WHERE ProductId = @ProductId AND isAvailable = 'true'";
 
 
-                    using (SqlCommand cmd = new SqlCommand(queryProducts, conn))
+                    using (SqlCommand cmd = new SqlCommand(queryProducts, connection))
                     {
                         cmd.Parameters.AddWithValue("@ProductId", basketProducts.Products[i].ProductId);
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -1022,7 +1026,7 @@ namespace myProject.Models
                     FROM ProductImages
                     WHERE ProductId = @productId";
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
                         cmd.Parameters.AddWithValue("@productId", basketProducts.Products[i].ProductId);
 
@@ -1056,9 +1060,9 @@ namespace myProject.Models
         /* Delete product from the user's basket. */
         public void DeleteItemInBasket(int? userId, int itemId)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
 
                 /* productId Id al */
@@ -1069,7 +1073,7 @@ namespace myProject.Models
                         FROM ProductsInBasket
                         WHERE Id = @itemId";
 
-                using (SqlCommand cmd = new SqlCommand(queryProductIds, conn))
+                using (SqlCommand cmd = new SqlCommand(queryProductIds, connection))
                 {
                     cmd.Parameters.AddWithValue("@itemId", itemId);
 
@@ -1091,7 +1095,7 @@ namespace myProject.Models
                     FROM Products
                     WHERE ProductId = @productId AND isAvailable = 'true'";
 
-                using (SqlCommand cmd = new SqlCommand(queryProductIds, conn))
+                using (SqlCommand cmd = new SqlCommand(queryProductIds, connection))
                 {
                     cmd.Parameters.AddWithValue("@productId", productId);
 
@@ -1108,7 +1112,7 @@ namespace myProject.Models
 
 
                 // Begin transaction
-                using (SqlTransaction transaction = conn.BeginTransaction())
+                using (SqlTransaction transaction = connection.BeginTransaction())
                 {
                     try
                     {
@@ -1118,7 +1122,7 @@ namespace myProject.Models
                         FROM ProductsDeletedFromBasket
                         WHERE UserId = @UserId AND ProductId = @ProductId";
 
-                        using (SqlCommand checkCommand = new SqlCommand(checkQuery, conn, transaction))
+                        using (SqlCommand checkCommand = new SqlCommand(checkQuery, connection, transaction))
                         {
                             checkCommand.Parameters.AddWithValue("@UserId", userId);
                             checkCommand.Parameters.AddWithValue("@ProductId", productId);
@@ -1132,7 +1136,7 @@ namespace myProject.Models
                                     INSERT INTO ProductsDeletedFromBasket (UserId, CompanyId, ProductId)
                                     VALUES (@UserId, @CompanyId, @ProductId)";
 
-                                using (SqlCommand insertCommand = new SqlCommand(insertQuery, conn, transaction))
+                                using (SqlCommand insertCommand = new SqlCommand(insertQuery, connection, transaction))
                                 {
                                     insertCommand.Parameters.AddWithValue("@UserId", userId);
                                     insertCommand.Parameters.AddWithValue("@CompanyId", companyId);
@@ -1145,7 +1149,7 @@ namespace myProject.Models
                         // Delete from ProductsInBasket
                         string deleteQuery = "DELETE FROM ProductsInBasket WHERE Id = @Id";
 
-                        using (SqlCommand deleteCommand = new SqlCommand(deleteQuery, conn, transaction))
+                        using (SqlCommand deleteCommand = new SqlCommand(deleteQuery, connection, transaction))
                         {
                             deleteCommand.Parameters.AddWithValue("@Id", itemId);
                             deleteCommand.ExecuteNonQuery();
@@ -1172,10 +1176,10 @@ namespace myProject.Models
         {
             var query = "UPDATE ProductsInBasket SET Count = @Quantity WHERE UserId = @UserId AND ProductId = @ProductId AND CompanyId = @CompanyId";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
-                using (SqlCommand command = new SqlCommand(query, conn))
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Quantity", quantity);
                     command.Parameters.AddWithValue("@UserId", userId);
@@ -1204,11 +1208,11 @@ namespace myProject.Models
                     WHERE Id = @userId";
 
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
-                using (SqlCommand cmd = new SqlCommand(userQuery, conn))
+                using (SqlCommand cmd = new SqlCommand(userQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@userId", userId);
 
@@ -1245,7 +1249,7 @@ namespace myProject.Models
                     FROM Reviews
                     WHERE UserId = @userId";
 
-                using (SqlCommand cmd = new SqlCommand(userQuery, conn))
+                using (SqlCommand cmd = new SqlCommand(userQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@userId", userId);
 
@@ -1282,7 +1286,7 @@ namespace myProject.Models
                         LEFT JOIN ProductImages pi ON p.ProductId = pi.ProductId
                         WHERE p.ProductId = @productId";
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
                         cmd.Parameters.AddWithValue("@productId", user.productReviews[i].ProductId);
 
@@ -1314,7 +1318,7 @@ namespace myProject.Models
                 FROM CreditCards
                 WHERE UserId = @userId";
 
-                using (SqlCommand cmd = new SqlCommand(creditCardQuery, conn))
+                using (SqlCommand cmd = new SqlCommand(creditCardQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@userId", userId);
 
@@ -1348,7 +1352,7 @@ namespace myProject.Models
 
                 List<(int ProductId, DateTime CreatedAt)> boughtProducts = new List<(int, DateTime)>();
 
-                using (SqlCommand cmd = new SqlCommand(productsBoughtQuery, conn))
+                using (SqlCommand cmd = new SqlCommand(productsBoughtQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@userId", userId);
 
@@ -1377,7 +1381,7 @@ namespace myProject.Models
                     FROM Products
                     WHERE ProductId IN (" + string.Join(",", productIds) + ") AND isAvailable = 'true'";
 
-                    using (SqlCommand cmd = new SqlCommand(productDetailsQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(productDetailsQuery, connection))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -1417,7 +1421,7 @@ namespace myProject.Models
                         LEFT JOIN ProductImages pi ON p.ProductId = pi.ProductId
                         WHERE p.ProductId = @productId AND p.isAvailable = 'true'";
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
                         cmd.Parameters.AddWithValue("@productId", user.productsBought[i].ProductId);
 
@@ -1450,7 +1454,7 @@ namespace myProject.Models
 
                 List<(int CompanyId, DateTime CreatedAt)> followedCompanies = new List<(int, DateTime)>();
 
-                using (SqlCommand cmd = new SqlCommand(followedCompaniesQuery, conn))
+                using (SqlCommand cmd = new SqlCommand(followedCompaniesQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@userId", userId);
 
@@ -1476,7 +1480,7 @@ namespace myProject.Models
                         FROM Companies
                         WHERE Id = @companyId";
 
-                    using (SqlCommand cmd = new SqlCommand(companyDetailsQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(companyDetailsQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@companyId", followedCompanies[i].CompanyId);
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -1518,9 +1522,9 @@ namespace myProject.Models
         /* Add card to the database */
         public void AddCard(int? userId, CardModel card)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 string query = @"
                     INSERT INTO CreditCards (UserId, CardNumber, CardHolderName, ExpirationDate, CVV)
@@ -1528,7 +1532,7 @@ namespace myProject.Models
 
 
                 // Create and configure the SqlCommand
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     // Add parameters to the command
                     cmd.Parameters.AddWithValue("@UserId", userId);
@@ -1549,12 +1553,12 @@ namespace myProject.Models
         /* Delete product from the user's basket. */
         public void ClearCart(int? userId)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 // Begin transaction
-                using (SqlTransaction transaction = conn.BeginTransaction())
+                using (SqlTransaction transaction = connection.BeginTransaction())
                 {
                     try
                     {
@@ -1567,7 +1571,7 @@ namespace myProject.Models
 
                         var productsInBasket = new List<(int ProductId, int CompanyId)>();
 
-                        using (SqlCommand cmd = new SqlCommand(queryProductsInBasket, conn, transaction))
+                        using (SqlCommand cmd = new SqlCommand(queryProductsInBasket, connection, transaction))
                         {
                             cmd.Parameters.AddWithValue("@UserId", userId);
 
@@ -1592,7 +1596,7 @@ namespace myProject.Models
 
                         foreach (var product in productsInBasket)
                         {
-                            using (SqlCommand checkCommand = new SqlCommand(checkQuery, conn, transaction))
+                            using (SqlCommand checkCommand = new SqlCommand(checkQuery, connection, transaction))
                             {
                                 checkCommand.Parameters.AddWithValue("@UserId", userId);
                                 checkCommand.Parameters.AddWithValue("@ProductId", product.ProductId);
@@ -1601,7 +1605,7 @@ namespace myProject.Models
 
                                 if (count == 0)
                                 {
-                                    using (SqlCommand insertCommand = new SqlCommand(insertQuery, conn, transaction))
+                                    using (SqlCommand insertCommand = new SqlCommand(insertQuery, connection, transaction))
                                     {
                                         insertCommand.Parameters.AddWithValue("@UserId", userId);
                                         insertCommand.Parameters.AddWithValue("@CompanyId", product.CompanyId);
@@ -1615,7 +1619,7 @@ namespace myProject.Models
                         // Delete all products from ProductsInBasket for the user
                         string deleteQuery = "DELETE FROM ProductsInBasket WHERE UserId = @UserId";
 
-                        using (SqlCommand deleteCommand = new SqlCommand(deleteQuery, conn, transaction))
+                        using (SqlCommand deleteCommand = new SqlCommand(deleteQuery, connection, transaction))
                         {
                             deleteCommand.Parameters.AddWithValue("@UserId", userId);
                             deleteCommand.ExecuteNonQuery();
@@ -1639,15 +1643,15 @@ namespace myProject.Models
 
         public void AddReview(ProductReviewModel model, int? userId)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 string query = @"
                     INSERT INTO Reviews (ProductId, CompanyId, UserId, Rating, Review, CreatedAt)
                     VALUES (@ProductId, @CompanyId, @UserId, @Rating, @Review, @CreatedAt)";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
 
                     cmd.Parameters.AddWithValue("@ProductId", model.ProductId);
@@ -1672,7 +1676,7 @@ namespace myProject.Models
                 )
                 WHERE ProductId = @ProductId";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@ProductId", model.ProductId);
 
@@ -1691,9 +1695,9 @@ namespace myProject.Models
         {
             List<CompanyModel> companies = new List<CompanyModel>();
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
 
                 try
@@ -1704,7 +1708,7 @@ namespace myProject.Models
                     FROM Companies
                    ";
 
-                    using (SqlCommand cmd = new SqlCommand(companyQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(companyQuery, connection))
                     {
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -1755,13 +1759,13 @@ namespace myProject.Models
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
 
                     // Ürünleri kategoriye göre filtreleyen sorgu
                     string productQuery = "SELECT * FROM Products WHERE Category = @Category AND isAvailable = 'true'";
-                    using (SqlCommand cmd = new SqlCommand(productQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(productQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@Category", category);
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -1790,11 +1794,11 @@ namespace myProject.Models
                     }
                 }
 
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
                     string imageQuery = "SELECT ProductId, ImageURL FROM ProductImages";
-                    using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(imageQuery, connection))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -1835,11 +1839,11 @@ namespace myProject.Models
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
                     string subcategoryQuery = "SELECT CategoryName FROM Categories WHERE MainCategory = @MainCategory";
-                    using (SqlCommand cmd = new SqlCommand(subcategoryQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(subcategoryQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@MainCategory", mainCategory);
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -1879,9 +1883,9 @@ namespace myProject.Models
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
 
 
                     string companyQuery = @"
@@ -1890,7 +1894,7 @@ namespace myProject.Models
                     WHERE Id = @CompanyId
                    ";
 
-                    using (SqlCommand cmd = new SqlCommand(companyQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(companyQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@CompanyId", companyId);
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -1923,7 +1927,7 @@ namespace myProject.Models
 
 
                     string productQuery = "SELECT * FROM Products WHERE CompanyId = @CompanyId AND isAvailable = 'true'";
-                    using (SqlCommand cmd = new SqlCommand(productQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(productQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@CompanyId", companyId);
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -1961,7 +1965,7 @@ namespace myProject.Models
                         LEFT JOIN ProductImages pi ON p.ProductId = pi.ProductId
                         WHERE p.ProductId = @productId AND p.isAvailable = 'true'";
 
-                        using (SqlCommand cmd = new SqlCommand(query, conn))
+                        using (SqlCommand cmd = new SqlCommand(query, connection))
                         {
                             cmd.Parameters.AddWithValue("@productId", modelForUserPages.companyProducts[i].ProductId);
 
@@ -1988,7 +1992,7 @@ namespace myProject.Models
                         FROM FollowedCompanies 
                         WHERE UserId = @UserId AND CompanyId = @CompanyId";
 
-                    using (SqlCommand cmd = new SqlCommand(followQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(followQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@UserId", userId);
                         cmd.Parameters.AddWithValue("@CompanyId", companyId);
@@ -2023,9 +2027,9 @@ namespace myProject.Models
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
 
 
                     try
@@ -2045,7 +2049,7 @@ namespace myProject.Models
                                 WHERE ProductId = @ProductId
                                 AND Stock >= @Quantity"; // Ensures stock is not negative
 
-                            using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
+                            using (SqlCommand cmd = new SqlCommand(updateQuery, connection))
                             {
                                 cmd.Parameters.AddWithValue("@ProductId", productId);
                                 cmd.Parameters.AddWithValue("@Quantity", quantity);
@@ -2079,14 +2083,14 @@ namespace myProject.Models
         {
             ModelForUserPages modelForUserPages = new ModelForUserPages();
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
                 string followQuery = @"
                 INSERT INTO FollowedCompanies (UserId, CompanyId)
                 VALUES (@UserId, @CompanyId)";
 
-                using (SqlCommand cmd = new SqlCommand(followQuery, conn))
+                using (SqlCommand cmd = new SqlCommand(followQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@UserId", userId);
                     cmd.Parameters.AddWithValue("@CompanyId", companyId);
@@ -2101,14 +2105,14 @@ namespace myProject.Models
         {
             ModelForUserPages modelForUserPages = new ModelForUserPages();
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
                 string unfollowQuery = @"
                     DELETE FROM FollowedCompanies
                     WHERE UserId = @UserId AND CompanyId = @CompanyId";
 
-                using (SqlCommand cmd = new SqlCommand(unfollowQuery, conn))
+                using (SqlCommand cmd = new SqlCommand(unfollowQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@UserId", userId);
                     cmd.Parameters.AddWithValue("@CompanyId", companyId);
@@ -2135,11 +2139,11 @@ namespace myProject.Models
         SET Favorite = Favorite + 1
         WHERE ProductId = @ProductId";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
-                using (SqlTransaction transaction = conn.BeginTransaction())
+                using (SqlTransaction transaction = connection.BeginTransaction())
                 {
                     try
                     {
@@ -2149,7 +2153,7 @@ namespace myProject.Models
                     FROM ProductsLiked
                     WHERE UserId = @UserId AND ProductId = @ProductId";
 
-                        using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn, transaction))
+                        using (SqlCommand checkCmd = new SqlCommand(checkQuery, connection, transaction))
                         {
                             checkCmd.Parameters.AddWithValue("@UserId", userId);
                             checkCmd.Parameters.AddWithValue("@ProductId", productId);
@@ -2159,7 +2163,7 @@ namespace myProject.Models
                             // If the user does not already like this product, insert the like
                             if (count == 0)
                             {
-                                using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn, transaction))
+                                using (SqlCommand insertCmd = new SqlCommand(insertQuery, connection, transaction))
                                 {
                                     insertCmd.Parameters.AddWithValue("@UserId", userId);
                                     insertCmd.Parameters.AddWithValue("@ProductId", productId);
@@ -2167,7 +2171,7 @@ namespace myProject.Models
                                 }
 
                                 // Update the Favorite count in the Products table
-                                using (SqlCommand updateCmd = new SqlCommand(updateFavoriteQuery, conn, transaction))
+                                using (SqlCommand updateCmd = new SqlCommand(updateFavoriteQuery, connection, transaction))
                                 {
                                     updateCmd.Parameters.AddWithValue("@ProductId", productId);
                                     updateCmd.ExecuteNonQuery();
@@ -2199,11 +2203,11 @@ namespace myProject.Models
                 FROM ProductsLiked
                 WHERE UserId = @UserId";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@UserId", userId);
 
@@ -2233,11 +2237,11 @@ namespace myProject.Models
             SET Favorite = Favorite - 1
             WHERE ProductId = @ProductId";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
-                using (SqlTransaction transaction = conn.BeginTransaction())
+                using (SqlTransaction transaction = connection.BeginTransaction())
                 {
                     try
                     {
@@ -2247,7 +2251,7 @@ namespace myProject.Models
                         FROM ProductsLiked
                         WHERE UserId = @UserId AND ProductId = @ProductId";
 
-                        using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn, transaction))
+                        using (SqlCommand checkCmd = new SqlCommand(checkQuery, connection, transaction))
                         {
                             checkCmd.Parameters.AddWithValue("@UserId", userId);
                             checkCmd.Parameters.AddWithValue("@ProductId", productId);
@@ -2257,7 +2261,7 @@ namespace myProject.Models
                             // If the user has liked this product, delete the like
                             if (count > 0)
                             {
-                                using (SqlCommand deleteCmd = new SqlCommand(deleteQuery, conn, transaction))
+                                using (SqlCommand deleteCmd = new SqlCommand(deleteQuery, connection, transaction))
                                 {
                                     deleteCmd.Parameters.AddWithValue("@ProductId", productId);
                                     deleteCmd.Parameters.AddWithValue("@UserId", userId);
@@ -2265,7 +2269,7 @@ namespace myProject.Models
                                 }
 
                                 // Update the Favorite count in the Products table
-                                using (SqlCommand updateCmd = new SqlCommand(updateFavoriteQuery, conn, transaction))
+                                using (SqlCommand updateCmd = new SqlCommand(updateFavoriteQuery, connection, transaction))
                                 {
                                     updateCmd.Parameters.AddWithValue("@ProductId", productId);
                                     updateCmd.ExecuteNonQuery();
@@ -2297,15 +2301,15 @@ namespace myProject.Models
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+               using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
 
 
                     for (int i = 0; i < productIds.Count; ++i)
                     {
                         string productQuery = "SELECT * FROM Products Where ProductId = @ProductId AND isAvailable = 'true'";
-                        using (SqlCommand cmd = new SqlCommand(productQuery, conn))
+                        using (SqlCommand cmd = new SqlCommand(productQuery, connection))
                         {
                             cmd.Parameters.AddWithValue("@ProductId", productIds[i]);
 
@@ -2337,11 +2341,11 @@ namespace myProject.Models
 
                 for (int i = 0; i < products.Count; ++i)
                 {
-                    using (SqlConnection conn = new SqlConnection(connectionString))
+                   using (SqlConnection connection = new SqlConnection(_connectionString))
                     {
-                        conn.Open();
+                        connection.Open();
                         string imageQuery = "SELECT ProductId, ImageURL FROM ProductImages Where ProductId = @ProductId";
-                        using (SqlCommand cmd = new SqlCommand(imageQuery, conn))
+                        using (SqlCommand cmd = new SqlCommand(imageQuery, connection))
                         {
                             cmd.Parameters.AddWithValue("@ProductId", products[i].ProductId);
 

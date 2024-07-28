@@ -7,25 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="Views\Seller\Followers.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.3" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Views\Seller\Followers.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="Views\Seller\Followers.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Views\Seller\Followers.cshtml" />
   </ItemGroup>
 
 </Project>

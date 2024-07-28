@@ -9,16 +9,22 @@ namespace myProject.Controllers
 {
     public class LoginController : Controller
     {
-        _LoginDatabaseControlModel _loginDatabaseControlModel = new _LoginDatabaseControlModel();
+        _LoginDatabaseControlModel _loginDatabaseControlModel;
+
+
+
+
+        public LoginController(_LoginDatabaseControlModel loginDatabaseControlModel)
+        {
+            _loginDatabaseControlModel = loginDatabaseControlModel;
+        }
+
+
 
         public IActionResult Index()
         {
             return View();
         }
-
-
-
-
 
         /* ------------------------------------- LOGIN ------------------------------------- */
         [HttpPost]

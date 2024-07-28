@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
+using System.Reflection;
 
 
 namespace myProject.Controllers
@@ -17,9 +18,9 @@ namespace myProject.Controllers
         private readonly _SellerDatabaseControlModel databaseControlModel;
 
         /* --------------------------------------------------- Constructor --------------------------------------------------- */
-        public SellerController()
+        public SellerController(_SellerDatabaseControlModel sellerDatabaseControlModel)
         {
-            databaseControlModel = new _SellerDatabaseControlModel();
+            databaseControlModel = sellerDatabaseControlModel;
         }
 
         /* --------------------------------------------------- Dashboard Page --------------------------------------------------- */
@@ -95,6 +96,9 @@ namespace myProject.Controllers
             return View(modelForSellerPages);
         }
 
+
+        // ----------------------------------------------------------------------------------------
+
         [HttpPost]
         public async Task<IActionResult> AddNewProduct(List<IFormFile> images, ProductModel model)
         {
@@ -149,6 +153,75 @@ namespace myProject.Controllers
                 return RedirectToAction("Products");
             }
         }
+
+        // ----------------------------------------------------------------------------------------
+        [HttpPost]
+        public async Task<IActionResult> UpdateProduct(int productId, string name, string description, decimal price, int stock, string category, string isAvailable, List<IFormFile> images)
+        {
+            ProductModel model = new ProductModel();
+            model.ProductId = productId;
+            model.Name = name;
+            model.Description = description;
+            model.Price = price;
+            model.Stock = stock;
+            model.Category = category;
+
+            if(isAvailable == "true") model.isAvailable="true";
+            else model.isAvailable = "false";
+
+
+            if (images != null && images.Count > 0)
+            {
+                foreach (var image in images)
+                {
+                    if (image.Length > 0)
+                    {
+                       
+                        var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", category);
+                        Directory.CreateDirectory(uploadPath);
+
+                       
+                        var fileName = Path.GetFileName(image.FileName);
+                        var filePath = Path.Combine(uploadPath, fileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await image.CopyToAsync(fileStream);
+                        }
+                        model.Images.Add(fileName);
+                    }
+                }
+            }
+
+            
+            databaseControlModel.UpdateProduct(model);
+
+            return RedirectToAction("Products");
+        }
+
+
+
+
+        [HttpPost]
+        public IActionResult RemoveProductImage(int productId, string imageName, string category)
+        {
+
+            // Resmi listeden kaldırın
+            var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", category, "/",imageName);
+            if (System.IO.File.Exists(imagePath))
+            {
+                System.IO.File.Delete(imagePath);
+            }
+
+            databaseControlModel.RemoveProductImage(productId, imageName);
+
+            return Json(new { success = true });
+        }
+
+
+
+
+
 
         /* --------------------------------------------------- Navbar --------------------------------------------------- */
         public IActionResult Signout()
@@ -225,7 +298,7 @@ namespace myProject.Controllers
         }
 
         /* --------------------------------------------------- Followers Page --------------------------------------------------- */
-        public IActionResult Followers(int page = 1, int pageSize = 10)
+        public IActionResult Followerss(int page = 1, int pageSize = 10)
         {
             ModelForSellerPages modelForSellerPages = new ModelForSellerPages();
             int? userId = HttpContext.Session.GetInt32("UserId");
@@ -257,6 +330,14 @@ namespace myProject.Controllers
 
             return View(modelForSellerPages);
         }
+
+
+
+
+
+
+
+
 
 
 

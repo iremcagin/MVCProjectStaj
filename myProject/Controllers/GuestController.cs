@@ -6,9 +6,16 @@ namespace myProject.Controllers
 {
     public class GuestController : Controller
     {
-       
 
-        private readonly _UserDatabaseControlModel userDatabaseControlModel = new _UserDatabaseControlModel();
+
+        private readonly _UserDatabaseControlModel userDatabaseControlModel;
+
+
+
+        public GuestController(_UserDatabaseControlModel userDatabaseControlModel_)
+        {
+            userDatabaseControlModel = userDatabaseControlModel_;
+        }
 
 
         public IActionResult Index()

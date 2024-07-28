@@ -140,6 +140,7 @@
                 <th>Favorite</th>
                 <th>Reviews</th>
                 <th>Status</th>
+                <th></th>
             </tr>
         </thead>
         <tbody id="productTableBody">
@@ -156,9 +157,14 @@
                                     <div class="carousel-item active  d-flex justify-content-center">
                                         @if (product.Images.Count > 0)
                                         {
-                                            <a href="#" data-toggle="modal" data-target="#imageModal">
-                                                <img src="@Url.Content("~/images/"+product.Category+"/" + product.Images[0])" alt="@product.Name" class="d-block  card-img" style="width: auto; height: 45px;" />
+                                            <!-- Example product image link -->
+                                            <a href="#" data-toggle="modal" data-target="#imageModal"
+                                               data-product-name="@product.Name"
+                                               data-product-images="@string.Join(",", product.Images)"
+                                               data-product-category="@product.Category">
+                                                <img src="@Url.Content("~/images/" + product.Category + "/" + product.Images[0])" alt="@product.Name" class="d-block card-img" style="width: auto; height: 45px;" />
                                             </a>
+
                                         }
                                         else
                                         {
@@ -170,26 +176,22 @@
                             </div>
                         </td>
 
-                        <!-- Modal penceresi -->
+
+                        <script src="/_framework/aspnetcore-browser-refresh.js"></script>
+
+                        <!-- Modal Window -->
                         <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="imageModalLabel">@product.Name</h5>
+                                        <h5 class="modal-title" id="imageModalLabel"></h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <div id="carouselImages" class="carousel slide" data-ride="false">
-                                            <div class="carousel-inner">
-                                                @foreach (var image in product.Images)
-                                                {
-                                                    <div class="carousel-item @(image == product.Images[0] ? "active" : "")">
-                                                        <img src="@Url.Content("~/images/"+product.Category+"/" + image)" alt="@product.Name" class="d-block w-100 img-fluid img-thumbnail" style="object-fit: contain; max-height: 450px;" />
-                                                    </div>
-                                                }
-                                            </div>
+                                        <div id="carouselImages" class="carousel slide" data-ride="carousel">
+                                            <div class="carousel-inner"></div>
                                             <a class="carousel-control-prev" href="#carouselImages" role="button" data-slide="prev">
                                                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                                 <span class="sr-only">Previous</span>
@@ -203,6 +205,13 @@
                                 </div>
                             </div>
                         </div>
+
+
+
+
+
+
+
 
                         <td>@product.Name</td>
                         <td class="table-description" onclick="showFullDescription('@product.Description')"  style=" white-space: nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 20px;">
@@ -330,7 +339,115 @@
                                 </span>
                             }
                         </td>
+
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center justify-content-center" data-toggle="modal" data-target="#updateProductModal-@product.ProductId">
+                                <i class="las la-edit"></i>
+                            </button>
+                        </td>
                     </tr>
+
+
+
+                      <!-- Update Product Modal -->
+                    <div class="modal fade" id="updateProductModal-@product.ProductId" tabindex="-1" role="dialog" aria-labelledby="updateProductModalLabel-@product.ProductId" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h6 class="modal-title" id="updateProductModalLabel-@product.ProductId">Update Product</h6>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="post" action="@Url.Action("UpdateProduct", "Seller")" enctype="multipart/form-data">
+                                        <input type="hidden" name="ProductId" value="@product.ProductId" />
+                                        <div class="form-group">
+                                            <label for="productName-@product.ProductId" style="font-size: 14px;">Product Name:</label>
+                                            <input type="text" class="form-control no-outline" style="font-size: 13px;" id="productName-@product.ProductId" name="Name" value="@product.Name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="productDescription-@product.ProductId" style="font-size: 14px;">Product Description:</label>
+                                            <textarea class="form-control no-outline" style="font-size: 13px;" id="productDescription-@product.ProductId" name="Description" rows="3" required>@product.Description</textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="productPrice-@product.ProductId" style="font-size: 14px;">Price:</label>
+                                            <input type="number" class="form-control no-outline" style="font-size: 13px;" id="productPrice-@product.ProductId" name="Price" step="0.01" value="@product.Price" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="productStock-@product.ProductId" style="font-size: 14px;">Stock Quantity:</label>
+                                            <input type="number" class="form-control no-outline" style="font-size: 13px;" id="productStock-@product.ProductId" name="Stock" value="@product.Stock" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="productCategory-@product.ProductId" style="font-size: 14px;">Category:</label>
+                                            <select class="form-control no-outline" style="font-size: 13px;" id="productCategory-@product.ProductId" name="Category" required>
+                                                @foreach (var category in Model.categories)
+                                                {
+                                                    if (category == product.Category)
+                                                    {
+                                                        <option value="@category" selected>@category</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@category">@category</option>
+                                                    }
+       }
+                                            </select>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label for="productImages-@product.ProductId" style="font-size: 14px;">Product Images:</label>
+
+                                            <div id="existing-images-@product.ProductId" class="mb-2">
+                                                @foreach (var image in product.Images)
+                                                {
+                                                    <div class="image-item position-relative" style="display: inline-block; margin-right: 10px;">
+                                                        <img src="@Url.Content("~/images/" + product.Category + "/" + image)" alt="Product Image" class="img-thumbnail" style="width: AUTO; height: 70px;">
+                                                        <button type="button" class="btn btn-sm btn-danger remove-image" data-image="@image" data-product-id="@product.ProductId" data-category="@product.Category" style="position: absolute; top: 5px; right: 5px;">
+                                                            <i class="las la-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <div id="new-images-preview-@product.ProductId" class="mb-2"></div>
+
+                                            @if (product.Images.Count < 4)
+                                            {
+                                                <input type="file" class="form-control no-outline" style="font-size: 13px;" id="productImages-@product.ProductId" name="Images" multiple onchange="checkImageCount(this, @product.ProductId)">
+                                            }
+                                            else
+                                            {
+                                                <p>Maximum of 4 images can be uploaded.</p>
+                                            }
+                                        </div>
+
+
+
+
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="d-flex align-items-center">
+                                                <label class="form-check-label" style="font-size: 14px;">Active:</label>
+                                                <input type="checkbox" class="form-check-input ml-2" name="isAvailable" value="true" @(product.isAvailable == "true" ? "checked" : "")>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-smaller">Update Product</button>
+                                        </div>
+
+
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
                 }
             }
         </tbody>
@@ -394,6 +511,8 @@
                                 }
                             </select>
                         </div>
+
+
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center">
                                 <label class="form-check-label" style="font-size:14px;" for="availabilityToggle">Status (Active):</label>
@@ -513,10 +632,9 @@
 
 <script>
 
-
-    const maxImages = 4;
-
     $(document).ready(function () {
+        var maxImages = 5; // Adjust the maximum number of images allowed
+
         // File input change event
         $('#productImages').on('change', function () {
             const files = $(this)[0].files;
@@ -534,13 +652,13 @@
                         // Render thumbnail
                         const imageSrc = e.target.result;
                         const imageElement = `
-                                <div class="image-item position-relative" style="display:inline-block;">
-                                        <img src="${imageSrc}" alt="Preview Image" style=" display: block; ">
-                                            <button type="button" class="btn btn-sm btn-danger remove-image position-absolute" style="border-radius: 100%;  bottom:0px; right:0px; border:none; cursor:pointer; width:30px; height:30px;">
-                                               <i class="las la-trash"></i>
-                                        </button>
-                                </div>
-                            `;
+                            <div class="image-item position-relative" style="display:inline-block;">
+                                <img src="${imageSrc}" alt="Preview Image" style=" display: block; ">
+                                <button type="button" class="btn btn-sm btn-danger remove-image position-absolute" style="border-radius: 100%;  bottom:0px; right:0px; border:none; cursor:pointer; width:30px; height:30px;">
+                                    <i class="las la-trash"></i>
+                                </button>
+                            </div>
+                        `;
                         $('#image-preview-container').append(imageElement);
 
                         // Remove image event
@@ -554,7 +672,121 @@
                 reader.readAsDataURL(files[i]);
             }
         });
+
+
+
+        // Modal show event
+        $('#imageModal').on('show.bs.modal', function (event) {
+            var link = $(event.relatedTarget); // Link that triggered the modal
+            var productName = link.data('product-name'); // Extract info from data-* attributes
+            var productImages = link.data('product-images').split(','); // Split images into an array
+            var productCategory = link.data('product-category'); // Extract category
+
+            var modal = $(this);
+            modal.find('.modal-title').text(productName);
+
+            var carouselInner = modal.find('.carousel-inner');
+            carouselInner.empty(); // Clear existing images
+
+            // Add new images to the carousel
+            productImages.forEach(function (image, index) {
+                var activeClass = index === 0 ? 'active' : '';
+                var itemHtml = `
+                    <div class="carousel-item ${activeClass}">
+                        <img src="/images/${productCategory}/${image}" alt="${productName}" class="d-block w-100 img-fluid img-thumbnail" style="object-fit: contain; max-height: 450px;">
+                    </div>
+                `;
+                carouselInner.append(itemHtml);
+
+            });
+        });
+
+
+ 
+
     });
+
+
+    function checkImageCount(input, productId) {
+        var existingImagesCount = document.querySelectorAll('#existing-images-' + productId + ' .image-item').length;
+        var newImagesCount = input.files.length;
+
+        if (existingImagesCount + newImagesCount > 4) {
+            alert('Maximum of 4 images can be uploaded.');
+            input.value = ""; // Clear the input field
+            document.getElementById('new-images-preview-' + productId).innerHTML = ""; // Clear the preview
+        } else {
+            // Show previews of new images
+            var previewContainer = document.getElementById('new-images-preview-' + productId);
+            previewContainer.innerHTML = ""; // Clear previous previews
+
+            Array.from(input.files).forEach(file => {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'img-thumbnail';
+                    img.style.width = 'AUTO';
+                    img.style.height = '70px';
+                    img.style.marginRight = '10px';
+                    previewContainer.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".remove-image").forEach(function (button) {
+            button.addEventListener("click", function () {
+                var imageName = button.getAttribute("data-image");
+                var productId = button.getAttribute("data-product-id");
+                var category = button.getAttribute("data-category");
+
+                fetch('/Seller/RemoveProductImage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': '@Html.AntiForgeryToken()'
+                    },
+                    body: JSON.stringify({ productId: productId, imageName: imageName, category: category })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the image div from the DOM
+                            button.closest('.image-item').remove();
+
+                            // Check if the file input should be re-enabled
+                            var existingImagesCount = document.querySelectorAll('#existing-images-' + productId + ' .image-item').length;
+                            if (existingImagesCount < 4) {
+                                var fileInput = document.getElementById('productImages-' + productId);
+                                fileInput.style.display = 'block'; // Show the file input
+                            }
+                        } else {
+                            alert('Failed to remove image.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred.');
+                    });
+            });
+        });
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+   
 
     /* Desciption modalı */
     function showFullDescription(description) {
@@ -643,5 +875,15 @@
             isAvailableInput.value = "unavailable";
         }
     });
+
+
+
+
+
+
+    $('#imageModal').on('shown.bs.modal', function () {
+    $('#carouselImages').carousel();
+});
+
 </script>
 

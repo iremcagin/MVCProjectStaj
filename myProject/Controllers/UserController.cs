@@ -14,7 +14,15 @@ namespace myProject.Controllers
     [Authorize(Policy = "UserPolicy")]
     public class UserController : Controller
     {
-        private readonly _UserDatabaseControlModel userDatabaseControlModel = new _UserDatabaseControlModel();
+        private readonly _UserDatabaseControlModel userDatabaseControlModel;
+
+
+
+        public UserController(_UserDatabaseControlModel userDatabaseControlModel_)
+        {
+            userDatabaseControlModel = userDatabaseControlModel_;
+        }
+
 
 
         public IActionResult Index()

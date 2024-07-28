@@ -6,19 +6,29 @@ namespace myProject.Models
 {
     public class _LoginDatabaseControlModel
     {
+      
+        private string _connectionString;
 
-        private string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\iremc\OneDrive\Documents\myProjectDatabase.mdf;Integrated Security=True;Connect Timeout=30";
+        public void Dispose(string _connectionString)
+        {
+            SqlConnection connection = new SqlConnection(_connectionString);
+            connection.Dispose();
+        }
 
+        public _LoginDatabaseControlModel(string connectionString)
+        {
+            _connectionString = connectionString;
 
-        public _LoginDatabaseControlModel() { }
+        }
+
 
 
         /* ------------------------------------- USER SIGN UP ------------------------------------- */
         public void UserSignUp(UserModel model)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 // Calculate age from Birthdate
                 int age = CalculateAge(model.Birthdate);
@@ -36,7 +46,7 @@ namespace myProject.Models
                 VALUES 
                 (@Age, @Name, @Surname, @PasswordHash, @Email, @PhoneNumber, @Address, @Role, @Birthdate ,@CreatedAt)";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Age", model.Age);
                     cmd.Parameters.AddWithValue("@Name", model.Name);
@@ -79,15 +89,15 @@ namespace myProject.Models
 
 
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 string query = @"
                 SELECT * FROM Users 
                 WHERE Email = @Email";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Email", model.Email);
 
@@ -126,9 +136,9 @@ namespace myProject.Models
         /* ------------------------------------- COMPANY SIGN UP ------------------------------------- */
         public void CompanySignUp(ModelForAdminPages model)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 // Calculate age from Birthdate
                 int age = CalculateAge(model.User.Birthdate);
@@ -148,7 +158,7 @@ namespace myProject.Models
 
                 int userId;
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Age", model.User.Age);
                     cmd.Parameters.AddWithValue("@Name", model.User.Name);
@@ -172,7 +182,7 @@ namespace myProject.Models
                 VALUES 
                 (@UserId, @CompanyName, @Description, @Address, @PhoneNumber, @Email, @isAccountActivated, @LogoUrl, @BannerUrl, @TaxIDNumber, @IBAN, @IsHighlighted, @CreatedAt, @Rating)";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@UserId", userId);
                     cmd.Parameters.AddWithValue("@CompanyName", model.Company.CompanyName);
@@ -201,13 +211,13 @@ namespace myProject.Models
         /* ------------------------------------- COMPANY LOGIN ------------------------------------- */
         public bool CheckIfAccountActivated(int UserId)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+           using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 string query = "SELECT IsAccountActivated FROM Companies WHERE UserId = @UserId";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@UserId", UserId);
 
