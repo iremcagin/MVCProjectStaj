@@ -203,20 +203,45 @@ namespace myProject.Controllers
 
 
         [HttpPost]
-        public IActionResult RemoveProductImage(int productId, string imageName, string category)
+        public IActionResult RemoveProductImage([FromBody] RemoveImageModel model)
         {
-
-            // Resmi listeden kaldırın
-            var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", category, "/",imageName);
-            if (System.IO.File.Exists(imagePath))
+            try
             {
-                System.IO.File.Delete(imagePath);
+                if (model == null || string.IsNullOrEmpty(model.ImageName) || string.IsNullOrEmpty(model.Category))
+                {
+                    return Json(new { success = false, message = "Invalid data." });
+                }
+
+                Console.WriteLine("Received request to remove image. ProductId: " + model.ProductId + ", ImageName: " + model.ImageName + ", Category: " + model.Category);
+
+                // Resmi listeden kaldırın
+                var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", model.Category, model.ImageName);
+                Console.WriteLine($"Attempting to delete image at path: {imagePath}");
+
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                    Console.WriteLine("Image deleted successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("Image not found.");
+                    return Json(new { success = false, message = "Image not found." });
+                }
+
+                databaseControlModel.RemoveProductImage(model.ProductId, model.ImageName);
+                Console.WriteLine("Image removed from database.");
+
+                return Json(new { success = true });
             }
-
-            databaseControlModel.RemoveProductImage(productId, imageName);
-
-            return Json(new { success = true });
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error occurred: {ex.Message}");
+                return Json(new { success = false, message = ex.Message });
+            }
         }
+
+
 
 
 
@@ -343,5 +368,13 @@ namespace myProject.Controllers
 
 
 
+    }
+
+
+    public class RemoveImageModel
+    {
+        public int ProductId { get; set; }
+        public string ImageName { get; set; }
+        public string Category { get; set; }
     }
 }
