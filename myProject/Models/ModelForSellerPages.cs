@@ -9,17 +9,17 @@
 
 
         // Dashboard için
-        public int TotalProducts { get; set; }
-        public int TotalReviews { get; set; }
-        public int TotalUsers { get; set; }
+        public int TotalProducts { get; set; } = 0;
+        public int TotalReviews { get; set; } = 0;
+        public int TotalUsers { get; set; } = 0;
         public ProductModel mostLikedProduct { get; set; } = new ProductModel();
         public ProductModel mostReviewedProduct { get; set; } = new ProductModel();
         public ProductModel mostPurchasedProduct { get; set; } = new ProductModel();
         public ProductModel mostClickedProduct { get; set; } = new ProductModel();
 
-        public int TotalSalesCount { get; set; }
-        public decimal TotalRevenue { get; set; }
-        public decimal AverageRating { get; set; }
+        public int TotalSalesCount { get; set; } = 0;
+        public decimal TotalRevenue { get; set; } = 0;
+        public decimal AverageRating { get; set; } = 0;
 
 
         public List<DailySalesModel> DailySales = new List<DailySalesModel>();

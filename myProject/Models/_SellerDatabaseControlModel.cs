@@ -35,12 +35,14 @@ namespace myProject.Models
 
                 int companyId = GetCompanyId(userId);
 
+
                 // Toplam ürün sayısı
                 string query = "SELECT COUNT(*) FROM Products WHERE CompanyId=@CompanyId";
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@CompanyId", companyId);
-                    modelForSellerPages.TotalProducts = (int)cmd.ExecuteScalar();
+                    var result = cmd.ExecuteScalar();
+                    modelForSellerPages.TotalProducts = result != DBNull.Value && result != null ? Convert.ToInt32(result) : 0;
                 }
 
                 // Toplam yorum sayısı
@@ -48,7 +50,8 @@ namespace myProject.Models
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@CompanyId", companyId);
-                    modelForSellerPages.TotalReviews = (int)cmd.ExecuteScalar();
+                    var result = cmd.ExecuteScalar();
+                    modelForSellerPages.TotalReviews = result != DBNull.Value && result != null ? Convert.ToInt32(result) : 0;
                 }
 
                 // Toplam müşteri sayısı
@@ -56,8 +59,10 @@ namespace myProject.Models
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@CompanyId", companyId);
-                    modelForSellerPages.TotalUsers = (int)cmd.ExecuteScalar();
+                    var result = cmd.ExecuteScalar();
+                    modelForSellerPages.TotalUsers = result != DBNull.Value && result != null ? Convert.ToInt32(result) : 0;
                 }
+
 
 
                 // Ortalama değerlendirme
@@ -68,8 +73,18 @@ namespace myProject.Models
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@CompanyId", companyId);
-                    modelForSellerPages.AverageRating = Convert.ToDecimal(cmd.ExecuteScalar());
+                    var result = cmd.ExecuteScalar();
+                    if (result != DBNull.Value && result != null)
+                    {
+                        modelForSellerPages.AverageRating = Convert.ToDecimal(result);
+                    }
+                    else
+                    {
+                        modelForSellerPages.AverageRating = 0; // Varsayılan değer
+                    }
                 }
+
+
 
                 // En çok yorum alan ürün
                 query = @"
@@ -410,8 +425,11 @@ namespace myProject.Models
                     {
                         if (reader.Read())
                         {
-                            modelForSellerPages.TotalSalesCount = reader.GetInt32(reader.GetOrdinal("TotalSalesCount"));
-                            modelForSellerPages.TotalRevenue = reader.GetDecimal(reader.GetOrdinal("TotalRevenue"));
+                            int totalSalesCountOrdinal = reader.GetOrdinal("TotalSalesCount");
+                            int totalRevenueOrdinal = reader.GetOrdinal("TotalRevenue");
+
+                            modelForSellerPages.TotalSalesCount = !reader.IsDBNull(totalSalesCountOrdinal) ? reader.GetInt32(totalSalesCountOrdinal) : 0;
+                            modelForSellerPages.TotalRevenue = !reader.IsDBNull(totalRevenueOrdinal) ? reader.GetDecimal(totalRevenueOrdinal) : 0m;
                         }
                     }
                 }

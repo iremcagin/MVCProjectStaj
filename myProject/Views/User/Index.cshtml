@@ -35,7 +35,7 @@
 <h3 class="mb-4 col-md-12" style="border-bottom: 1px solid black; font-size: 20px;">Top 5 Most Viewed Products</h3>
 
 <div id="mostViewedCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
+    <div class="carousel-inner" style="border:1px solid #ece9e6; border-radius:7px;">
         @if (Model.mostClickedProducts != null && Model.mostClickedProducts.Any())
         {
             @foreach (var product in Model.mostClickedProducts)
