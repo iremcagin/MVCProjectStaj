@@ -18,7 +18,7 @@
         <!-- Company Details -->
         <div class="company-details mt-3">
             <h2>@Model.companyDetails.CompanyName</h2>
-            <p>@Model.companyDetails.Description</p>
+            <p style="">@Model.companyDetails.Description</p>
             <p><strong>Address:</strong> @Model.companyDetails.Address</p>
             <p><strong>Phone:</strong> @Model.companyDetails.PhoneNumber</p>
             <div class="d-flex justify-content-between">
@@ -114,7 +114,17 @@
                     }
                     <div class="card-body d-flex flex-column justify-content">
                         <div class="d-flex flex-column" style="font-size:15px;">
-                            <h5 class="card-title"><span style="font-size:15px; font-weight:600;"> @product.Name </span><span style="font-size:14px; color:grey;">@product.Description</span></h5>
+                            <h5 class="card-title">
+                                <span style="font-size:15px; font-weight:600;"> @product.Name </span><span style="font-size:14px; color:grey;  font-size: 14px;
+                                                    color: grey;
+                                                    max-height: 5.5em;
+                                                    overflow: hidden;
+                                                    text-overflow: ellipsis;
+                                                    line-height: 1.1em; /* Adjust according to your line height */
+                                                    -webkit-line-clamp: 5; /* For WebKit browsers */
+                                                    -webkit-box-orient: vertical; /* For WebKit browsers */
+                                                    display: -webkit-box; /* For WebKit browsers */">@product.Description</span>
+                            </h5>
 
                             <div class="d-flex">
                                 <p style="margin-right:5px;  font-size:14px; margin-top:2px;">@product.Rating</p>

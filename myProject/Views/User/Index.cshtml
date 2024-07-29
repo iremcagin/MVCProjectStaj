@@ -287,7 +287,7 @@
                                 </div>
 
                                 <div class="col-md-3  d-flex flex-column justify-content-end">
-                                    <h6 style="font-size: 14px; margin-bottom:-2px;" class="d-flex align-items-center"><i class="las la-heart me-1" style=""></i> product.Favorite</h6>
+                                    <h6 style="font-size: 14px; margin-bottom:-2px;" class="d-flex align-items-center"><i class="las la-heart me-1" style=""></i> @product.Favorite</h6>
                                     <h6 style="font-size: 14px;  margin-bottom:-1px;" class="d-flex align-items-center"><i class="las la-eye me-1 no-outline"></i> @product.Clicked</h6>
                                 </div>
                             </div>
@@ -309,7 +309,7 @@
         <!-- Product Reviews Content -->
         <div class="container-fluid ">
             <div class="row">
-                @for (int i = 0; i < Model.randomlySelectedReviewModel.Count; i++)
+                @for (int i = 0; i < Math.Min(Model.randomlySelectedReviewModel.Count, Model.randomlySelectedProductModel.Count); i++)
                 {
                     var review = Model.randomlySelectedReviewModel[i];
                     var product = Model.randomlySelectedProductModel[i];

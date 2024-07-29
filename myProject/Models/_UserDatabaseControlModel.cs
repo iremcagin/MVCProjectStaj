@@ -284,7 +284,7 @@ namespace myProject.Models
                     // GetRandomComments
                    List<ProductReviewModel> productReviews = new List<ProductReviewModel>();
 
-                   query = "SELECT Id, ProductId, CompanyId, UserId, Rating, Review, CreatedAt FROM Reviews\r\n";
+                   query = "SELECT r.Id, r.ProductId, r.CompanyId, r.UserId, r.Rating, r.Review, r.CreatedAt FROM Reviews AS r JOIN Products AS p ON p.ProductId = r.ProductId WHERE p.isAvailable = 'true' \r\n";
                     using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
