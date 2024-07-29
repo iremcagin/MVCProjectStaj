@@ -90,15 +90,7 @@
                     <td class="open-modal">@item.isHighlighed</td>
                     <td class="open-modal">@item.CreatedAt</td>
                     <td class="open-modal">@item.Rating</td>
-                    <td>
-                        <!-- Activation Button with Form -->
-                        <form id="activateForm-@item.CompanyId" asp-controller="Admin" asp-action="ActivateAccountSubmit" method="post">
-                            <input type="hidden" name="companyId" value="@item.CompanyId" />
-                            <button type="button" class="btn btn-outline-success btn-sm activate-btn  no-outline" data-company-id="@item.CompanyId">
-                                Activate
-                            </button>
-                        </form>
-                    </td>
+                    
                 </tr>
                 i++;
             }

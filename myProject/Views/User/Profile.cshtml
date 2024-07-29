@@ -268,7 +268,15 @@
                             </div>
                             <div class="card-body">
                                 <h5 class="card-title">@product.Name</h5>
-                                <p class="card-text">@product.Description</p>
+                                <p class="card-text" style=" font-size: 14px;
+                                                    color: grey;
+                                                    max-height: 5.5em;
+                                                    overflow: hidden;
+                                                    text-overflow: ellipsis;
+                                                    line-height: 1.1em; /* Adjust according to your line height */
+                                                    -webkit-line-clamp: 5; /* For WebKit browsers */
+                                                    -webkit-box-orient: vertical; /* For WebKit browsers */
+                                                    display: -webkit-box;">@product.Description</p>
                                 <p class="card-text"><strong>Price:</strong> @product.Price.ToString("C")</p>
                                 <p class="card-text"><small class="text-muted">Bought At: @product.CreatedAt.ToShortDateString()</small></p>
                             </div>

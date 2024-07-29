@@ -1446,7 +1446,7 @@ namespace myProject.Models
                     WHERE UserId = @userId
                     ORDER BY CreatedAt DESC";
 
-                List<(int CompanyId, DateTime CreatedAt)> followedCompanies = new List<(int, DateTime)>();
+                List<int> followedCompanies = new List<int>();
 
                 using (SqlCommand cmd = new SqlCommand(followedCompaniesQuery, connection))
                 {
@@ -1457,15 +1457,12 @@ namespace myProject.Models
                         while (reader.Read())
                         {
                             followedCompanies.Add((
-                                CompanyId: reader.GetInt32(reader.GetOrdinal("CompanyId")),
-                                CreatedAt: reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+                               reader.GetInt32(reader.GetOrdinal("CompanyId"))
                             ));
                         }
                     }
                 }
 
-                // Prepare the list of Company IDs for the query
-                var companyIds = followedCompanies.Select(c => c.CompanyId).ToList();
 
                 for (int i = 0; i < followedCompanies.Count; ++i)
                 {
@@ -1476,10 +1473,9 @@ namespace myProject.Models
 
                     using (SqlCommand cmd = new SqlCommand(companyDetailsQuery, connection))
                     {
-                        cmd.Parameters.AddWithValue("@companyId", followedCompanies[i].CompanyId);
+                        cmd.Parameters.AddWithValue("@companyId", followedCompanies[i]);
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            user.followedCompanies = new List<CompanyModel>();
 
                             while (reader.Read())
                             {
@@ -1779,6 +1775,7 @@ namespace myProject.Models
                                     Rating = Convert.ToSingle(reader["Rating"]),  // Float tipi için Convert.ToSingle
                                     Favorite = (int)reader["Favorite"],
                                     isAvailable = reader["isAvailable"].ToString(),
+                                    Clicked = (int)reader["Clicked"],
                                     Images = new List<string>()
                                 };
                                 products.Add(product);
