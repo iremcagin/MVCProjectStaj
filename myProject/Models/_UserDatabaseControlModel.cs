@@ -178,12 +178,13 @@ namespace myProject.Models
                     }
 
 
-                    for(int i=0; i< modelForUserPages.mostClickedProducts.Count; ++i) { 
+                    for(int i=0; i< modelForUserPages.mostClickedProducts.Count; ++i) {
                         // Then, retrieve company details based on CompanyId
                         string companyQuery = @"
                         SELECT *
                         FROM Companies
                         WHERE Id = @companyId";
+
 
                         using (SqlCommand cmd = new SqlCommand(companyQuery, connection))
                         {
@@ -642,7 +643,7 @@ namespace myProject.Models
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            if (reader.Read())
+                            while (reader.Read())
                             {
                                 modelForUserPages.recommendatitons.Add(new ProductModel
                                 {
@@ -1698,7 +1699,7 @@ namespace myProject.Models
                     // Then, retrieve company details based on CompanyId
                     string companyQuery = @"
                     SELECT *
-                    FROM Companies
+                    FROM Companies  Where isAccountActivated = 1
                    ";
 
                     using (SqlCommand cmd = new SqlCommand(companyQuery, connection))

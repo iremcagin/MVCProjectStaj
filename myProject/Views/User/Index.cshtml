@@ -187,7 +187,7 @@
 
 
 <!-- Sliding Divs -->
-<div class="side-panel-container" style="margin-top: 200px; height:1000px;">
+<div class="side-panel-container" style="margin-top: 150px; height:900px;">
     <!-- Left Panel -->
     <div class="side-panel left-panel d-flex flex-column col-md-8">
         <h5 style="border-bottom:1px solid black">Latest Products</h5>
@@ -287,7 +287,7 @@
                                 </div>
 
                                 <div class="col-md-3  d-flex flex-column justify-content-end">
-                                    <!--h6 style="font-size: 14px; margin-bottom:-2px;" class="d-flex align-items-center"><i class="las la-heart me-1" style=""></i> @product.Favorite</!--h6-->
+                                    <h6 style="font-size: 14px; margin-bottom:-2px;" class="d-flex align-items-center"><i class="las la-heart me-1" style=""></i> product.Favorite</h6>
                                     <h6 style="font-size: 14px;  margin-bottom:-1px;" class="d-flex align-items-center"><i class="las la-eye me-1 no-outline"></i> @product.Clicked</h6>
                                 </div>
                             </div>
@@ -317,12 +317,12 @@
                         <div class="card mb-4 shadow-sm">
                             <div class="card-header d-flex justify-content-between">
                                 <p class="my-0 font-weight-normal" style="font-size:17px;"><strong>@product.Name</strong></p>
-                                <p class="card-text" style="font-size:17px;">
+                                <!--p class="card-text" style="font-size:17px;">
                                     <strong>
-                                        $@product.Price
+                                        $product.Price
                                     </strong>
 
-                                </p>
+                                </!--p-->
                             </div>
                             <div class="card-body">
                                 <div id="carouselExampleIndicators@i" class="carousel slide" data-ride="carousel">
@@ -346,7 +346,6 @@
                                         <span class="sr-only">Next</span>
                                     </a>
                                 </div>
-                                <p class="card-text review-text">@product.Description</p>
                                 <p class="card-text">
                                     <strong>Rating:</strong> @if (@product.Rating >= 0 && @product.Rating <= 5)
                                     {

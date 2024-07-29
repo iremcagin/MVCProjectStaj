@@ -323,11 +323,11 @@
         <h4 style="border-bottom:1px solid black;">Recommended Products</h4>
         <div id="recommendationsCarousel" class="carousel slide" data-bs-ride="carousel"  style="margin-top:50px;">
             <div class="carousel-inner">
-                @for (int i = 0; i < Model.recommendatitons.Count; i += 3) // Show 3 products per slide
+                @for (int i = 0; i < Model.recommendatitons.Count; i += 6) // Show 3 products per slide
                 {
                     <div class="carousel-item @(i == 0 ? "active" : "")">
                         <div class="d-flex">
-                            @for (int j = i; j < i + 3 && j < Model.recommendatitons.Count; j++)
+                            @for (int j = i; j < i + 6 && j < Model.recommendatitons.Count; j++)
                             {
                                 var imageUrl = Model.recommendatitons[j].Images.Any()
                                 ? Url.Content($"~/images/" + @Model.recommendatitons[j].Category + "/" + Model.recommendatitons[j].Images[0])
@@ -360,7 +360,20 @@
 
                                     <div class="card-body d-flex flex-column justify-content">
                                         <div class="d-flex flex-column" style="font-size:15px;">
-                                            <h5 class="card-title"><span style="font-size:15px; font-weight:600;"> @Model.recommendatitons[j].Name </span><span style="font-size:14px; color:grey;">@Model.recommendatitons[j].Description</span></h5>
+                                            <h5 class="card-title">
+                                                <span style="font-size:15px; font-weight:600;"> @Model.recommendatitons[j].Name </span><span style="
+
+                                                    font-size: 14px;
+                                                    color: grey;
+                                                    max-height: 5.5em;
+                                                    overflow: hidden;
+                                                    text-overflow: ellipsis;
+                                                    line-height: 1.1em; /* Adjust according to your line height */
+                                                    -webkit-line-clamp: 5; /* For WebKit browsers */
+                                                    -webkit-box-orient: vertical; /* For WebKit browsers */
+                                                    display: -webkit-box; /* For WebKit browsers */
+                                                                ">@Model.recommendatitons[j].Description</span>
+                                            </h5>
 
                                             <div class="d-flex">
                                                 <p style="margin-right:5px;  font-size:14px; margin-top:2px;">@Model.recommendatitons[j].Rating</p>
@@ -397,12 +410,12 @@
                     </div>
                 }
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#recommendationsCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <button class="carousel-control-prev" type="button" data-bs-target="#recommendationsCarousel" data-bs-slide="prev" style="border: none; color: white; left: -180px; position: absolute;">
+                <span style="background-color:black;" class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Previous</span>
             </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#recommendationsCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <button class="carousel-control-next" type="button" data-bs-target="#recommendationsCarousel" data-bs-slide="next" style="border: none; color: white; right: -180px; position: absolute;">
+                <span style="background-color:black;" class="carousel-control-next-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Next</span>
             </button>
         </div>

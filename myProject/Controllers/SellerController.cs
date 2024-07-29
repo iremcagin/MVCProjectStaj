@@ -93,6 +93,7 @@ namespace myProject.Controllers
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
             ViewBag.CurrentPage = page;
 
+            modelForSellerPages.products = pagedProducts;
             return View(modelForSellerPages);
         }
 
@@ -274,6 +275,7 @@ namespace myProject.Controllers
             }
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
             ViewBag.CurrentPage = page;
+            modelForSellerPages.orders = pagedProducts;
 
             var companyInfo = databaseControlModel.GetCompanyInfo(userId);
             if (companyInfo == null)
@@ -307,7 +309,7 @@ namespace myProject.Controllers
             }
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
             ViewBag.CurrentPage = page;
-
+            modelForSellerPages.customers = pagedProducts;
 
             var companyInfo = databaseControlModel.GetCompanyInfo(userId);
             if (companyInfo == null)
@@ -342,7 +344,7 @@ namespace myProject.Controllers
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
             ViewBag.CurrentPage = page;
 
-
+            modelForSellerPages.followers = pagedProducts;
             var companyInfo = databaseControlModel.GetCompanyInfo(userId);
             if (companyInfo == null)
             {
