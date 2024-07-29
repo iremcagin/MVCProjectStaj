@@ -1,6 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using myProject.Models;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
+
 
 namespace myProject.Controllers
 {
@@ -25,6 +30,8 @@ namespace myProject.Controllers
             modelForUserPages = userDatabaseControlModel.HomePageProducts();
 
             ModelForUserPages.companies = userDatabaseControlModel.GetAllCompanies();
+
+
 
             return View(modelForUserPages);
         }

@@ -392,7 +392,6 @@ namespace myProject.Models
         public ModelForUserPages ProductDetail(int productId)
         {
             ModelForUserPages modelForUserPages = new ModelForUserPages();
-            ProductDetailsModel productDetailsModel = modelForUserPages.productDetailsModel;
 
 
             try
@@ -426,19 +425,19 @@ namespace myProject.Models
 
                             if (reader.Read())
                             {
-                                productDetailsModel.Product = new ProductModel();
-                                productDetailsModel.Product.ProductId = reader.GetInt32(reader.GetOrdinal("ProductId"));
-                                productDetailsModel.Product.CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId"));
-                                productDetailsModel.Product.Name = reader.GetString(reader.GetOrdinal("Name"));
-                                productDetailsModel.Product.Description = reader.GetString(reader.GetOrdinal("Description"));
-                                productDetailsModel.Product.Price = reader.GetDecimal(reader.GetOrdinal("Price"));
-                                productDetailsModel.Product.Stock = reader.GetInt32(reader.GetOrdinal("Stock"));
-                                productDetailsModel.Product.CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"));
-                                productDetailsModel.Product.Category = reader.GetString(reader.GetOrdinal("Category"));
-                                productDetailsModel.Product.Rating = Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("Rating")));
-                                productDetailsModel.Product.Favorite = reader.GetInt32(reader.GetOrdinal("Favorite"));
-                                productDetailsModel.Product.Clicked = reader.GetInt32(reader.GetOrdinal("Clicked"));
-                                productDetailsModel.Product.isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"));
+                                modelForUserPages.productDetailsModel.Product = new ProductModel();
+                                modelForUserPages.productDetailsModel.Product.ProductId = reader.GetInt32(reader.GetOrdinal("ProductId"));
+                                modelForUserPages.productDetailsModel.Product.CompanyId = reader.GetInt32(reader.GetOrdinal("CompanyId"));
+                                modelForUserPages.productDetailsModel.Product.Name = reader.GetString(reader.GetOrdinal("Name"));
+                                modelForUserPages.productDetailsModel.Product.Description = reader.GetString(reader.GetOrdinal("Description"));
+                                modelForUserPages.productDetailsModel.Product.Price = reader.GetDecimal(reader.GetOrdinal("Price"));
+                                modelForUserPages.productDetailsModel.Product.Stock = reader.GetInt32(reader.GetOrdinal("Stock"));
+                                modelForUserPages.productDetailsModel.Product.CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"));
+                                modelForUserPages.productDetailsModel.Product.Category = reader.GetString(reader.GetOrdinal("Category"));
+                                modelForUserPages.productDetailsModel.Product.Rating = Convert.ToSingle(reader.GetDouble(reader.GetOrdinal("Rating")));
+                                modelForUserPages.productDetailsModel.Product.Favorite = reader.GetInt32(reader.GetOrdinal("Favorite"));
+                                modelForUserPages.productDetailsModel.Product.Clicked = reader.GetInt32(reader.GetOrdinal("Clicked"));
+                                modelForUserPages.productDetailsModel.Product.isAvailable = reader.GetString(reader.GetOrdinal("isAvailable"));
 
                             }
                         }
@@ -453,13 +452,13 @@ namespace myProject.Models
 
                     using (SqlCommand cmd = new SqlCommand(companyQuery, connection))
                     {
-                        cmd.Parameters.AddWithValue("@companyId", productDetailsModel.Product.CompanyId);
+                        cmd.Parameters.AddWithValue("@companyId", modelForUserPages.productDetailsModel.Product.CompanyId);
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
                             {
-                                productDetailsModel.Company = new CompanyModel
+                                modelForUserPages.productDetailsModel.Company = new CompanyModel
                                 {
                                     CompanyId = reader.GetInt32(reader.GetOrdinal("Id")),
                                     UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
@@ -483,7 +482,7 @@ namespace myProject.Models
                     }
 
 
-
+                    // satıcı bilgileri
                     string userQuery = @"
                     SELECT *
                     FROM Users
@@ -491,13 +490,13 @@ namespace myProject.Models
 
                     using (SqlCommand cmd = new SqlCommand(userQuery, connection))
                     {
-                        cmd.Parameters.AddWithValue("@userId", productDetailsModel.Company.UserId);
+                        cmd.Parameters.AddWithValue("@userId", modelForUserPages.productDetailsModel.Company.UserId);
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
                             {
-                                productDetailsModel.User = new UserModel
+                                modelForUserPages.productDetailsModel.User = new UserModel
                                 {
                                     UserId = reader.GetInt32(reader.GetOrdinal("Id")),
                                     Age = reader.GetInt32(reader.GetOrdinal("Age")),
@@ -530,13 +529,13 @@ namespace myProject.Models
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            productDetailsModel.ProductReviews = new List<ProductReviewModel>();
+                            modelForUserPages.productDetailsModel.ProductReviews = new List<ProductReviewModel>();
 
                             if (reader.HasRows)
                             {
                                 while (reader.Read())
                                 {
-                                    productDetailsModel.ProductReviews.Add(new ProductReviewModel
+                                    modelForUserPages.productDetailsModel.ProductReviews.Add(new ProductReviewModel
                                     {
                                         ReviewId = reader.GetInt32(reader.GetOrdinal("Id")),
                                         ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
@@ -557,7 +556,7 @@ namespace myProject.Models
 
 
                     // Yorum yapan kullanıcıların bilgilerini oku 
-                    for (int i = 0; i < productDetailsModel.ProductReviews.Count; i++)
+                    for (int i = 0; i < modelForUserPages.productDetailsModel.ProductReviews.Count; i++)
                     {
                         string reviewsUsersQuery = @"
                         SELECT *
@@ -566,7 +565,7 @@ namespace myProject.Models
 
                         using (SqlCommand cmd = new SqlCommand(reviewsUsersQuery, connection))
                         {
-                            cmd.Parameters.AddWithValue("@userId", productDetailsModel.ProductReviews[i].UserId);
+                            cmd.Parameters.AddWithValue("@userId", modelForUserPages.productDetailsModel.ProductReviews[i].UserId);
 
                             using (SqlDataReader reader = cmd.ExecuteReader())
                             {
@@ -574,7 +573,7 @@ namespace myProject.Models
                                 {
                                     while (reader.Read())
                                     {
-                                        productDetailsModel.ReviewedUsers.Add(new UserModel
+                                        modelForUserPages.productDetailsModel.ReviewedUsers.Add(new UserModel
                                         {
                                             UserId = reader.GetInt32(reader.GetOrdinal("Id")),
                                             Age = reader.GetInt32(reader.GetOrdinal("Age")),
@@ -592,7 +591,7 @@ namespace myProject.Models
                                 }
                                 else
                                 {
-                                    Console.WriteLine("No user found with Id: " + productDetailsModel.ProductReviews[i].UserId);
+                                    Console.WriteLine("No user found with Id: " + modelForUserPages.productDetailsModel.ProductReviews[i].UserId);
                                 }
                             }
                         }
@@ -612,14 +611,14 @@ namespace myProject.Models
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            productDetailsModel.ProductImages = new List<string>();
+                            modelForUserPages.productDetailsModel.ProductImages = new List<string>();
 
                             while (reader.Read())
                             {
                                 int imageUrlIndex = reader.GetOrdinal("ImageURL");
                                 string imageUrl = reader.GetString(imageUrlIndex);
 
-                                productDetailsModel.ProductImages.Add(imageUrl);
+                                modelForUserPages.productDetailsModel.ProductImages.Add(imageUrl);
                             }
                         }
                     }
@@ -627,7 +626,7 @@ namespace myProject.Models
 
 
 
-
+                    // ürün önerme 
                     query = @"
                         SELECT *
                         FROM Products
@@ -637,8 +636,8 @@ namespace myProject.Models
 
                     using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
-                        cmd.Parameters.AddWithValue("@category", productDetailsModel.Product.Category);
-                        cmd.Parameters.AddWithValue("@excludedProductId", productDetailsModel.Product.ProductId);
+                        cmd.Parameters.AddWithValue("@category", modelForUserPages.productDetailsModel.Product.Category);
+                        cmd.Parameters.AddWithValue("@excludedProductId", modelForUserPages.productDetailsModel.Product.ProductId);
 
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -680,8 +679,6 @@ namespace myProject.Models
 
                             using (SqlDataReader reader = cmd.ExecuteReader())
                             {
-                                productDetailsModel.ProductImages = new List<string>();
-
                                 while (reader.Read())
                                 {
                                     int imageUrlIndex = reader.GetOrdinal("ImageURL");
@@ -692,10 +689,6 @@ namespace myProject.Models
                             }
                         }
                     }
-
-
-
-
                 }
             }
             catch (Exception ex)

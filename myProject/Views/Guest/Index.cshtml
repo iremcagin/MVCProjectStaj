@@ -126,7 +126,7 @@
                 {
                     <div class="col-md-3 mb-4">
                         <div class="card h-100 position-relative">
-                            <a href="@Url.Action("CompanyDetails", "User", new { id = company.CompanyId })">
+                            <a href="@Url.Action("CompanyDetails", "Guest", new { id = company.CompanyId })">
                                 <img class="card-img-top" src="@Url.Content(string.IsNullOrEmpty(company.BannerUrl) ? "~/images/placeholder-1.png" : "~/images/_Banners/" + company.BannerUrl)" alt="Banner">
                                 <img class="logo-img position-absolute" src="@Url.Content(string.IsNullOrEmpty(company.LogoUrl) ? "~/images/placeholder-1.png" : "~/images/_Logos/" + company.LogoUrl)" alt="Logo">
                             </a>
